@@ -53,15 +53,18 @@ RootPolynomial<T> CoefficientPolynomial<T>::roots() const
     // Companion matrix is a square m x m matrix, where m = polynomial order
     int size = coefficients_.rows() - 1;
 
-    // Zero-order polynomial has no roots
+    // Each coefficient is divided by this factor to make it a monic polynomial
+    T factor = coefficients_(0);
+
+    // Zero-order polynomial has no roots, but it still has a factor equal to
+    // the largest coefficient
     if (size == 0)
-        return RootPolynomial<T>();
+        return RootPolynomial<T>(typename Type<T>::ComplexVector(), factor);
 
     if (companionMatrix_.rows() != coefficients_.rows())
         companionMatrix_ = CompanionMatrixType::Zero(size, size);
 
     // Has to be a monic polynomial (this is also why we pass by value instead of by const reference)
-    T factor = coefficients_(0);
     typename Type<T>::RealVector monicCoeffs = coefficients_ / factor;
 
     for (int row = 1; row < size; ++row)

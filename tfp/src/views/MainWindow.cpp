@@ -22,29 +22,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     CoefficientPolynomial<double> numerator(1);
     CoefficientPolynomial<double> denominator(3);
-    numerator(0) = 1;
-    denominator(0) = 1;
-    denominator(1) = 0.5;
-    denominator(2) = 1;
+    numerator(0) = 10;
+    denominator(0) = 2;
+    denominator(1) = 1;
+    denominator(2) = 2;
     TransferFunction<double> T(numerator, denominator);
 
-    Type<double>::ComplexArray t = T.frequencyResponse(0.01, 100, 100);
-    Type<double>::RealArray impulse = T.impulseResponse(0, 50, 100);
     Type<double>::RealArray step = T.stepResponse(0, 50, 100);
-
-    std::cout << "[" << std::abs(t(0));
-    for (int i = 1; i < t.size(); ++i)
-        std::cout << ", " << std::abs(t(i));
-    std::cout << "];" << std::endl;
-    std::cout << "[" << std::arg(t(0));
-    for (int i = 1; i < t.size(); ++i)
-        std::cout << ", " << std::arg(t(i));
-    std::cout << "];" << std::endl;
-
-    std::cout << "[" << std::arg(impulse(0));
-    for (int i = 1; i < impulse.size(); ++i)
-        std::cout << ", " << impulse(i);
-    std::cout << "];" << std::endl;
 
     std::cout << "[" << std::arg(step(0));
     for (int i = 1; i < step.size(); ++i)

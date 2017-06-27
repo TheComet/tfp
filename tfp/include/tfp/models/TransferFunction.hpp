@@ -41,6 +41,8 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
 {
     PFEResultData result;
 
+    std::cout << "factors: " << numerator_.factor_ << "," << denominator_.factor_ << std::endl;
+
     // Create poles vector. Add as many zero poles as specified
     result.poles_.resize(denominator_.roots_.size() + numZeroPoles, 1);
     for (int i = 0; i < denominator_.roots_.size(); ++i)
@@ -78,7 +80,7 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
         std::cout << "pvB: " << pvB << std::endl;
         std::cout << "pvA: " << pvB << std::endl;
         std::complex<T> pvD = pvB / pvA;
-        result.residuals_(m) = pvD / denominator_.factor_ * numerator_.factor_;
+        result.residuals_(m) = pvD / denominator_.factor_;
     }
 
     std::cout << "poles:\n" << result.poles_ << std::endl;
