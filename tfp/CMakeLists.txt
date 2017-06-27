@@ -1,0 +1,162 @@
+###############################################################################
+# compiler flags
+###############################################################################
+
+if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+    add_definitions (-W -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-unused-local-typedefs -Wno-long-long -Wno-variadic-macros -Wno-missing-field-initializers -Wno-write-strings)
+elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+    add_definitions (-W -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-unused-local-typedefs -Wno-long-long -Wno-variadic-macros -Wno-missing-field-initializers -Wno-write-strings)
+elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
+elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+endif ()
+
+###############################################################################
+# config
+###############################################################################
+
+# Required by export.hpp.in
+set (LIBRARY_NAME "TFP")
+set (BUILD_TYPE "STATIC")
+
+configure_file (${TEMPLATE_EXPORT_H} "include/tfp/export.hpp")
+configure_file ("include/tfp/config.hpp.in" "include/tfp/config.hpp")
+
+###############################################################################
+# source files and library definition
+###############################################################################
+
+set (tfp_HEADERS_MOC
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/AutoScaler.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/DeltaPlotPicker.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Panner.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/RectangleZoomer.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/UnitTracker.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Zoomer.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
+
+set (tfp_SOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/Util.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/Math.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/Metric.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/String.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/MousePlotPickerMachine.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/Panner.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp")
+set (tfp_FORMS
+        "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
+set (tfp_RESOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/res/res.qrc")
+
+set (tfp_TRANSLATION_FILES
+        "")
+
+qt5_wrap_cpp (tfp_SOURCES_MOC ${tfp_HEADERS_MOC})
+qt5_wrap_ui  (tfp_FORMS_MOC ${tfp_FORMS})
+qt5_add_resources (tfp_RESOURCES_GEN ${tfp_RESOURCES})
+#qt5_add_translation (tfp_QM_FILES ${tfp_TRANSLATION_FILES})
+
+include_directories ("${CMAKE_CURRENT_LIST_DIR}/include")
+include_directories (${CMAKE_BINARY_DIR})                    # need this because MOC outputs to binary_dir/tfp
+include_directories ("${CMAKE_CURRENT_BINARY_DIR}/include")  # need this for config.hpp and export.hpp
+
+add_executable (tfp
+    ${tfp_SOURCES}
+    ${tfp_SOURCES_MOC}
+    ${tfp_FORMS_MOC}
+    ${tfp_RESOURCES_GEN}
+    ${QM_FILES}
+)
+
+# generates the correct project files for visual studio, setting thee correct
+# debug working directory and other stuff
+create_vcproj_userfile (tfp)
+
+###############################################################################
+# dependencies
+###############################################################################
+
+target_link_libraries (tfp Qt5::Core)
+target_link_libraries (tfp Qt5::Widgets)
+target_link_libraries (tfp Qt5::Gui)
+target_link_libraries (tfp Qt5::Concurrent)
+target_link_libraries (tfp Qt5::PrintSupport)
+target_link_libraries (tfp Qt5::OpenGL)
+target_link_libraries (tfp Qt5::Svg)
+
+target_link_libraries (tfp qwtinternal)
+target_link_libraries (tfp kiss_fft)
+target_link_libraries (tfp pugixml)
+
+###############################################################################
+# Compile translation files
+###############################################################################
+
+if (PLATFORM MATCHES "WINDOWS")
+    set (LRELEASE_COMMAND ${Qt5Core_DIR}/../../../bin/lrelease.exe)
+else ()
+    set (LRELEASE_COMMAND lrelease)
+endif ()
+
+#add_custom_target (tfp_translations_compile
+#    COMMAND ${LRELEASE_COMMAND} ${CMAKE_CURRENT_LIST_DIR}/translations/tfp_de.ts
+#    COMMENT "Compiling translations"
+#    VERBATIM
+#)
+#add_custom_target (tfp_translations_move
+#    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations
+#    COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_LIST_DIR}/translations/tfp_de.qm ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations/tfp_de.qm
+#    VERBATIM
+#)
+#add_dependencies (tfp_translations_move tfp_translations_compile)
+#add_dependencies (tfp tfp_translations_move)
+
+###############################################################################
+# DLLs need to be copied on Windows
+###############################################################################
+
+if (PLATFORM MATCHES "WINDOWS")
+    if (CMAKE_BUILD_TYPE MATCHES "Debug")
+        add_custom_target (Qt5CopyBinaries
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Cored.dll         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Guid.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5OpenGLd.dll       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5PrintSupportd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Svgd.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Widgetsd.dll      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindowsd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+
+            COMMENT "Copying Qt binaries from '${Qt5Core_DIR}/../../bin/' to '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}'"
+            VERBATIM
+        )
+        add_dependencies (tfp Qt5CopyBinaries)
+    endif ()
+    if (CMAKE_BUILD_TYPE MATCHES "Release")
+        add_custom_target (Qt5CopyBinaries
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Core.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Gui.dll           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5OpenGL.dll        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5PrintSupport.dll  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Svg.dll           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Widgets.dll       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindows.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+
+            COMMENT "Copying Qt binaries from '${Qt5Core_DIR}/../../bin/' to '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}'"
+            VERBATIM
+        )
+        add_dependencies (tfp Qt5CopyBinaries)
+    endif ()
+endif ()
+

@@ -1,0 +1,13 @@
+/* --------------------------------------------------------------
+ * Configures prerequisits for this library
+ * --------------------------------------------------------------*/
+
+#ifndef TFP_CONFIG_HPP
+#   define TFP_CONFIG_HPP
+
+#   include "tfp/export.hpp"
+
+#   define ON 1
+#   define OFF 0
+
+#endif /* TFP_CONFIG_HPP */
