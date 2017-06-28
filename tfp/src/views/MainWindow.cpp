@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     StandardLowOrderFilter* filterConfig = new StandardLowOrderFilter;
     layout->addWidget(filterConfig);
 
-    filterVisualiser->setTransferFunction(filterConfig);
+    filterVisualiser->setSystem(filterConfig);
 }
 
 // ----------------------------------------------------------------------------

@@ -10,8 +10,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 BodePlot::BodePlot(QWidget* parent) :
-    QWidget(parent),
-    tf_(NULL),
+    DynamicSystemVisualiser(parent),
     ampPlot_(new RealtimePlot),
     phasePlot_(new RealtimePlot),
     amplitude_(new QwtPlotCurve),
@@ -35,26 +34,6 @@ BodePlot::BodePlot(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-void BodePlot::setTransferFunction(StandardLowOrderFilter* tf)
-{
-    if (tf_ != NULL)
-    {
-        disconnect(tf_, SIGNAL(valuesChanged()), this, SLOT(onTFChanged()));
-        disconnect(tf_, SIGNAL(structureChanged()), this, SLOT(onTFChanged()));
-    }
-
-    tf_ = tf;
-
-    if (tf_ != NULL)
-    {
-        connect(tf_, SIGNAL(valuesChanged()), this, SLOT(onTFChanged()));
-        connect(tf_, SIGNAL(structureChanged()), this, SLOT(onTFChanged()));
-        onTFChanged();
-        autoScale();
-    }
-}
-
-// ----------------------------------------------------------------------------
 void BodePlot::autoScale()
 {
     ampPlot_->autoScale();
@@ -69,13 +48,27 @@ void BodePlot::replot()
 }
 
 // ----------------------------------------------------------------------------
-void BodePlot::onTFChanged()
+void BodePlot::onSystemParametersChanged()
+{
+    onSystemChanged();
+}
+
+// ----------------------------------------------------------------------------
+void BodePlot::onSystemStructureChanged()
+{
+    onSystemChanged();
+}
+
+// ----------------------------------------------------------------------------
+void BodePlot::onSystemChanged()
 {
     double ampdata[1000];
     double phasedata[1000];
     double freqdata[1000];
+    double xStart, xEnd;
 
-    tf_->frequencyResponse(freqdata, ampdata, phasedata, 0.01, 100, 1000);
+    system_->getInterestingRange(&xStart, &xEnd);
+    system_->frequencyResponse(freqdata, ampdata, phasedata, xStart, xEnd, 1000);
     amplitude_->setSamples(freqdata, ampdata, 1000);
     phase_->setSamples(freqdata, phasedata, 1000);
 

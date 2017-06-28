@@ -1,31 +1,32 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include <QWidget>
+#include "tfp/views/DynamicSystemVisualiser.hpp"
 
 class QwtPlotCurve;
 
 namespace tfp {
 
-class StandardLowOrderFilter;
 class RealtimePlot;
 
-class BodePlot : public QWidget
+class BodePlot : public DynamicSystemVisualiser
 {
     Q_OBJECT
 
 public:
     explicit BodePlot(QWidget* parent=NULL);
 
-    void setTransferFunction(StandardLowOrderFilter* tf);
-    void replot();
-    void autoScale();
+    virtual void replot() override;
+    virtual void autoScale() override;
 
-private slots:
-    void onTFChanged();
+protected:
+    virtual void onSystemParametersChanged() override;
+    virtual void onSystemStructureChanged() override;
 
 private:
-    StandardLowOrderFilter* tf_;
+    void onSystemChanged();
+
+protected:
     RealtimePlot* ampPlot_;
     RealtimePlot* phasePlot_;
     QwtPlotCurve* amplitude_;

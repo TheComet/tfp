@@ -1,21 +1,17 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/math/TransferFunction.hxx"
-#include <QWidget>
+#include "tfp/views/DynamicSystemConfig.hpp"
 
 namespace tfp {
 
 class FloatAdjustmentWidget;
 
-class StandardLowOrderFilter : public QWidget,
-                               public TransferFunction<double>
+class StandardLowOrderFilter : public DynamicSystemConfig
 {
     Q_OBJECT
 
 public:
-    explicit StandardLowOrderFilter(QWidget* parent=NULL);
-
     enum FilterType
     {
         LOWPASS_1 = 0,
@@ -26,11 +22,10 @@ public:
         FILTER_COUNT
     };
 
-    void setFilterType(FilterType filterType);
+    explicit StandardLowOrderFilter(QWidget* parent=NULL);
 
-signals:
-    void valuesChanged();
-    void structureChanged();
+    virtual void getInterestingRange(double* xStart, double* xEnd) override;
+    void setFilterType(FilterType filterType);
 
 public slots:
     void setScale(double k);
@@ -41,6 +36,7 @@ public slots:
 private:
     FloatAdjustmentWidget* qpadj_;
     FilterType filterType_;
+    double k_, wp_, qp_;
 };
 
 }
