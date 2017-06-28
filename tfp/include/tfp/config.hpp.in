@@ -10,4 +10,8 @@
 #   define ON 1
 #   define OFF 0
 
+namespace tfp {
+typedef double Real;
+}
+
 #endif /* TFP_CONFIG_HPP */

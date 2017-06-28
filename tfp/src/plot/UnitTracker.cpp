@@ -1,5 +1,5 @@
 #include "tfp/plot/UnitTracker.hpp"
-#include "tfp/models/Parameter.hpp"
+#include "tfp/math/Parameter.hpp"
 
 
 namespace tfp {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "tfp/models/CoefficientPolynomial.hxx"
-#include "tfp/models/RootPolynomial.hpp"
+#include "tfp/math/CoefficientPolynomial.hxx"
+#include "tfp/math/RootPolynomial.hpp"
 
 namespace tfp {
 

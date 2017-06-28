@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/models/Math.hpp"
+#include "tfp/math/Math.hpp"
 
 #include <string>
 #include <vector>

@@ -1,7 +1,7 @@
 #include "tfp/config.hpp"
 
-#include "tfp/models/TemplateStuff.hpp"
-#include "tfp/models/Metric.hpp"
+#include "tfp/math/TemplateStuff.hpp"
+#include "tfp/math/Metric.hpp"
 
 #include <cassert>
 

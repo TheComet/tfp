@@ -1,15 +1,8 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QMap>
 
 #include "tfp/config.hpp"
-
-
-class QMdiArea;
-class QCloseEvent;
-class QSignalMapper;
-
 
 namespace Ui {
     class MainWindow;
@@ -27,7 +20,7 @@ class MainWindow : public QMainWindow
 
 public:
     //! Constructor
-    explicit MainWindow(QWidget* parent = 0);
+    explicit MainWindow(QWidget* parent=NULL);
     //! Default destructor
     ~MainWindow();
 

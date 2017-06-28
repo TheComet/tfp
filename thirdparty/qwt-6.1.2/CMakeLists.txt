@@ -20,7 +20,7 @@ set (QWT_VER_PAT 2)
 set (QWT_VERSION "${QWT_VER_MAJ}.${QWT_VER_MIN}.${QWT_VER_PAT}")
 
 option (QWT_SHARED_LIB "Enable this to build Qwt as a shared library. Disable
-to build as a static library" OFF)
+to build as a static library" ON)
 
 option (QWT_PLOT "Enables all classes that are needed to use the QwtPlot
 widget" ON)
@@ -36,7 +36,7 @@ option (QWT_OPENGL "If you want to use an OpenGL plot canvas" ON)
 option (QWT_MATHML "You can use the MathML renderer of the Qt solutions
 package to enable MathML support in Qwt. Because of license implications the (
 modified ) code of the MML Widget solution is included and linked together
-with the QwtMathMLTextEngine into an own lobrary." OFF)
+with the QwtMathMLTextEngine into an own lobrary." ON)
 
 option (QWT_DESIGNER "If you want to build the Qwt designer plugins." ON)
 

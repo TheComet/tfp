@@ -10,6 +10,8 @@ elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 endif ()
 
+add_definitions (-D_USE_MATH_DEFINES)
+
 ###############################################################################
 # config
 ###############################################################################
@@ -32,15 +34,20 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/RectangleZoomer.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/UnitTracker.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Zoomer.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/AdjustmentWidget.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/BodePlot.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/StandardLowOrderFilter.hpp")
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/Util.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/Math.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Metric.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/String.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
@@ -50,9 +57,13 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/BodePlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/StandardLowOrderFilter.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
 set (tfp_RESOURCES
@@ -95,6 +106,7 @@ target_link_libraries (tfp Qt5::OpenGL)
 target_link_libraries (tfp Qt5::Svg)
 
 target_link_libraries (tfp qwtinternal)
+target_link_libraries (tfp qwtmathml)
 target_link_libraries (tfp kiss_fft)
 target_link_libraries (tfp pugixml)
 

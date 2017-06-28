@@ -1,4 +1,6 @@
-#include "tfp/models/TransferFunction.hxx"
+#include "tfp/math/TransferFunction.hxx"
+#include "tfp/math/CoefficientPolynomial.hpp"
+#include "tfp/math/RootPolynomial.hpp"
 #include <cmath>
 
 namespace tfp {
@@ -41,8 +43,6 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
 {
     PFEResultData result;
 
-    std::cout << "factors: " << numerator_.factor_ << "," << denominator_.factor_ << std::endl;
-
     // Create poles vector. Add as many zero poles as specified
     result.poles_.resize(denominator_.roots_.size() + numZeroPoles, 1);
     for (int i = 0; i < denominator_.roots_.size(); ++i)
@@ -58,6 +58,7 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
         // TODO need to calculate the direct terms
     }
 
+    // Calculate residuals
     result.residuals_.resize(denominatorDegree, 1);
     typename Type<T>::ComplexArray otherPoles(denominatorDegree - 1, 1);
     for (int m = 0; m < denominatorDegree; ++m)
@@ -70,36 +71,27 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
             ++i;
         }
 
-        std::cout << "m: " << m << std::endl;
-        std::cout << "poles:\n" << result.poles_ << std::endl;
-        std::cout << "otherPoles:\n" << otherPoles << std::endl;
-
         RootPolynomial<T> aTilde(otherPoles, 1);
         std::complex<T> pvB = numerator_.evaluate(result.poles_(m));
         std::complex<T> pvA = aTilde.evaluate(result.poles_(m));
-        std::cout << "pvB: " << pvB << std::endl;
-        std::cout << "pvA: " << pvB << std::endl;
         std::complex<T> pvD = pvB / pvA;
         result.residuals_(m) = pvD / denominator_.factor_;
     }
-
-    std::cout << "poles:\n" << result.poles_ << std::endl;
-    std::cout << "residuals:\n" << result.residuals_ << std::endl;
 
     return result;
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-typename Type<T>::RealArray TransferFunction<T>::inverseLaplaceTransform(
+void TransferFunction<T>::inverseLaplaceTransform(
         const PFEResultData& pfe,
+        T* outTime,
+        T* outAmp,
         T timeBegin,
         T timeEnd,
         int numPoints
     ) const
 {
-    typename Type<T>::RealArray result(numPoints, 1);
-
     /*
      *                            a
      *  E(t)ae^(-at)    o--o    -----
@@ -107,53 +99,50 @@ typename Type<T>::RealArray TransferFunction<T>::inverseLaplaceTransform(
      */
     for (int i = 0; i < numPoints; ++i)
     {
-        T time = (timeEnd - timeBegin) * T(i) / (numPoints-1);
-        typename Type<T>::Complex value = 0;
+        outTime[i] = (timeEnd - timeBegin) * T(i) / (numPoints-1);
+        outAmp[i] = 0;
         for (int m = 0; m < pfe.residuals_.size(); ++m)
         {
-            typename Type<T>::Complex a = -pfe.poles_(m);
+            typename Type<T>::Complex a = pfe.poles_(m);
             typename Type<T>::Complex k = pfe.residuals_(m);
 
-            value += k * std::exp(-a * time);
+            // We're only interested in calculating the real part, since the
+            // imaginary parts will cancel out to 0 if the function is real.
+            //     Equivalent to:   outAmp[i] += k * std::exp(a * outTime[i]);
+            outAmp[i] += std::exp(-a.real()*outTime[i]) * (k.real() * std::cos(a.imag()*outTime[i]) - k.imag()*std::sin(a.imag()*outTime[i]));
         }
-        result(i) = value.real();
     }
-
-    return result;
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-typename Type<T>::RealArray TransferFunction<T>::impulseResponse(T timeBegin, T timeEnd, int numPoints) const
+void TransferFunction<T>::impulseResponse(T* outTime, T* outAmp, T timeBegin, T timeEnd, int numPoints) const
 {
     PFEResultData pfe = partialFractionExpansion();
-    return inverseLaplaceTransform(pfe, timeBegin, timeEnd, numPoints);
+    return inverseLaplaceTransform(pfe, outTime, outAmp, timeBegin, timeEnd, numPoints);
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-typename Type<T>::RealArray TransferFunction<T>::stepResponse(T timeBegin, T timeEnd, int numPoints) const
+void TransferFunction<T>::stepResponse(T* outTime, T* outAmp, T timeBegin, T timeEnd, int numPoints) const
 {
     // Add 1 zero-pole, which is the equivalent of integrating the function
-    // once in the time domain (because this is the step response)
+    // in the time domain (because this is the step response)
     PFEResultData pfe = partialFractionExpansion(1);
-    return inverseLaplaceTransform(pfe, timeBegin, timeEnd, numPoints);
+    return inverseLaplaceTransform(pfe, outTime, outAmp, timeBegin, timeEnd, numPoints);
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-typename Type<T>::ComplexArray
-TransferFunction<T>::frequencyResponse(T freqStart, T freqEnd, int numPoints) const
+void TransferFunction<T>::frequencyResponse(T* outFreq, T* outAmp, T* outPhase, T freqStart, T freqEnd, int numPoints) const
 {
-    typename Type<T>::ComplexArray result(numPoints, 1);
-
     for (int i = 0; i < numPoints; ++i)
     {
-        T freq = freqStart * std::pow(freqEnd / freqStart, T(i) / (numPoints-1));
-        result(i) = evaluate(std::complex<T>(0, freq));
+        outFreq[i] = freqStart * std::pow(freqEnd / freqStart, T(i) / (numPoints-1));
+        typename Type<T>::Complex result = evaluate(typename Type<T>::Complex(0, outFreq[i]));
+        outAmp[i] = 20 * std::log10(std::abs(result));
+        outPhase[i] = std::arg(result) * 180.0 / M_PI;
     }
-
-    return result;
 }
 
 // ----------------------------------------------------------------------------

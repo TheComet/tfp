@@ -1,5 +1,5 @@
 #include "tfp/views/InfiniSliderWidget.hpp"
-#include "tfp/models/Math.hpp"
+#include "tfp/math/Math.hpp"
 
 #include <QMouseEvent>
 

@@ -1,4 +1,4 @@
-#include "tfp/models/Math.hpp"
+#include "tfp/math/Math.hpp"
 #include <cmath>
 
 // ----------------------------------------------------------------------------

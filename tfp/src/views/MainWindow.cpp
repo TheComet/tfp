@@ -1,9 +1,10 @@
 #include "tfp/ui_MainWindow.h"
 #include "tfp/views/MainWindow.hpp"
-#include "tfp/models/TransferFunction.hpp"
+#include "tfp/views/StandardLowOrderFilter.hpp"
+#include "tfp/views/BodePlot.hpp"
 
-#include <iostream>
-#include <cmath>
+#include <qwt_text.h>
+#include <qwt_mathml_text_engine.h>
 
 namespace tfp {
 
@@ -17,23 +18,18 @@ MainWindow::MainWindow(QWidget *parent) :
     // Window icon and title
     setWindowIcon(QIcon(":/icons/icon.ico"));
 
-    Eigen::Matrix<double, Eigen::Dynamic, 1> x(1, 1);
-    x(0, 0) = 4;
+    // Need to explicitly enable MathML rendering support
+    QwtText::setTextEngine(QwtText::MathMLText, new QwtMathMLTextEngine());
 
-    CoefficientPolynomial<double> numerator(1);
-    CoefficientPolynomial<double> denominator(3);
-    numerator(0) = 10;
-    denominator(0) = 2;
-    denominator(1) = 1;
-    denominator(2) = 2;
-    TransferFunction<double> T(numerator, denominator);
+    QLayout* layout = centralWidget()->layout();
 
-    Type<double>::RealArray step = T.stepResponse(0, 50, 100);
+    BodePlot* filterVisualiser = new BodePlot;
+    layout->addWidget(filterVisualiser);
 
-    std::cout << "[" << std::arg(step(0));
-    for (int i = 1; i < step.size(); ++i)
-        std::cout << ", " << step(i);
-    std::cout << "];" << std::endl;
+    StandardLowOrderFilter* filterConfig = new StandardLowOrderFilter;
+    layout->addWidget(filterConfig);
+
+    filterVisualiser->setTransferFunction(filterConfig);
 }
 
 // ----------------------------------------------------------------------------

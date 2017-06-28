@@ -1,8 +1,8 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/models/RootPolynomial.hpp"
-#include "tfp/models/CoefficientPolynomial.hpp"
+#include "tfp/math/RootPolynomial.hxx"
+#include "tfp/math/CoefficientPolynomial.hxx"
 #include <iostream>
 
 namespace tfp {
@@ -27,15 +27,11 @@ public:
     std::complex<T> evaluate(const std::complex<T>& value) const;
 
     PFEResultData partialFractionExpansion(int numZeroPoles=0) const;
-    typename Type<T>::RealArray inverseLaplaceTransform(
-        const PFEResultData& pfe,
-        T timeBegin,
-        T timeEnd,
-        int numPoints) const;
+    void inverseLaplaceTransform(const PFEResultData& pfe, T* outTime, T* outAmp, T timeBegin, T timeEnd, int numPoints) const;
 
-    typename Type<T>::RealArray impulseResponse(T timeBegin, T timeEnd, int numPoints) const;
-    typename Type<T>::RealArray stepResponse(T timeBegin, T timeEnd, int numPoints) const;
-    typename Type<T>::ComplexArray frequencyResponse(T freqStart, T freqEnd, int numPoints) const;
+    void impulseResponse(T* outTime, T* outAmp, T timeBegin, T timeEnd, int numPoints) const;
+    void stepResponse(T* outTime, T* outAmp, T timeBegin, T timeEnd, int numPoints) const;
+    void frequencyResponse(T* outFreq, T* outAmp, T* outPhase, T freqStart, T freqEnd, int numPoints) const;
 
     template <class U>
     friend std::ostream& operator<<(std::ostream& os, const TransferFunction<U>& tf);

@@ -1,4 +1,4 @@
-#include "tfp/models/Metric.hpp"
+#include "tfp/math/Metric.hpp"
 #include "tfp/models/String.hpp"
 
 #include <cstring>

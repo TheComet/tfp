@@ -1,8 +1,8 @@
 #pragma once
 
-#include "tfp/models/Parameter.hxx"
+#include "tfp/math/Parameter.hxx"
+#include "tfp/math/Math.hpp"
 #include "tfp/models/String.hpp"
-#include "tfp/models/Math.hpp"
 
 #include <cstring>
 #include <cstdlib>
