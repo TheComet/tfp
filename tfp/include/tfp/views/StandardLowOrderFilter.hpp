@@ -31,6 +31,7 @@ public slots:
     void setScale(double k);
     void setPoleFrequency(double wp);
     void setQualityFactor(double qp);
+    void setParameters(double k, double wp, double qp);
     void setFilterType(int index);
 
 private:

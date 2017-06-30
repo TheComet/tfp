@@ -41,6 +41,7 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/PoleZeroPlot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/StandardLowOrderFilter.hpp")
 
@@ -64,10 +65,14 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemConfig.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemVisualiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/ImpulsePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/PoleZeroPlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/StandardLowOrderFilter.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/StandardLowOrderFilter.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/StepPlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/TimeDomainResponsePlot.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
 set (tfp_RESOURCES

@@ -2,7 +2,10 @@
 #include "tfp/views/MainWindow.hpp"
 #include "tfp/views/StandardLowOrderFilter.hpp"
 #include "tfp/views/BodePlot.hpp"
-
+#include "tfp/views/PoleZeroPlot.hpp"
+#include "tfp/views/StepPlot.hpp"
+#include "tfp/views/ImpulsePlot.hpp"
+#include <QGridLayout>
 #include <qwt_text.h>
 #include <qwt_mathml_text_engine.h>
 
@@ -21,15 +24,24 @@ MainWindow::MainWindow(QWidget *parent) :
     // Need to explicitly enable MathML rendering support
     QwtText::setTextEngine(QwtText::MathMLText, new QwtMathMLTextEngine());
 
-    QLayout* layout = centralWidget()->layout();
+    QWidget* widget = new QWidget;
+    centralWidget()->layout()->addWidget(widget);
+    QGridLayout* layout = new QGridLayout;
+    widget->setLayout(layout);
 
-    BodePlot* filterVisualiser = new BodePlot;
-    layout->addWidget(filterVisualiser);
+    DynamicSystemVisualiser* bodePlot = new BodePlot;
+    DynamicSystemVisualiser* pzplot = new PoleZeroPlot;
+    DynamicSystemVisualiser* stepPlot = new StepPlot;
+    layout->addWidget(bodePlot, 0, 0, 2, 1);
+    layout->addWidget(pzplot, 0, 1, 1, 1);
+    layout->addWidget(stepPlot, 1, 1, 1, 1);
 
     StandardLowOrderFilter* filterConfig = new StandardLowOrderFilter;
-    layout->addWidget(filterConfig);
+    layout->addWidget(filterConfig, 0, 2, 2, 1);
 
-    filterVisualiser->setSystem(filterConfig);
+    bodePlot->setSystem(filterConfig);
+    pzplot->setSystem(filterConfig);
+    stepPlot->setSystem(filterConfig);
 }
 
 // ----------------------------------------------------------------------------

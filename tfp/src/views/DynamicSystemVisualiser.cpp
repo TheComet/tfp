@@ -26,6 +26,7 @@ void DynamicSystemVisualiser::setSystem(DynamicSystemConfig* system)
         connect(system_, SIGNAL(parametersChanged()), this, SLOT(onParametersChanged()));
         connect(system_, SIGNAL(structureChanged()), this, SLOT(onStructureChanged()));
         onStructureChanged();
+        onParametersChanged();
     }
 }
 
@@ -38,7 +39,7 @@ void DynamicSystemVisualiser::onParametersChanged()
 // ----------------------------------------------------------------------------
 void DynamicSystemVisualiser::onStructureChanged()
 {
-    onSystemParametersChanged();
+    onSystemStructureChanged();
 }
 
 }

@@ -50,18 +50,6 @@ void BodePlot::replot()
 // ----------------------------------------------------------------------------
 void BodePlot::onSystemParametersChanged()
 {
-    onSystemChanged();
-}
-
-// ----------------------------------------------------------------------------
-void BodePlot::onSystemStructureChanged()
-{
-    onSystemChanged();
-}
-
-// ----------------------------------------------------------------------------
-void BodePlot::onSystemChanged()
-{
     double ampdata[1000];
     double phasedata[1000];
     double freqdata[1000];
@@ -73,6 +61,15 @@ void BodePlot::onSystemChanged()
     phase_->setSamples(freqdata, phasedata, 1000);
 
     replot();
+    if (ampPlot_->lastScaleWasAutomatic())
+        ampPlot_->autoScale();
+    if (phasePlot_->lastScaleWasAutomatic())
+        phasePlot_->autoScale();
+}
+
+// ----------------------------------------------------------------------------
+void BodePlot::onSystemStructureChanged()
+{
     autoScale();
 }
 

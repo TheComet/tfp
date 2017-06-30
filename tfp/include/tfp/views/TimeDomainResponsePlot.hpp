@@ -2,6 +2,7 @@
 
 #include "tfp/config.hpp"
 #include "tfp/views/DynamicSystemVisualiser.hpp"
+#include "tfp/math/TransferFunction.hxx"
 
 class QwtPlotCurve;
 
@@ -9,25 +10,22 @@ namespace tfp {
 
 class RealtimePlot;
 
-class BodePlot : public DynamicSystemVisualiser
+class TimeDomainResponsePlot : public DynamicSystemVisualiser
 {
-    Q_OBJECT
-
 public:
-    explicit BodePlot(QWidget* parent=NULL);
+    explicit TimeDomainResponsePlot(QWidget* parent=NULL);
+
+protected:
+    virtual TransferFunction<double>::PFEResultData doPartialFractionExpansion() = 0;
 
     virtual void replot() override;
     virtual void autoScale() override;
-
-protected:
     virtual void onSystemParametersChanged() override;
     virtual void onSystemStructureChanged() override;
 
-protected:
-    RealtimePlot* ampPlot_;
-    RealtimePlot* phasePlot_;
-    QwtPlotCurve* amplitude_;
-    QwtPlotCurve* phase_;
+private:
+    RealtimePlot* plot_;
+    QwtPlotCurve* curve_;
 };
 
 }

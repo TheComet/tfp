@@ -191,6 +191,7 @@ bool RealtimePlot::event(QEvent* event)
         if(ke->key() == Qt::Key_Space)
         {
             autoScale();
+            lastScaleWasAutomatic_ = true;
             return true;
         }
     }
@@ -226,6 +227,11 @@ bool RealtimePlot::event(QEvent* event)
     if(event->type() == QEvent::MouseButtonPress)
     {
         lastScaleWasAutomatic_ = false;
+    }
+
+    if(event->type() == QEvent::MouseButtonDblClick)
+    {
+        lastScaleWasAutomatic_ = true;
     }
 
     return QwtPlot::event(event);

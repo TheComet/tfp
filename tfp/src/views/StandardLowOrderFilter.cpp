@@ -54,10 +54,8 @@ void StandardLowOrderFilter::getInterestingRange(double* xStart, double* xEnd)
 }
 
 // ----------------------------------------------------------------------------
-void StandardLowOrderFilter::setScale(double k)
+void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
 {
-    k_ = k;
-
     switch (filterType_)
     {
         case LOWPASS_1:
@@ -66,7 +64,7 @@ void StandardLowOrderFilter::setScale(double k)
              * T(s) = --------
              *         s + wp
              */
-            numerator_.factor_ = k_ * wp_;
+            denominator_.roots_(0) = -wp_;
             break;
 
         case HIGHPASS_1:
@@ -75,163 +73,85 @@ void StandardLowOrderFilter::setScale(double k)
              * T(s) = --------
              *         s + wp
              */
-            numerator_.factor_ = k_;
+            denominator_.roots_(0) = -wp_;
             break;
 
+        // Denominator is calculated the same for all 3 variants
         case LOWPASS_2:
+        case BANDPASS:
+        case HIGHPASS_2:
+        {
             /*
              *              k*wp^2
              * T(s) = --------------------
              *        s^2 + wp/qp*s + wp^2
              */
+
+            // Real part
+            denominator_.roots_(0).real(-wp_ / (2.0 * qp_));
+            denominator_.roots_(1).real(-wp_ / (2.0 * qp_));
+
+            // Roots are complex conjugates if qp > 0.5
+            if (qp_ > 0.5)
+            {
+                denominator_.roots_(0).imag(+wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
+                denominator_.roots_(1).imag(-wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
+            }
+            else
+            {
+                denominator_.roots_(0) += wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
+                denominator_.roots_(1) -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
+                denominator_.roots_(0).imag(0);
+                denominator_.roots_(1).imag(0);
+            }
+
+            break;
+        }
+
+        default: break;
+    }
+
+    switch (filterType_)
+    {
+        case HIGHPASS_1:
+        case HIGHPASS_2:
+            numerator_.factor_ = k_;
+            break;
+
+        case LOWPASS_2:
             numerator_.factor_ = k_ * wp_ * wp_;
             break;
 
+        case LOWPASS_1:
         case BANDPASS:
-            /*
-             *              k*wp*s
-             * T(s) = --------------------
-             *        s^2 + wp/qp*s + wp^2
-             */
             numerator_.factor_ = k_ * wp_;
-            break;
-
-        case HIGHPASS_2:
-            /*
-             *              k*s^2
-             * T(s) = --------------------
-             *        s^2 + wp/qp*s + wp^2
-             */
-            numerator_.factor_ = k_;
             break;
 
         default: break;
     }
 
     emit parametersChanged();
+}
+
+// ----------------------------------------------------------------------------
+void StandardLowOrderFilter::setScale(double k)
+{
+    k_ = k;
+    setParameters(k_, wp_, qp_);
 }
 
 // ----------------------------------------------------------------------------
 void StandardLowOrderFilter::setPoleFrequency(double wp)
 {
     wp_ = wp;
-
-    switch (filterType_)
-    {
-        case LOWPASS_1:
-            /*
-             *          k*wp
-             * T(s) = --------
-             *         s + wp
-             */
-            denominator_.roots_(0) = -wp_;
-            break;
-
-        case HIGHPASS_1:
-            /*
-             *          k*s
-             * T(s) = --------
-             *         s + wp
-             */
-            denominator_.roots_(0) = -wp_;
-            break;
-
-        // Denominator is calculated the same for all 3 variants
-        case LOWPASS_2:
-        case BANDPASS:
-        case HIGHPASS_2:
-        {
-            /*
-             *              k*wp^2
-             * T(s) = --------------------
-             *        s^2 + wp/qp*s + wp^2
-             */
-
-            // Real part
-            denominator_.roots_(0).real(-wp_ / (2.0 * qp_));
-            denominator_.roots_(1).real(-wp_ / (2.0 * qp_));
-
-            // Roots are complex conjugates if qp > 0.5
-            if (qp_ > 0.5)
-            {
-                denominator_.roots_(0).imag(+wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
-                denominator_.roots_(1).imag(-wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
-            }
-            else
-            {
-                denominator_.roots_(0) += wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(1) -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(0).imag(0);
-                denominator_.roots_(1).imag(0);
-            }
-
-            break;
-        }
-
-        default: break;
-    }
-
-    // Pole frequency affects numerator with these filter types
-    switch (filterType_)
-    {
-        case LOWPASS_2:
-            numerator_.factor_ = k_ * wp_ * wp_;
-            break;
-
-        case LOWPASS_1:
-        case BANDPASS:
-            numerator_.factor_ = k_ * wp_;
-            break;
-
-        default: break;
-    }
-
-    emit parametersChanged();
+    setParameters(k_, wp_, qp_);
 }
 
 // ----------------------------------------------------------------------------
 void StandardLowOrderFilter::setQualityFactor(double qp)
 {
     qp_ = qp;
-
-    switch (filterType_)
-    {
-        // Denominator is calculated the same for all 3 variants
-        case LOWPASS_2:
-        case BANDPASS:
-        case HIGHPASS_2:
-        {
-            /*
-             *              k*wp^2
-             * T(s) = --------------------
-             *        s^2 + wp/qp*s + wp^2
-             */
-
-            // Real part
-            denominator_.roots_(0).real(-wp_ / (2.0 * qp_));
-            denominator_.roots_(1).real(-wp_ / (2.0 * qp_));
-
-            // Roots are complex conjugates if qp > 0.5
-            if (qp_ > 0.5)
-            {
-                denominator_.roots_(0).imag(+wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
-                denominator_.roots_(1).imag(-wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
-            }
-            else
-            {
-                denominator_.roots_(0) += wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(1) -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(0).imag(0);
-                denominator_.roots_(1).imag(0);
-            }
-
-            break;
-        }
-
-        default: break;
-    }
-
-    emit parametersChanged();
+    setParameters(k_, wp_, qp_);
 }
 
 // ----------------------------------------------------------------------------
@@ -275,12 +195,25 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
             std::cerr << "Invalid filter type " << filterType_ << std::endl;
             break;
     }
+/*
+    // Butterworth filter
+    int N = 64;
+    denominator_.roots_.resize(N, 1);
+    for (int i = 0; i < N; ++i)
+        denominator_.roots_(i) = std::pow(typename Type<double>::Complex(-1, 0), double(i+0.5)/(N)) * typename Type<double>::Complex(0, 1);
 
-    setScale(k_);
-    setPoleFrequency(wp_);
-    setQualityFactor(qp_);
+    // Chebyshev
+    double eta = 1;
+    double a = -std::sinh(1.0/N * std::asinh(1.0/eta));
+    double b = std::cosh(1.0/N * std::asinh(1.0/eta));
+    for (int i = 0; i < N; ++i)
+        denominator_.roots_(i) = typename Type<double>::Complex(
+            a * std::sin(M_PI / 2.0 * (2.0*i+1)/N),
+            b * std::cos(M_PI / 2.0 * (2.0*i+1)/N)
+        );*/
 
     emit structureChanged();
+    setParameters(k_, wp_, qp_);
 }
 
 // ----------------------------------------------------------------------------

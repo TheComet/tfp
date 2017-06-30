@@ -109,7 +109,8 @@ void TransferFunction<T>::inverseLaplaceTransform(
             // We're only interested in calculating the real part, since the
             // imaginary parts will cancel out to 0 if the function is real.
             //     Equivalent to:   outAmp[i] += k * std::exp(a * outTime[i]);
-            outAmp[i] += std::exp(-a.real()*outTime[i]) * (k.real() * std::cos(a.imag()*outTime[i]) - k.imag()*std::sin(a.imag()*outTime[i]));
+            outAmp[i] += std::exp(a.real()*outTime[i]) * (k.real() * std::cos(a.imag()*outTime[i]) - k.imag()*std::sin(a.imag()*outTime[i]));
+            //outAmp[i] += (k * std::exp(a * outTime[i])).real();
         }
     }
 }
