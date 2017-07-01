@@ -5,7 +5,7 @@
 #include "tfp/views/DynamicSystemVisualiser.hpp"
 
 namespace Qwt3D {
-    class SurfacePlot;
+    class GridPlot;
 }
 
 namespace tfp {
@@ -23,7 +23,7 @@ protected:
     virtual void onSystemStructureChanged() override;
 
 private:
-    Qwt3D::SurfacePlot* plot_;
+    Qwt3D::GridPlot* plot_;
 };
 
 }

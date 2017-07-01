@@ -2,12 +2,12 @@
 #include "tfp/views/DynamicSystemConfig.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <QVBoxLayout>
-#include <qwt3d_surfaceplot.h>
+#include <qwt3d_gridplot.h>
 #include <qwt3d_function.h>
 #include <qwt3d_color.h>
 
 namespace tfp {
-
+/*
 class Jet : public Qwt3D::StandardColor
 {
 public:
@@ -50,12 +50,12 @@ public:
     double blue( double gray ) {
         return base( gray + 0.5 );
     }
-};
+};*/
 
 class MagnitudeFunction : public Qwt3D::Function
 {
 public:
-    MagnitudeFunction(Qwt3D::SurfacePlot* pw, TransferFunction<double>* tf) :
+    MagnitudeFunction(Qwt3D::GridPlot* pw, TransferFunction<double>* tf) :
         Function(*pw),
         tf_(tf)
     {
@@ -73,7 +73,7 @@ private:
 // ----------------------------------------------------------------------------
 ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
     DynamicSystemVisualiser(parent),
-    plot_(new Qwt3D::SurfacePlot)
+    plot_(new Qwt3D::GridPlot)
 {
     setLayout(new QVBoxLayout);
 
