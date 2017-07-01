@@ -7,9 +7,6 @@
 
 #   include "tfp/export.hpp"
 
-#   define ON 1
-#   define OFF 0
-
 namespace tfp {
 typedef double Real;
 }

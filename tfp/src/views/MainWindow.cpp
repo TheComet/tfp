@@ -5,6 +5,7 @@
 #include "tfp/views/PoleZeroPlot.hpp"
 #include "tfp/views/StepPlot.hpp"
 #include "tfp/views/ImpulsePlot.hpp"
+#include "tfp/views/ComplexPlane3D.hpp"
 #include <QGridLayout>
 #include <qwt_text.h>
 #include <qwt_mathml_text_engine.h>
@@ -30,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     widget->setLayout(layout);
 
     DynamicSystemVisualiser* bodePlot = new BodePlot;
-    DynamicSystemVisualiser* pzplot = new PoleZeroPlot;
+    DynamicSystemVisualiser* pzplot = new ComplexPlane3D;
     DynamicSystemVisualiser* stepPlot = new StepPlot;
     layout->addWidget(bodePlot, 0, 0, 2, 1);
     layout->addWidget(pzplot, 0, 1, 1, 1);

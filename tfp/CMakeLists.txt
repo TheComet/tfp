@@ -62,6 +62,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/BodePlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/ComplexPlane3D.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemConfig.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemVisualiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
@@ -115,6 +116,7 @@ target_link_libraries (tfp Qt5::OpenGL)
 target_link_libraries (tfp Qt5::Svg)
 
 target_link_libraries (tfp qwtinternal)
+target_link_libraries (tfp qwtplot3d)
 target_link_libraries (tfp qwtmathml)
 target_link_libraries (tfp kiss_fft)
 target_link_libraries (tfp pugixml)
