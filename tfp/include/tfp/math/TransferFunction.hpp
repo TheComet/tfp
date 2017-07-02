@@ -44,14 +44,14 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
     PFEResultData result;
 
     // Create poles vector. Add as many zero poles as specified
-    result.poles_.resize(denominator_.roots_.size() + numZeroPoles, 1);
-    for (int i = 0; i < denominator_.roots_.size(); ++i)
-        result.poles_(i) = denominator_.roots_(i);
+    result.poles_.resize(denominator_.size() + numZeroPoles, 1);
+    for (int i = 0; i < denominator_.size(); ++i)
+        result.poles_(i) = denominator_.root(i);
     for (int i = 0; i < numZeroPoles; ++i)
-        result.poles_(denominator_.roots_.size() + i) = typename Type<T>::Complex(0, 0);
+        result.poles_(denominator_.size() + i) = typename Type<T>::Complex(0, 0);
 
     // Calculate the direct terms, if necessary
-    int numeratorDegree   = numerator_.roots_.size();
+    int numeratorDegree   = numerator_.size();
     int denominatorDegree = result.poles_.size();
     if(numeratorDegree >= denominatorDegree)
     {
@@ -75,7 +75,7 @@ TransferFunction<T>::partialFractionExpansion(int numZeroPoles) const
         std::complex<T> pvB = numerator_.evaluate(result.poles_(m));
         std::complex<T> pvA = aTilde.evaluate(result.poles_(m));
         std::complex<T> pvD = pvB / pvA;
-        result.residuals_(m) = pvD / denominator_.factor_;
+        result.residuals_(m) = pvD / denominator_.factor();
     }
 
     return result;

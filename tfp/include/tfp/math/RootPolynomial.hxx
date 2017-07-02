@@ -8,7 +8,27 @@
 namespace tfp {
 
 template <class T> class CoefficientPolynomial;
+template <class T> class RootPolynomial;
 
+template <class T>
+class UniqueRootIterator
+{
+public:
+    const typename Type<T>::Complex& get() const;
+    bool hasNext();
+    void next();
+
+private:
+    UniqueRootIterator(RootPolynomial<T>* rootPolynomial);
+
+    RootPolynomial<T>* rootPolynomial_;
+    int index_;
+};
+
+/*!
+ * @brief A polynomial function consisting of roots (as opposed to
+ * coefficients, see CoefficientPolynomial).
+ */
 template <class T>
 class RootPolynomial
 {
@@ -18,8 +38,37 @@ public:
     RootPolynomial(const typename Type<T>::ComplexVector& roots, T factor);
     RootPolynomial(const CoefficientPolynomial<T>& coeffs);
 
+    /*!
+     * @brief Resizes the internal storage of roots. If expanding, the new
+     * slots remain unintialised, so you must set them by calling root().
+     */
     void resize(int size);
-    typename Type<T>::Complex& operator()(int index);
+
+    //! Returns the number of roots (**including** multiple roots)
+    int size() const;
+    //! Sets the value of a root at the specified index
+    void setRoot(int index, const typename Type<T>::Complex& root);
+    //! Sets the real part of the root at the specified index
+    void setRoot(int index, T real);
+    //! Retrieves a root at the specified index.
+    const typename Type<T>::Complex& root(int index) const;
+
+    /*!
+     * @brief Returns the multiplicity of the specified root. When setting the
+     * value of a root, it is checked against the existing roots. If an
+     * identical root is found, then its multiplicity is increased.
+     */
+    int multiplicity(int index) const;
+
+    void setFactor(T factor);
+
+    /*!
+     * @brief  Returns the constant factor which was factored out when
+     * calculating the monic polynomial. E.g.
+     *
+     * 2s + 4  -->  2(s+2)    factor=2
+     */
+    T factor() const;
 
     /*!
      * Computes the polynomial coefficients with the specified roots.
@@ -34,9 +83,13 @@ public:
 
     template <class U>
     friend std::ostream& operator<<(std::ostream& os, const RootPolynomial<U>& polynomial);
+    friend class UniqueRootIterator<T>;
 
+private:
     typename Type<T>::ComplexVector roots_;
+    std::vector<T> multiplicities_;
     T factor_;
+    bool multiplicityDirty_;
 };
 
 } // namespace tfp

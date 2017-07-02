@@ -64,7 +64,7 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
              * T(s) = --------
              *         s + wp
              */
-            denominator_.roots_(0) = -wp_;
+            denominator_.setRoot(0, -wp_);
             break;
 
         case HIGHPASS_1:
@@ -73,7 +73,7 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
              * T(s) = --------
              *         s + wp
              */
-            denominator_.roots_(0) = -wp_;
+            denominator_.setRoot(0, -wp_);
             break;
 
         // Denominator is calculated the same for all 3 variants
@@ -88,22 +88,23 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
              */
 
             // Real part
-            denominator_.roots_(0).real(-wp_ / (2.0 * qp_));
-            denominator_.roots_(1).real(-wp_ / (2.0 * qp_));
+            typename Type<double>::Complex r1(-wp_ / (2.0 * qp_), 0);
+            typename Type<double>::Complex r2(-wp_ / (2.0 * qp_), 0);
 
             // Roots are complex conjugates if qp > 0.5
             if (qp_ > 0.5)
             {
-                denominator_.roots_(0).imag(+wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
-                denominator_.roots_(1).imag(-wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
+                r1.imag(+wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
+                r2.imag(-wp_ * std::sqrt(1.0 - 1.0/(4.0*qp_*qp_)));
             }
             else
             {
-                denominator_.roots_(0) += wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(1) -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
-                denominator_.roots_(0).imag(0);
-                denominator_.roots_(1).imag(0);
+                r1 += wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
+                r2 -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
             }
+
+            denominator_.setRoot(0, r1);
+            denominator_.setRoot(1, r2);
 
             break;
         }
@@ -115,16 +116,16 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
     {
         case HIGHPASS_1:
         case HIGHPASS_2:
-            numerator_.factor_ = k_;
+            numerator_.setFactor(k_);
             break;
 
         case LOWPASS_2:
-            numerator_.factor_ = k_ * wp_ * wp_;
+            numerator_.setFactor(k_ * wp_ * wp_);
             break;
 
         case LOWPASS_1:
         case BANDPASS:
-            numerator_.factor_ = k_ * wp_;
+            numerator_.setFactor(k_ * wp_);
             break;
 
         default: break;
@@ -163,32 +164,32 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
     {
         case LOWPASS_1:
             qpadj_->setEnabled(false);
-            numerator_.roots_.resize(0, Eigen::NoChange);
-            denominator_.roots_.resize(1, Eigen::NoChange);
+            numerator_.resize(0);
+            denominator_.resize(1);
             break;
 
         case HIGHPASS_1:
             qpadj_->setEnabled(false);
-            numerator_.roots_.resize(1, Eigen::NoChange);
-            denominator_.roots_.resize(1, Eigen::NoChange);
+            numerator_.resize(1);
+            denominator_.resize(1);
             break;
 
         case LOWPASS_2:
             qpadj_->setEnabled(true);
-            numerator_.roots_.resize(0, Eigen::NoChange);
-            denominator_.roots_.resize(2, Eigen::NoChange);
+            numerator_.resize(0);
+            denominator_.resize(2);
             break;
 
         case BANDPASS:
             qpadj_->setEnabled(true);
-            numerator_.roots_.resize(1, Eigen::NoChange);
-            denominator_.roots_.resize(2, Eigen::NoChange);
+            numerator_.resize(1);
+            denominator_.resize(2);
             break;
 
         case HIGHPASS_2:
             qpadj_->setEnabled(true);
-            numerator_.roots_.resize(2, Eigen::NoChange);
-            denominator_.roots_.resize(2, Eigen::NoChange);
+            numerator_.resize(2);
+            denominator_.resize(2);
             break;
 
         default:
@@ -198,16 +199,16 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
 /*
     // Butterworth filter
     int N = 64;
-    denominator_.roots_.resize(N, 1);
+    denominator_..resize(N, 1);
     for (int i = 0; i < N; ++i)
-        denominator_.roots_(i) = std::pow(typename Type<double>::Complex(-1, 0), double(i+0.5)/(N)) * typename Type<double>::Complex(0, 1);
+        denominator_.(i) = std::pow(typename Type<double>::Complex(-1, 0), double(i+0.5)/(N)) * typename Type<double>::Complex(0, 1);
 
     // Chebyshev
     double eta = 1;
     double a = -std::sinh(1.0/N * std::asinh(1.0/eta));
     double b = std::cosh(1.0/N * std::asinh(1.0/eta));
     for (int i = 0; i < N; ++i)
-        denominator_.roots_(i) = typename Type<double>::Complex(
+        denominator_.(i) = typename Type<double>::Complex(
             a * std::sin(M_PI / 2.0 * (2.0*i+1)/N),
             b * std::cos(M_PI / 2.0 * (2.0*i+1)/N)
         );*/

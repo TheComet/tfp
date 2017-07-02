@@ -41,7 +41,14 @@ void CoefficientPolynomial<T>::resize(int size)
 
 // ----------------------------------------------------------------------------
 template <class T>
-T& CoefficientPolynomial<T>::operator()(int index)
+void CoefficientPolynomial<T>::setCoefficient(int index, T coefficient)
+{
+    coefficients_(index, 0) = coefficient;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+T CoefficientPolynomial<T>::coefficient(int index) const
 {
     return coefficients_(index, 0);
 }

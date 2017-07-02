@@ -53,24 +53,24 @@ void PoleZeroPlot::onSystemParametersChanged()
 // ----------------------------------------------------------------------------
 void PoleZeroPlot::onSystemStructureChanged()
 {
-    while (system_->numerator_.roots_.size() < zeros_.size())
+    while (system_->numerator_.size() < zeros_.size())
     {
         zeros_.last()->detach();
         delete zeros_.last();
         zeros_.pop_back();
     }
-    while (system_->numerator_.roots_.size() > zeros_.size())
+    while (system_->numerator_.size() > zeros_.size())
     {
         zeros_.push_back(new QwtPlotShapeItem);
         zeros_.back()->attach(plot_);
     }
-    while (system_->denominator_.roots_.size() < poles_.size())
+    while (system_->denominator_.size() < poles_.size())
     {
         poles_.last()->detach();
         delete poles_.last();
         poles_.pop_back();
     }
-    while (system_->denominator_.roots_.size() > poles_.size())
+    while (system_->denominator_.size() > poles_.size())
     {
         poles_.push_back(new QwtPlotShapeItem);
         poles_.back()->attach(plot_);
@@ -84,18 +84,18 @@ void PoleZeroPlot::onSystemChanged()
 {
     const double radius = 0.02;
 
-    for (int i = 0; i < system_->numerator_.roots_.size(); ++i)
+    for (int i = 0; i < system_->numerator_.size(); ++i)
     {
-        typename Type<double>::Complex& root = system_->numerator_.roots_(i);
+        const typename Type<double>::Complex& root = system_->numerator_.root(i);
 
         QPainterPath path;
         path.addEllipse(root.real()-radius, root.imag()-radius, radius*2, radius*2);
         zeros_[i]->setShape(path);
     }
 
-    for (int i = 0; i < system_->denominator_.roots_.size(); ++i)
+    for (int i = 0; i < system_->denominator_.size(); ++i)
     {
-        typename Type<double>::Complex& root = system_->denominator_.roots_(i);
+        const typename Type<double>::Complex& root = system_->denominator_.root(i);
 
         QPainterPath path;
         path.moveTo(root.real()-radius, root.imag()+radius);

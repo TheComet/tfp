@@ -7,8 +7,46 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 template <class T>
+UniqueRootIterator<T>::UniqueRootIterator(RootPolynomial<T>* rootPolynomial) :
+    rootPolynomial_(rootPolynomial),
+    index_(0)
+{
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+const typename Type<T>::Complex& UniqueRootIterator<T>::get() const
+{
+    return rootPolynomial_->roots_[index_];
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+bool UniqueRootIterator<T>::hasNext()
+{
+    return index_ < rootPolynomial_->roots_.size();
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void UniqueRootIterator<T>::next()
+{
+    while (true)
+    {
+        ++index_;
+        if (hasNext() == false)
+            break;
+
+        if (rootPolynomial_->roots_[index_].first >= 1)
+            break;
+    }
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
 RootPolynomial<T>::RootPolynomial() :
-    factor_(1)
+    factor_(1),
+    multiplicityDirty_(true)
 {
 }
 
@@ -16,7 +54,8 @@ RootPolynomial<T>::RootPolynomial() :
 template <class T>
 RootPolynomial<T>::RootPolynomial(int size) :
     roots_(size, 1),
-    factor_(1)
+    factor_(1),
+    multiplicityDirty_(true)
 {
 }
 
@@ -24,7 +63,8 @@ RootPolynomial<T>::RootPolynomial(int size) :
 template <class T>
 RootPolynomial<T>::RootPolynomial(const typename Type<T>::ComplexVector& roots, T factor) :
     roots_(roots),
-    factor_(factor)
+    factor_(factor),
+    multiplicityDirty_(true)
 {
 }
 
@@ -32,7 +72,8 @@ RootPolynomial<T>::RootPolynomial(const typename Type<T>::ComplexVector& roots, 
 template <class T>
 RootPolynomial<T>::RootPolynomial(const CoefficientPolynomial<T>& polynomial) :
     roots_(polynomial.roots().roots_),
-    factor_(polynomial.coefficients_(0))
+    factor_(polynomial.coefficients_(0)),
+    multiplicityDirty_(true)
 {
 }
 
@@ -45,9 +86,80 @@ void RootPolynomial<T>::resize(int size)
 
 // ----------------------------------------------------------------------------
 template <class T>
-typename Type<T>::Complex& RootPolynomial<T>::operator()(int index)
+int RootPolynomial<T>::size() const
 {
-    return roots_(index, 0);
+    return roots_.size();
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void RootPolynomial<T>::setRoot(int index, const typename Type<T>::Complex& root)
+{
+    multiplicityDirty_ = true;
+    roots_[index] = root;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void RootPolynomial<T>::setRoot(int index, T root)
+{
+    multiplicityDirty_ = true;
+    roots_[index] = typename Type<T>::Complex(root, 0);
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+const typename Type<T>::Complex& RootPolynomial<T>::root(int index) const
+{
+    return roots_[index];
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+int RootPolynomial<T>::multiplicity(int index) const
+{
+    if (multiplicityDirty_)
+    {
+        multiplicities_.resize(roots_.size());
+        for (int i = 0; i != multiplicities_.size(); ++i)
+            multiplicities_[i] = 1;
+
+        for (int i = 0; i != roots_.size(); ++i)
+        {
+            for (int j = i + 1; j < roots_.size(); ++j)
+            {
+                if (roots_[i] == roots_[j])
+                {
+                    if (multiplicities_[i] >= 1)
+                    {
+                        multiplicities_[i]++;
+                        multiplicities_[j] = -index;
+                    }
+                }
+            }
+        }
+
+        multiplicityDirty_ = false;
+    }
+
+    int multiplicity = multiplicities_[index];
+    if (multiplicity < 1)
+        multiplicity = multiplicities_[-multiplicity];
+    return multiplicity;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void RootPolynomial<T>::setFactor(T factor)
+{
+    factor_ = factor;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+T RootPolynomial<T>::factor() const
+{
+    return factor_;
 }
 
 // ----------------------------------------------------------------------------

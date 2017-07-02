@@ -22,7 +22,8 @@ public:
     CoefficientPolynomial(const RootPolynomial<T>& polynomial);
 
     void resize(int size);
-    T& operator()(int index);
+    void setCoefficient(int index, T coefficient);
+    T coefficient(int index) const;
 
     RootPolynomial<T> roots() const;
 
@@ -31,9 +32,8 @@ public:
     template <class U>
     friend std::ostream& operator<<(std::ostream& os, const CoefficientPolynomial<U>& polynomial);
 
-    typename Type<T>::RealVector coefficients_;
-
 private:
+    typename Type<T>::RealVector coefficients_;
     mutable CompanionMatrixType companionMatrix_;
 };
 
