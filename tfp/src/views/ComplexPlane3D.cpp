@@ -86,17 +86,6 @@ ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
         plot_->coordinates()->axes[i].setMinors(5);
     }
 
-    // TODO why the fuck isn't this working
-    plot_->coordinates()->axes[Qwt3D::X1].setLabelString("Current (A)");
-    plot_->coordinates()->axes[Qwt3D::Y1].setLabelString("Exposure (%)");
-    plot_->coordinates()->axes[Qwt3D::Z1].setLabelString("Voltage (V)");
-    plot_->coordinates()->axes[Qwt3D::X2].setLabelString("Current (A)");
-    plot_->coordinates()->axes[Qwt3D::Y2].setLabelString("Exposure (%)");
-    plot_->coordinates()->axes[Qwt3D::Z2].setLabelString("Voltage (V)");
-    plot_->coordinates()->axes[Qwt3D::X3].setLabelString("Current (A)");
-    plot_->coordinates()->axes[Qwt3D::Y3].setLabelString("Exposure (%)");
-    plot_->coordinates()->axes[Qwt3D::Z3].setLabelString("Voltage (V)");
-
     plot_->setRotation(30, 0, 15);
     plot_->setScale(1, 1, 1);
     plot_->setShift(0.15, 0, 0);
@@ -119,7 +108,6 @@ void ComplexPlane3D::replot()
 // ----------------------------------------------------------------------------
 void ComplexPlane3D::autoScale()
 {
-
 }
 
 // ----------------------------------------------------------------------------
@@ -127,25 +115,25 @@ void ComplexPlane3D::onSystemParametersChanged()
 {
     MagnitudeFunction func(plot_, system_);
     
-    func.setMesh(100, 100);
-    func.setDomain(-5.5, 0.5, -3, 3);
-    func.setMinZ(-5);
-    func.setMaxZ(5);
-    func.create();
+    const double minx = -5.5;
+    const double maxx = 0.5;
+    const double miny = -3;
+    const double maxy = 3;
+    const double minz = -4;
+    const double maxz = 4;
 
-    replot();
+    func.setMesh(100, 100);
+    func.setDomain(minx, maxx, miny, maxy);
+    func.setMinZ(minz);
+    func.setMaxZ(maxz);
+    func.create();
+    plot_->createCoordinateSystem(Qwt3D::Triple(minx, miny, minz), Qwt3D::Triple(maxx, maxy, maxz));
+    plot_->updateGL();
 }
 
 // ----------------------------------------------------------------------------
 void ComplexPlane3D::onSystemStructureChanged()
 {
-    MagnitudeFunction func(plot_, system_);
-
-    func.setMesh(100, 100);
-    func.setDomain(-5.5, 0.5, -3, 3);
-    func.setMinZ(-5);
-    func.setMaxZ(5);
-    func.create();
 }
 
 }
