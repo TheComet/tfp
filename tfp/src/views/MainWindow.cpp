@@ -31,17 +31,20 @@ MainWindow::MainWindow(QWidget *parent) :
     widget->setLayout(layout);
 
     DynamicSystemVisualiser* bodePlot = new BodePlot;
-    DynamicSystemVisualiser* pzplot = new ComplexPlane3D;
+    DynamicSystemVisualiser* pzplot = new PoleZeroPlot;
+    DynamicSystemVisualiser* pzplot3d = new ComplexPlane3D;
     DynamicSystemVisualiser* stepPlot = new StepPlot;
     layout->addWidget(bodePlot, 0, 0, 2, 1);
     layout->addWidget(pzplot, 0, 1, 1, 1);
     layout->addWidget(stepPlot, 1, 1, 1, 1);
+    layout->addWidget(pzplot3d, 0, 2, 1, 1);
 
     StandardLowOrderFilter* filterConfig = new StandardLowOrderFilter;
-    layout->addWidget(filterConfig, 0, 2, 2, 1);
+    layout->addWidget(filterConfig, 1, 2, 1, 1);
 
     bodePlot->setSystem(filterConfig);
     pzplot->setSystem(filterConfig);
+    pzplot3d->setSystem(filterConfig);
     stepPlot->setSystem(filterConfig);
 }
 

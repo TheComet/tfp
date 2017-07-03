@@ -7,7 +7,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 template <class T>
-UniqueRootIterator<T>::UniqueRootIterator(RootPolynomial<T>* rootPolynomial) :
+UniqueRootIterator<T>::UniqueRootIterator(const RootPolynomial<T>* rootPolynomial) :
     rootPolynomial_(rootPolynomial),
     index_(0)
 {
@@ -116,7 +116,19 @@ const typename Type<T>::Complex& RootPolynomial<T>::root(int index) const
 
 // ----------------------------------------------------------------------------
 template <class T>
-int RootPolynomial<T>::multiplicity(int index) const
+int RootPolynomial<T>::multiplicity(int index)
+{
+    updateMultiplicities();
+
+    int multiplicity = multiplicities_[index];
+    if (multiplicity < 1)
+        multiplicity = multiplicities_[-multiplicity];
+    return multiplicity;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void RootPolynomial<T>::updateMultiplicities()
 {
     if (multiplicityDirty_)
     {
@@ -133,7 +145,7 @@ int RootPolynomial<T>::multiplicity(int index) const
                     if (multiplicities_[i] >= 1)
                     {
                         multiplicities_[i]++;
-                        multiplicities_[j] = -index;
+                        multiplicities_[j] = -i;
                     }
                 }
             }
@@ -141,11 +153,14 @@ int RootPolynomial<T>::multiplicity(int index) const
 
         multiplicityDirty_ = false;
     }
+}
 
-    int multiplicity = multiplicities_[index];
-    if (multiplicity < 1)
-        multiplicity = multiplicities_[-multiplicity];
-    return multiplicity;
+// ----------------------------------------------------------------------------
+template <class T>
+UniqueRootIterator<T> RootPolynomial<T>::uniqueRoots()
+{
+    updateMultiplicities();
+    return UniqueRootIterator<T>(this);
 }
 
 // ----------------------------------------------------------------------------

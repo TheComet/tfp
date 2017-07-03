@@ -19,9 +19,9 @@ public:
     void next();
 
 private:
-    UniqueRootIterator(RootPolynomial<T>* rootPolynomial);
+    UniqueRootIterator(const RootPolynomial<T>* rootPolynomial);
 
-    RootPolynomial<T>* rootPolynomial_;
+    const RootPolynomial<T>* rootPolynomial_;
     int index_;
 };
 
@@ -58,7 +58,9 @@ public:
      * value of a root, it is checked against the existing roots. If an
      * identical root is found, then its multiplicity is increased.
      */
-    int multiplicity(int index) const;
+    int multiplicity(int index);
+
+    UniqueRootIterator<T> uniqueRoots();
 
     void setFactor(T factor);
 
@@ -86,6 +88,8 @@ public:
     friend class UniqueRootIterator<T>;
 
 private:
+    void updateMultiplicities();
+
     typename Type<T>::ComplexVector roots_;
     std::vector<T> multiplicities_;
     T factor_;
