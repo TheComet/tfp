@@ -1,6 +1,7 @@
 #include "tfp/views/BodePlot.hpp"
 #include "tfp/views/RealtimePlot.hpp"
 #include "tfp/views/StandardLowOrderFilter.hpp"
+#include "tfp/models/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <QVBoxLayout>
 #include <qwt_plot_curve.h>
@@ -10,7 +11,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 BodePlot::BodePlot(QWidget* parent) :
-    DynamicSystemVisualiser(parent),
+    SystemVisualiser(parent),
     ampPlot_(new RealtimePlot),
     phasePlot_(new RealtimePlot),
     amplitude_(new QwtPlotCurve),
@@ -55,7 +56,7 @@ void BodePlot::onSystemParametersChanged()
     double freqdata[1000];
     double xStart, xEnd;
 
-    system_->getInterestingRange(&xStart, &xEnd);
+    system_->getInterestingFrequencyInterval(&xStart, &xEnd);
     system_->frequencyResponse(freqdata, ampdata, phasedata, xStart, xEnd, 1000);
     amplitude_->setSamples(freqdata, ampdata, 1000);
     phase_->setSamples(freqdata, phasedata, 1000);

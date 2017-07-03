@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/views/DynamicSystemVisualiser.hpp"
+#include "tfp/views/SystemVisualiser.hpp"
 #include "tfp/math/TransferFunction.hxx"
 
 class QwtPlotCurve;
@@ -10,7 +10,7 @@ namespace tfp {
 
 class RealtimePlot;
 
-class TimeDomainResponsePlot : public DynamicSystemVisualiser
+class TimeDomainResponsePlot : public SystemVisualiser
 {
 public:
     explicit TimeDomainResponsePlot(QWidget* parent=NULL);

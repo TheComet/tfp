@@ -2,7 +2,7 @@
 
 
 #include "tfp/config.hpp"
-#include "tfp/views/DynamicSystemVisualiser.hpp"
+#include "tfp/views/SystemVisualiser.hpp"
 
 namespace Qwt3D {
     class GridPlot;
@@ -10,7 +10,7 @@ namespace Qwt3D {
 
 namespace tfp {
 
-class ComplexPlane3D : public DynamicSystemVisualiser
+class ComplexPlane3D : public SystemVisualiser
 {
 public:
     explicit ComplexPlane3D(QWidget* parent=NULL);

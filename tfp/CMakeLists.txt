@@ -28,21 +28,16 @@ configure_file ("include/tfp/config.hpp.in" "include/tfp/config.hpp")
 ###############################################################################
 
 set (tfp_HEADERS_MOC
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/AutoScaler.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/DeltaPlotPicker.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Panner.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/RectangleZoomer.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/UnitTracker.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Zoomer.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/AdjustmentWidget.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/BodePlot.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/DynamicSystemConfig.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/DynamicSystemVisualiser.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/PoleZeroPlot.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SystemVisualiser.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/StandardLowOrderFilter.hpp")
 
 set (tfp_SOURCES
@@ -52,6 +47,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/String.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
@@ -63,8 +59,6 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/BodePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/ComplexPlane3D.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemConfig.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/DynamicSystemVisualiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/ImpulsePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
@@ -73,6 +67,8 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/StandardLowOrderFilter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/StepPlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemManipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemVisualiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/TimeDomainResponsePlot.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")

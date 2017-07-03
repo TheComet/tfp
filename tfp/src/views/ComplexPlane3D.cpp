@@ -1,6 +1,6 @@
 #include "tfp/views/ComplexPlane3D.hpp"
-#include "tfp/views/DynamicSystemConfig.hpp"
-#include "tfp/math/TransferFunction.hpp"
+#include "tfp/views/SystemManipulator.hpp"
+#include "tfp/models/System.hpp"
 #include <QVBoxLayout>
 #include <qwt3d_gridplot.h>
 #include <qwt3d_function.h>
@@ -72,7 +72,7 @@ private:
 
 // ----------------------------------------------------------------------------
 ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
-    DynamicSystemVisualiser(parent),
+    SystemVisualiser(parent),
     plot_(new Qwt3D::GridPlot)
 {
     setLayout(new QVBoxLayout);
@@ -86,10 +86,10 @@ ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
         plot_->coordinates()->axes[i].setMinors(5);
     }
 
-    plot_->setRotation(30, 0, 15);
+    plot_->setRotation(25, 0, 285);
     plot_->setScale(1, 1, 1);
-    plot_->setShift(0.15, 0, 0);
-    plot_->setZoom(0.9);
+    plot_->setShift(0, -0.4, 0);
+    plot_->setZoom(2);
     plot_->setPlotStyle(Qwt3D::FILLED);
     //plot_->setDataColor(new Jet(plot_));
     plot_->setCoordinateStyle(Qwt3D::BOX);

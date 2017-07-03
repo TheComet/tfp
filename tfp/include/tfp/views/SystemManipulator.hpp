@@ -1,10 +1,12 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/math/TransferFunction.hxx"
+#include "tfp/models/Reference.hpp"
 #include <QWidget>
 
 namespace tfp {
+
+class System;
 
 /*!
  * @brief Represents a continuous dynamic system.
@@ -14,19 +16,18 @@ namespace tfp {
  * parametersChanged() (if you only modified existing values) or
  * structureChanged() (if you added or removed roots).
  */
-class DynamicSystemConfig : public QWidget,
-                            public TransferFunction<double>
+class SystemManipulator : public QWidget
 {
-    Q_OBJECT
-
 public:
-    explicit DynamicSystemConfig(QWidget* parent=NULL);
+    explicit SystemManipulator(QWidget* parent=NULL);
+    void setSystem(System* system);
+    System* createSystem();
 
-    virtual void getInterestingRange(double* xStart, double* xEnd) = 0;
+protected:
+    virtual void onSetSystem() = 0;
 
-signals:
-    void parametersChanged();
-    void structureChanged();
+protected:
+    Reference<System> system_;
 };
 
 }

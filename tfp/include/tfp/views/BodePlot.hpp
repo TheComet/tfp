@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/views/DynamicSystemVisualiser.hpp"
+#include "tfp/views/SystemVisualiser.hpp"
 
 class QwtPlotCurve;
 
@@ -9,10 +9,8 @@ namespace tfp {
 
 class RealtimePlot;
 
-class BodePlot : public DynamicSystemVisualiser
+class BodePlot : public SystemVisualiser
 {
-    Q_OBJECT
-
 public:
     explicit BodePlot(QWidget* parent=NULL);
 

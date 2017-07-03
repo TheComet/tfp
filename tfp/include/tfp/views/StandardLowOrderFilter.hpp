@@ -1,13 +1,14 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/views/DynamicSystemConfig.hpp"
+#include "tfp/views/SystemManipulator.hpp"
+#include "tfp/models/System.hpp"
 
 namespace tfp {
 
 class FloatAdjustmentWidget;
 
-class StandardLowOrderFilter : public DynamicSystemConfig
+class StandardLowOrderFilter : public SystemManipulator
 {
     Q_OBJECT
 
@@ -24,7 +25,6 @@ public:
 
     explicit StandardLowOrderFilter(QWidget* parent=NULL);
 
-    virtual void getInterestingRange(double* xStart, double* xEnd) override;
     void setFilterType(FilterType filterType);
 
 public slots:
@@ -33,6 +33,9 @@ public slots:
     void setQualityFactor(double qp);
     void setParameters(double k, double wp, double qp);
     void setFilterType(int index);
+
+protected:
+    virtual void onSetSystem() override;
 
 private:
     FloatAdjustmentWidget* qpadj_;

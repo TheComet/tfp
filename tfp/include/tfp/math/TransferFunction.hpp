@@ -1,3 +1,5 @@
+#pragma once
+
 #include "tfp/math/TransferFunction.hxx"
 #include "tfp/math/CoefficientPolynomial.hpp"
 #include "tfp/math/RootPolynomial.hpp"

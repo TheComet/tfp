@@ -1,6 +1,5 @@
 #include "tfp/views/StepPlot.hpp"
-#include "tfp/views/DynamicSystemConfig.hpp"
-#include "tfp/math/TransferFunction.hpp"
+#include "tfp/models/System.hpp"
 
 namespace tfp {
 

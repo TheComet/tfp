@@ -1,6 +1,7 @@
 #include "tfp/views/PoleZeroPlot.hpp"
 #include "tfp/views/RealtimePlot.hpp"
-#include "tfp/views/DynamicSystemConfig.hpp"
+#include "tfp/models/System.hpp"
+#include "tfp/math/TransferFunction.hpp"
 #include <QVBoxLayout>
 #include <QPainterPath>
 #include <qwt_plot_shapeitem.h>
@@ -10,7 +11,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 PoleZeroPlot::PoleZeroPlot(QWidget* parent) :
-    DynamicSystemVisualiser(parent),
+    SystemVisualiser(parent),
     plot_(new RealtimePlot)
 {
     plot_->enableRectangleZoom();

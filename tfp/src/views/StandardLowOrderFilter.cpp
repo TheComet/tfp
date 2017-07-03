@@ -8,7 +8,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 StandardLowOrderFilter::StandardLowOrderFilter(QWidget* parent) :
-    DynamicSystemConfig(parent),
+    SystemManipulator(parent),
     qpadj_(new FloatAdjustmentWidget),
     filterType_(LOWPASS_1),
     k_(1.0), wp_(1.0), qp_(1.0)
@@ -42,15 +42,6 @@ StandardLowOrderFilter::StandardLowOrderFilter(QWidget* parent) :
     connect(wpadj, SIGNAL(valueChanged(double)), this, SLOT(setPoleFrequency(double)));
     connect(qpadj_, SIGNAL(valueChanged(double)), this, SLOT(setQualityFactor(double)));
     connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(setFilterType(int)));
-
-    setFilterType(LOWPASS_1);
-}
-
-// ----------------------------------------------------------------------------
-void StandardLowOrderFilter::getInterestingRange(double* xStart, double* xEnd)
-{
-    *xStart = wp_ * 0.01;
-    *xEnd = wp_ * 100;
 }
 
 // ----------------------------------------------------------------------------
@@ -64,7 +55,7 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
              * T(s) = --------
              *         s + wp
              */
-            denominator_.setRoot(0, -wp_);
+            system_->denominator_.setRoot(0, -wp_);
             break;
 
         case HIGHPASS_1:
@@ -73,7 +64,7 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
              * T(s) = --------
              *         s + wp
              */
-            denominator_.setRoot(0, -wp_);
+            system_->denominator_.setRoot(0, -wp_);
             break;
 
         // Denominator is calculated the same for all 3 variants
@@ -103,8 +94,8 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
                 r2 -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
             }
 
-            denominator_.setRoot(0, r1);
-            denominator_.setRoot(1, r2);
+            system_->denominator_.setRoot(0, r1);
+            system_->denominator_.setRoot(1, r2);
 
             break;
         }
@@ -116,22 +107,22 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
     {
         case HIGHPASS_1:
         case HIGHPASS_2:
-            numerator_.setFactor(k_);
+            system_->numerator_.setFactor(k_);
             break;
 
         case LOWPASS_2:
-            numerator_.setFactor(k_ * wp_ * wp_);
+            system_->numerator_.setFactor(k_ * wp_ * wp_);
             break;
 
         case LOWPASS_1:
         case BANDPASS:
-            numerator_.setFactor(k_ * wp_);
+            system_->numerator_.setFactor(k_ * wp_);
             break;
 
         default: break;
     }
 
-    emit parametersChanged();
+    system_->notifyParametersChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -164,32 +155,32 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
     {
         case LOWPASS_1:
             qpadj_->setEnabled(false);
-            numerator_.resize(0);
-            denominator_.resize(1);
+            system_->numerator_.resize(0);
+            system_->denominator_.resize(1);
             break;
 
         case HIGHPASS_1:
             qpadj_->setEnabled(false);
-            numerator_.resize(1);
-            denominator_.resize(1);
+            system_->numerator_.resize(1);
+            system_->denominator_.resize(1);
             break;
 
         case LOWPASS_2:
             qpadj_->setEnabled(true);
-            numerator_.resize(0);
-            denominator_.resize(2);
+            system_->numerator_.resize(0);
+            system_->denominator_.resize(2);
             break;
 
         case BANDPASS:
             qpadj_->setEnabled(true);
-            numerator_.resize(1);
-            denominator_.resize(2);
+            system_->numerator_.resize(1);
+            system_->denominator_.resize(2);
             break;
 
         case HIGHPASS_2:
             qpadj_->setEnabled(true);
-            numerator_.resize(2);
-            denominator_.resize(2);
+            system_->numerator_.resize(2);
+            system_->denominator_.resize(2);
             break;
 
         default:
@@ -213,7 +204,7 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
             b * std::cos(M_PI / 2.0 * (2.0*i+1)/N)
         );*/
 
-    emit structureChanged();
+    system_->notifyStructureChanged();
     setParameters(k_, wp_, qp_);
 }
 
@@ -221,6 +212,12 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
 void StandardLowOrderFilter::setFilterType(int index)
 {
     setFilterType(FilterType(index));
+}
+
+// ----------------------------------------------------------------------------
+void StandardLowOrderFilter::onSetSystem()
+{
+    setFilterType(filterType_);
 }
 
 }

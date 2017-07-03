@@ -8,6 +8,8 @@ namespace Ui {
     class MainWindow;
 }
 
+class QMdiArea;
+
 namespace tfp {
 
 /*!
@@ -26,6 +28,7 @@ public:
 
 private:
     Ui::MainWindow* ui;
+    QMdiArea* mdiArea_;
 };
 
 } // namespace tfp

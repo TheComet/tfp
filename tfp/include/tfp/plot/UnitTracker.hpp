@@ -8,8 +8,6 @@ namespace tfp {
 
 class UnitTracker : public QwtPlotPicker
 {
-    Q_OBJECT
-
 public:
     explicit UnitTracker(QWidget* canvas);
 

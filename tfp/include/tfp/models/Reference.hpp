@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "common/RefCounted.hpp"
+#include "tfp/models/RefCounted.hpp"
 
 #include <cassert>
 #include <cstddef>
 
-namespace common {
+namespace tfp {
 
 /// Shared pointer template class with intrusive reference counting.
 template <class T>
@@ -520,4 +520,4 @@ WeakReference<T> dynamicCast(const WeakReference<U>& ptr)
     return ret;
 }
 
-} // namespace common
+} // namespace tfp

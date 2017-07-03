@@ -11,8 +11,6 @@ namespace tfp {
  */
 class AutoScaler : public DeltaPlotPicker
 {
-    Q_OBJECT
-
 public:
     explicit AutoScaler(QWidget* canvas);
     ~AutoScaler();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/views/DynamicSystemVisualiser.hpp"
+#include "tfp/views/SystemVisualiser.hpp"
 #include <QVector>
 
 class QwtPlotShapeItem;
@@ -11,10 +11,8 @@ namespace tfp {
 
 class RealtimePlot;
 
-class PoleZeroPlot : public DynamicSystemVisualiser
+class PoleZeroPlot : public SystemVisualiser
 {
-    Q_OBJECT
-
 public:
     explicit PoleZeroPlot(QWidget* parent=NULL);
 
