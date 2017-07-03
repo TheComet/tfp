@@ -52,12 +52,14 @@ MainWindow::MainWindow(QWidget *parent) :
     mdiArea_->setTabsClosable(true);
     mdiArea_->setTabsMovable(true);
     ui->centralWidget->layout()->addWidget(mdiArea_);
+    mdiArea_->setVisible(false);
 
     // TODO Just for debugging.
 
     QWidget* widget = new QWidget;
-    mdiArea_->addSubWindow(widget);
-    widget->showMaximized();
+    //mdiArea_->addSubWindow(widget);
+    //widget->showMaximized();
+    ui->centralWidget->layout()->addWidget(widget);
 
     QGridLayout* layout = new QGridLayout;
     widget->setLayout(layout);
