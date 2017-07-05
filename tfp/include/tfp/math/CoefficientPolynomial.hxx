@@ -22,6 +22,7 @@ public:
     CoefficientPolynomial(const RootPolynomial<T>& polynomial);
 
     void resize(int size);
+    int size() const;
     void setCoefficient(int index, T coefficient);
     T coefficient(int index) const;
 

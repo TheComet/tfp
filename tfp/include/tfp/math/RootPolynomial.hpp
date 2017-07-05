@@ -186,7 +186,7 @@ CoefficientPolynomial<T> RootPolynomial<T>::poly() const
     // roots (real functions)
     typename Type<T>::ComplexVector coeffs = Type<T>::ComplexVector::Zero(roots_.size() + 1);
     typename Type<T>::ComplexVector temp(roots_.size() + 1);
-    coeffs(0) = Type<T>::Complex(1, 0);
+    coeffs(0) = typename Type<T>::Complex(1, 0);
 
     for (int i = 0; i < roots_.size(); ++i)
     {
@@ -204,7 +204,7 @@ CoefficientPolynomial<T> RootPolynomial<T>::poly() const
     CoefficientPolynomial<T> ret;
     ret.resize(coeffs.size());
     for (int i = 0; i < coeffs.size(); ++i)
-        ret.coefficients_(i) = coeffs(i).real() * factor_;
+        ret.setCoefficient(i, coeffs(i).real() * factor_);
 
     return ret;
 }

@@ -42,12 +42,12 @@ set (tfp_HEADERS_MOC
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/String.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
@@ -59,6 +59,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/BodePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/ComplexPlane3D.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTree.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/ImpulsePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"

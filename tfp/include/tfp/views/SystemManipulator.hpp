@@ -21,7 +21,6 @@ class SystemManipulator : public QWidget
 public:
     explicit SystemManipulator(QWidget* parent=NULL);
     void setSystem(System* system);
-    System* createSystem();
 
 protected:
     virtual void onSetSystem() = 0;

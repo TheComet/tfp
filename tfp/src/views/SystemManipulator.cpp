@@ -16,11 +16,4 @@ void SystemManipulator::setSystem(System* system)
     onSetSystem();
 }
 
-// ----------------------------------------------------------------------------
-System* SystemManipulator::createSystem()
-{
-    system_ = new System;
-    return system_;
-}
-
 }
