@@ -16,6 +16,7 @@ class System : public RefCounted,
 {
 public:
     System(QTreeWidgetItem* dataTree);
+    ~System();
 
     void notifyParametersChanged();
     void notifyStructureChanged();
@@ -29,6 +30,7 @@ public:
 private:
     QTreeWidgetItem* dataTree_;
     QTreeWidgetItem* tfItem_;
+    QTreeWidgetItem* factorItem_;
     QTreeWidgetItem* polesItem_;
     QTreeWidgetItem* zerosItem_;
     QTreeWidgetItem* coeffBItem_;

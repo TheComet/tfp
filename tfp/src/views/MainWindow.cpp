@@ -98,6 +98,7 @@ MainWindow::~MainWindow()
 System* MainWindow::newSystem(const QString& name)
 {
     QTreeWidgetItem* systemDataTree = dataTree_->addSystem(name);
+    systemDataTree->setExpanded(true);
     System* system = new System(systemDataTree);
     return system;
 }

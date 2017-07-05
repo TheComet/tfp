@@ -9,6 +9,9 @@ System::System(QTreeWidgetItem* dataTree) :
 {
     tfItem_ = new QTreeWidgetItem(dataTree);
     tfItem_->setText(0, "Transfer Function");
+    tfItem_->setExpanded(true);
+    factorItem_ = new QTreeWidgetItem(tfItem_);
+    factorItem_->setText(0, "Factor");
     polesItem_ = new QTreeWidgetItem(tfItem_);
     polesItem_->setText(0, "Poles");
     zerosItem_ = new QTreeWidgetItem(tfItem_);
@@ -17,6 +20,14 @@ System::System(QTreeWidgetItem* dataTree) :
     coeffBItem_->setText(0, "Numerator");
     coeffAItem_ = new QTreeWidgetItem(tfItem_);
     coeffAItem_->setText(0, "Denominator");
+
+    dataTree_->treeWidget()->resizeColumnToContents(0);
+}
+
+// ----------------------------------------------------------------------------
+System::~System()
+{
+    delete dataTree_->takeChild(dataTree_->indexOfChild(tfItem_));
 }
 
 // ----------------------------------------------------------------------------
@@ -53,6 +64,7 @@ void System::notifyParametersChanged()
     buf += "]";                                                              \
     item->setText(1, buf);
 
+    factorItem_->setText(1, QString::number(numerator_.factor() / denominator_.factor()));
     UPDATE_CHILD_VALUES_COMPLEX(polesItem_, denominator_);
     UPDATE_CHILD_VALUES_COMPLEX(zerosItem_, numerator_);
     UPDATE_CHILD_VALUES_REAL(coeffBItem_, coeffNumerator);
@@ -60,7 +72,6 @@ void System::notifyParametersChanged()
 
     dispatcher.dispatch(&SystemListener::onSystemParametersChanged);
 }
-
 
 // ----------------------------------------------------------------------------
 void System::notifyStructureChanged()
