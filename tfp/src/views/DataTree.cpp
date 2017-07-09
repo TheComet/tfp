@@ -1,4 +1,5 @@
 #include "tfp/views/DataTree.hpp"
+#include "tfp/models/System.hpp"
 
 namespace tfp {
 
@@ -12,18 +13,19 @@ DataTree::DataTree(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-QTreeWidgetItem* DataTree::addSystem(const QString& name)
+void DataTree::addSystem(System* system)
 {
-    QTreeWidgetItem* system = new QTreeWidgetItem;
-    system->setText(0, name);
-    addTopLevelItem(system);
-    return system;
+    QTreeWidgetItem* item = new QTreeWidgetItem;
+    addTopLevelItem(item);
+    item->setExpanded(true);
+    item->setText(0, system->name());
+    system->setDataTree(item);
 }
 
 // ----------------------------------------------------------------------------
-void DataTree::removeSystem(QTreeWidgetItem* system)
+void DataTree::removeSystem(System* system)
 {
-    delete takeTopLevelItem(indexOfTopLevelItem(system));
+    delete takeTopLevelItem(indexOfTopLevelItem(system->dataTree()));
 }
 
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QMainWindow>
-
 #include "tfp/config.hpp"
+#include "tfp/util/Reference.hpp"
+#include <QMainWindow>
 
 namespace Ui {
     class MainWindow;
@@ -12,8 +12,9 @@ class QMdiArea;
 
 namespace tfp {
 
-class System;
 class DataTree;
+class PluginManager;
+class System;
 
 /*!
  * @brief The top-most Qt widget of this application. Handles the menu bar
@@ -33,9 +34,13 @@ public:
     void deleteSystem(System* system);
 
 private:
+    void loadPlugins();
+
+private:
     Ui::MainWindow* ui;
     QMdiArea* mdiArea_;
     DataTree* dataTree_;
+    Reference<PluginManager> pluginManager_;
 };
 
 } // namespace tfp

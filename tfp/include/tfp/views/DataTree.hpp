@@ -5,13 +5,15 @@
 
 namespace tfp {
 
+class System;
+
 class DataTree : public QTreeWidget
 {
 public:
     explicit DataTree(QWidget* parent=NULL);
 
-    QTreeWidgetItem* addSystem(const QString& name);
-    void removeSystem(QTreeWidgetItem* system);
+    void addSystem(System* system);
+    void removeSystem(System* system);
 
 private:
     int getTopLevelItemIndex(QTreeWidgetItem* item);

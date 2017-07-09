@@ -37,17 +37,12 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SystemVisualiser.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/StandardLowOrderFilter.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SystemVisualiser.hpp")
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/Metric.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/RefCounted.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/String.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
@@ -56,21 +51,21 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/PluginManager.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/PluginWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/BodePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/ComplexPlane3D.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTree.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/ImpulsePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/PoleZeroPlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/StandardLowOrderFilter.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/StepPlot.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemManipulator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemVisualiser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/TimeDomainResponsePlot.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemVisualiser.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
 set (tfp_RESOURCES
@@ -117,6 +112,7 @@ target_link_libraries (tfp qwtplot3d)
 target_link_libraries (tfp qwtmathml)
 target_link_libraries (tfp kiss_fft)
 target_link_libraries (tfp pugixml)
+target_link_libraries (tfp dl)
 
 ###############################################################################
 # Compile translation files
@@ -180,3 +176,12 @@ if (PLATFORM MATCHES "WINDOWS")
     endif ()
 endif ()
 
+###############################################################################
+# plugins
+###############################################################################
+
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/bode-plot")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/complex-plane-3d")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/pole-zero-plot")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/std-low-order-filters")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/step-impulse-response")

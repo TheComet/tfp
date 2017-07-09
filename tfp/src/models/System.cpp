@@ -4,30 +4,16 @@
 namespace tfp {
 
 // ----------------------------------------------------------------------------
-System::System(QTreeWidgetItem* dataTree) :
-    dataTree_(dataTree)
+System::System(const QString& name) :
+    dataTree_(NULL),
+    name_(name)
 {
-    tfItem_ = new QTreeWidgetItem(dataTree);
-    tfItem_->setText(0, "Transfer Function");
-    tfItem_->setExpanded(true);
-    factorItem_ = new QTreeWidgetItem(tfItem_);
-    factorItem_->setText(0, "Factor");
-    polesItem_ = new QTreeWidgetItem(tfItem_);
-    polesItem_->setText(0, "Poles");
-    zerosItem_ = new QTreeWidgetItem(tfItem_);
-    zerosItem_->setText(0, "Zeros");
-    coeffBItem_ = new QTreeWidgetItem(tfItem_);
-    coeffBItem_->setText(0, "Numerator");
-    coeffAItem_ = new QTreeWidgetItem(tfItem_);
-    coeffAItem_->setText(0, "Denominator");
-
-    dataTree_->treeWidget()->resizeColumnToContents(0);
 }
 
 // ----------------------------------------------------------------------------
 System::~System()
 {
-    delete dataTree_->takeChild(dataTree_->indexOfChild(tfItem_));
+    setDataTree(NULL);
 }
 
 // ----------------------------------------------------------------------------
@@ -128,6 +114,40 @@ void System::getInterestingTimeInterval(double* xStart, double* xEnd) const
 
     *xStart = 0;
     *xEnd   = 10 / closestpole;
+}
+
+// ----------------------------------------------------------------------------
+const QString& System::name() const
+{
+    return name_;
+}
+
+// ----------------------------------------------------------------------------
+void System::setDataTree(QTreeWidgetItem* tree)
+{
+    if (dataTree_ != NULL)
+        delete dataTree_->takeChild(dataTree_->indexOfChild(tfItem_));
+
+    dataTree_ = tree;
+
+    if (dataTree_ == NULL)
+        return;
+
+    tfItem_ = new QTreeWidgetItem(dataTree_);
+    tfItem_->setText(0, "Transfer Function");
+    tfItem_->setExpanded(true);
+    factorItem_ = new QTreeWidgetItem(tfItem_);
+    factorItem_->setText(0, "Factor");
+    polesItem_ = new QTreeWidgetItem(tfItem_);
+    polesItem_->setText(0, "Poles");
+    zerosItem_ = new QTreeWidgetItem(tfItem_);
+    zerosItem_->setText(0, "Zeros");
+    coeffBItem_ = new QTreeWidgetItem(tfItem_);
+    coeffBItem_->setText(0, "Numerator");
+    coeffAItem_ = new QTreeWidgetItem(tfItem_);
+    coeffAItem_->setText(0, "Denominator");
+
+    dataTree_->treeWidget()->resizeColumnToContents(0);
 }
 
 // ----------------------------------------------------------------------------

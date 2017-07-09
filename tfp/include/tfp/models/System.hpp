@@ -3,8 +3,8 @@
 #include "tfp/config.hpp"
 #include "tfp/listeners/SystemListener.hpp"
 #include "tfp/math/TransferFunction.hpp"
-#include "tfp/models/RefCounted.hpp"
-#include "tfp/models/ListenerDispatcher.hpp"
+#include "tfp/util/RefCounted.hpp"
+#include "tfp/util/ListenerDispatcher.hpp"
 #include <QVector>
 
 class QTreeWidgetItem;
@@ -15,7 +15,7 @@ class System : public RefCounted,
                public TransferFunction<double>
 {
 public:
-    System(QTreeWidgetItem* dataTree);
+    System(const QString& name);
     ~System();
 
     void notifyParametersChanged();
@@ -23,6 +23,9 @@ public:
     void getInterestingFrequencyInterval(double* xStart, double* xEnd) const;
     void getInterestingTimeInterval(double* xStart, double* xEnd) const;
 
+    const QString& name() const;
+
+    void setDataTree(QTreeWidgetItem* dataTree);
     QTreeWidgetItem* dataTree();
 
     ListenerDispatcher<SystemListener> dispatcher;
@@ -35,6 +38,7 @@ private:
     QTreeWidgetItem* zerosItem_;
     QTreeWidgetItem* coeffBItem_;
     QTreeWidgetItem* coeffAItem_;
+    QString name_;
 };
 
 }

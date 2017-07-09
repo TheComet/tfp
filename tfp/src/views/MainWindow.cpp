@@ -1,18 +1,17 @@
 #include "tfp/ui_MainWindow.h"
-#include "tfp/views/BodePlot.hpp"
-#include "tfp/views/ComplexPlane3D.hpp"
+#include "tfp/models/System.hpp"
+#include "tfp/util/PluginManager.hpp"
 #include "tfp/views/DataTree.hpp"
-#include "tfp/views/ImpulsePlot.hpp"
 #include "tfp/views/MainWindow.hpp"
-#include "tfp/views/PoleZeroPlot.hpp"
-#include "tfp/views/StandardLowOrderFilter.hpp"
-#include "tfp/views/StepPlot.hpp"
 #include <QGridLayout>
 #include <QMdiArea>
 #include <QPainter>
-#include <QPushButton>
+#include <QSplitter>
+#include <QDir>
 #include <qwt_text.h>
 #include <qwt_mathml_text_engine.h>
+
+#include <dlfcn.h>
 
 namespace tfp {
 
@@ -39,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     mdiArea_(new QMdiArea),
-    dataTree_(new DataTree)
+    dataTree_(new DataTree),
+    pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
 
@@ -50,42 +50,46 @@ MainWindow::MainWindow(QWidget *parent) :
     // Need to explicitly enable MathML rendering support
     QwtText::setTextEngine(QwtText::MathMLText, new QwtMathMLTextEngine());
 
-    // Data tree on the very left
-    ui->centralWidget->layout()->addWidget(dataTree_);
-
+/*
     mdiArea_->setViewMode(QMdiArea::TabbedView);
     mdiArea_->setTabsClosable(true);
     mdiArea_->setTabsMovable(true);
     ui->centralWidget->layout()->addWidget(mdiArea_);
-    mdiArea_->setVisible(false);
+    mdiArea_->setVisible(false);*/
 
+    loadPlugins();
 
     // TODO Just for debugging.
 
     QWidget* widget = new QWidget;
-    ui->centralWidget->layout()->addWidget(widget);
 
     QGridLayout* layout = new QGridLayout;
     widget->setLayout(layout);
 
-    System* system = newSystem("System");
-    SystemVisualiser* bodePlot = new BodePlot;
+    SystemManipulator* bodePlot = pluginManager_->createSystemManipulator("Bode Plot");
+    SystemManipulator* pzplot = pluginManager_->createSystemManipulator("Pole Zero Plot");
+    SystemManipulator* stepPlot = pluginManager_->createSystemManipulator("Step Response");
+    SystemManipulator* pzplot3d = pluginManager_->createSystemManipulator("Complex Plane 3D");
+    SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Standard Low Order Filters");
     layout->addWidget(bodePlot, 0, 0, 2, 1);
-    SystemVisualiser* pzplot = new PoleZeroPlot;
     layout->addWidget(pzplot, 0, 1, 1, 1);
-    SystemVisualiser* stepPlot = new StepPlot;
     layout->addWidget(stepPlot, 1, 1, 1, 1);
-    SystemVisualiser* pzplot3d = new ComplexPlane3D;
     layout->addWidget(pzplot3d, 0, 2, 1, 1);
-
-    SystemManipulator* manipulator = new StandardLowOrderFilter;
     layout->addWidget(manipulator, 1, 2, 1, 1);
 
+    System* system = newSystem("System");
     manipulator->setSystem(system);
     bodePlot->setSystem(system);
     pzplot->setSystem(system);
     pzplot3d->setSystem(system);
     stepPlot->setSystem(system);
+
+    QSplitter* splitter = new QSplitter;
+    ui->centralWidget->layout()->addWidget(splitter);
+    splitter->addWidget(dataTree_);
+    splitter->addWidget(widget);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
 }
 
 // ----------------------------------------------------------------------------
@@ -95,18 +99,27 @@ MainWindow::~MainWindow()
 }
 
 // ----------------------------------------------------------------------------
+void MainWindow::loadPlugins()
+{
+    QDir pluginsDir("plugins");
+    QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
+
+    for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
+        pluginManager_->loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
+}
+
+// ----------------------------------------------------------------------------
 System* MainWindow::newSystem(const QString& name)
 {
-    QTreeWidgetItem* systemDataTree = dataTree_->addSystem(name);
-    systemDataTree->setExpanded(true);
-    System* system = new System(systemDataTree);
+    System* system = new System(name);
+    dataTree_->addSystem(system);
     return system;
 }
 
 // ----------------------------------------------------------------------------
 void MainWindow::deleteSystem(System* system)
 {
-    dataTree_->removeSystem(system->dataTree());
+    dataTree_->removeSystem(system);
     delete system;
 }
 

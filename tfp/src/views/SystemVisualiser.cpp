@@ -5,8 +5,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 SystemVisualiser::SystemVisualiser(QWidget* parent) :
-    QWidget(parent),
-    system_(NULL)
+    SystemManipulator(parent)
 {
 }
 
@@ -25,7 +24,7 @@ void SystemVisualiser::setSystem(System* system)
         system_->dispatcher.removeListener(this);
     }
 
-    system_ = system;
+    SystemManipulator::setSystem(system);
 
     if (system_ != NULL)
     {

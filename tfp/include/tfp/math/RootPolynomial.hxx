@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/math/Type.hpp"
+#include "tfp/util/Type.hpp"
 #include "Eigen/Eigenvalues"
 #include <iostream>
 
