@@ -1,12 +1,11 @@
 #pragma once
 
+#include "tfp/config.hpp"
 
 class QLayout;
 class QwtPlotTextLabel;
 
-
 namespace tfp {
-
 
 struct Util
 {

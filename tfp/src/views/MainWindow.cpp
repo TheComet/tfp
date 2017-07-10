@@ -1,10 +1,14 @@
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
 #include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
 #include "tfp/views/MainWindow.hpp"
 #include <QGridLayout>
+#include <QVBoxLayout>
 #include <QMdiArea>
+#include <QGroupBox>
+#include <QComboBox>
 #include <QPainter>
 #include <QSplitter>
 #include <QDir>
@@ -38,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mdiArea_(new QMdiArea),
     dataTree_(new DataTree),
+    manipulatorContainer_(new QGroupBox),
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
@@ -66,21 +71,31 @@ MainWindow::MainWindow(QWidget *parent) :
     SystemManipulator* pzplot = pluginManager_->createSystemManipulator("Pole Zero Plot");
     SystemManipulator* stepPlot = pluginManager_->createSystemManipulator("Step Response");
     SystemManipulator* pzplot3d = pluginManager_->createSystemManipulator("Complex Plane 3D");
-    SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Standard Low Order Filters");
-    //SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Butterworth Filter");
-    //SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Chebyshev Filter");
     layout->addWidget(bodePlot, 0, 0, 2, 1);
     layout->addWidget(pzplot, 0, 1, 1, 1);
     layout->addWidget(stepPlot, 1, 1, 1, 1);
     layout->addWidget(pzplot3d, 0, 2, 1, 1);
-    layout->addWidget(manipulator, 1, 2, 1, 1);
 
-    System* system = newSystem("System");
-    manipulator->setSystem(system);
-    bodePlot->setSystem(system);
-    pzplot->setSystem(system);
-    pzplot3d->setSystem(system);
-    stepPlot->setSystem(system);
+    QWidget* manipulatorWidget = new QWidget;
+    manipulatorWidget->setLayout(new QVBoxLayout);
+    layout->addWidget(manipulatorWidget, 1, 2, 1, 1);
+
+    QComboBox* manipulators = new QComboBox;
+    manipulators->addItem("Standard Low Order Filters");
+    manipulators->addItem("Butterworth Filter");
+    manipulators->addItem("Chebyshev Filter");
+    manipulatorWidget->layout()->addWidget(manipulators);
+
+    manipulatorContainer_->setLayout(new QVBoxLayout);
+    manipulatorContainer_->setTitle("Filter Settings");
+    manipulatorWidget->layout()->addWidget(manipulatorContainer_);
+
+    currentSystem_ = newSystem("System");
+    bodePlot->setSystem(currentSystem_);
+    pzplot->setSystem(currentSystem_);
+    pzplot3d->setSystem(currentSystem_);
+    stepPlot->setSystem(currentSystem_);
+    setManipulator("Standard Low Order Filters");
 
     QSplitter* splitter = new QSplitter;
     ui->centralWidget->layout()->addWidget(splitter);
@@ -88,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->addWidget(widget);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
+
+    connect(manipulators, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setManipulator(const QString&)));
 }
 
 // ----------------------------------------------------------------------------
@@ -119,6 +136,21 @@ void MainWindow::deleteSystem(System* system)
 {
     dataTree_->removeSystem(system);
     delete system;
+}
+
+// ----------------------------------------------------------------------------
+void MainWindow::setManipulator(const QString& name)
+{
+    SystemManipulator* manipulator = pluginManager_->createSystemManipulator(name);
+    if (manipulator == NULL)
+    {
+        std::cout << "Failed to create manipulator \"" << name.toStdString() << "\"" << std::endl;
+        return;
+    }
+
+    Util::clearLayout(manipulatorContainer_->layout());
+    manipulatorContainer_->layout()->addWidget(manipulator);
+    manipulator->setSystem(currentSystem_);
 }
 
 } // namespace tfp
