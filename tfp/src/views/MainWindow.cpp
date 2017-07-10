@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     manipulators->addItem("Standard Low Order Filters");
     manipulators->addItem("Butterworth Filter");
     manipulators->addItem("Chebyshev Filter");
+    manipulators->addItem("Elliptic Filter");
     manipulatorWidget->layout()->addWidget(manipulators);
 
     manipulatorContainer_->setLayout(new QVBoxLayout);
