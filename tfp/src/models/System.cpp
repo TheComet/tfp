@@ -19,8 +19,8 @@ System::~System()
 // ----------------------------------------------------------------------------
 void System::notifyParametersChanged()
 {
-    CoefficientPolynomial<double> coeffNumerator = numerator_.poly();
-    CoefficientPolynomial<double> coeffDenominator = denominator_.poly();
+    CoefficientPolynomial<double> coeffNumerator = numerator().poly();
+    CoefficientPolynomial<double> coeffDenominator = denominator().poly();
     QString buf;
 
 #define UPDATE_CHILD_VALUES_COMPLEX(item, polynomial)                        \
@@ -50,9 +50,9 @@ void System::notifyParametersChanged()
     buf += "]";                                                              \
     item->setText(1, buf);
 
-    factorItem_->setText(1, QString::number(numerator_.factor() / denominator_.factor()));
-    UPDATE_CHILD_VALUES_COMPLEX(polesItem_, denominator_);
-    UPDATE_CHILD_VALUES_COMPLEX(zerosItem_, numerator_);
+    factorItem_->setText(1, QString::number(numerator().factor() / denominator().factor()));
+    UPDATE_CHILD_VALUES_COMPLEX(polesItem_, denominator());
+    UPDATE_CHILD_VALUES_COMPLEX(zerosItem_, numerator());
     UPDATE_CHILD_VALUES_REAL(coeffBItem_, coeffNumerator);
     UPDATE_CHILD_VALUES_REAL(coeffAItem_, coeffDenominator);
 
@@ -62,15 +62,15 @@ void System::notifyParametersChanged()
 // ----------------------------------------------------------------------------
 void System::notifyStructureChanged()
 {
-    CoefficientPolynomial<double> coeffNumerator = numerator_.poly();
-    CoefficientPolynomial<double> coeffDenominator = denominator_.poly();
+    CoefficientPolynomial<double> coeffNumerator = numerator().poly();
+    CoefficientPolynomial<double> coeffDenominator = denominator().poly();
 #define UPDATE_CHILD_COUNT(item, polynomial, name)                           \
     while (item->childCount() < polynomial.size())                           \
         item->addChild(new QTreeWidgetItem(QStringList(name + QString::number(item->childCount())))); \
     while (item->childCount() > polynomial.size())                           \
         delete item->takeChild(item->childCount() - 1);
-    UPDATE_CHILD_COUNT(polesItem_, denominator_, "p");
-    UPDATE_CHILD_COUNT(zerosItem_, numerator_, "z");
+    UPDATE_CHILD_COUNT(polesItem_, denominator(), "p");
+    UPDATE_CHILD_COUNT(zerosItem_, numerator(), "z");
     UPDATE_CHILD_COUNT(coeffBItem_, coeffNumerator, "b");
     UPDATE_CHILD_COUNT(coeffAItem_, coeffDenominator, "a");
 
@@ -78,14 +78,14 @@ void System::notifyStructureChanged()
 }
 
 // ----------------------------------------------------------------------------
-void System::getInterestingFrequencyInterval(double* xStart, double* xEnd) const
+void System::interestingFrequencyInterval(double* xStart, double* xEnd) const
 {
     double minx = std::numeric_limits<double>::max();
     double maxx = 0;
 
-    for (int i = 0; i != denominator_.size(); ++i)
+    for (int i = 0; i != denominator().size(); ++i)
     {
-        double mag = std::abs(denominator_.root(i));
+        double mag = std::abs(denominator().root(i));
         if (maxx < mag)
             maxx = mag;
         if (minx > mag)
@@ -101,13 +101,13 @@ void System::getInterestingFrequencyInterval(double* xStart, double* xEnd) const
 }
 
 // ----------------------------------------------------------------------------
-void System::getInterestingTimeInterval(double* xStart, double* xEnd) const
+void System::interestingTimeInterval(double* xStart, double* xEnd) const
 {
     double closestpole = std::numeric_limits<double>::max();
 
-    for (int i = 0; i != denominator_.size(); ++i)
+    for (int i = 0; i != denominator().size(); ++i)
     {
-        double real = std::abs(denominator_.root(i).real());
+        double real = std::abs(denominator().root(i).real());
         if (closestpole > real)
             closestpole = real;
     }

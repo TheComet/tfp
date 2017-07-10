@@ -157,4 +157,27 @@ Which is now more readable in matrix form:
 \subsection{Multi-Roots}
 
 \begin{equation}
-    \frac{b_0 + b_1s + b_2s^2 + b_3s^3}{(s-p_1)^4} = \frac{A_1}{(s-p_1)^4} + \frac{A_2}{(s-p_1)^3} + \
+    \frac{b_0 + b_1s + b_2s^2 + b_3s^3}{(s-p_1)^4} = \frac{A_1}{(s-p_1)^4} + \frac{A_2}{(s-p_1)^3} + \frac{A_3}{(s-p_1)^2} + \frac{A_4}{s-p_1}
+\end{equation}
+
+\begin{equation}
+    \begin{bmatrix}
+        b_3 \\
+        b_2 \\
+        b_1 \\
+        b_0 \\
+    \end{bmatrix} =
+    \begin{bmatrix}
+        1            & 0     & 0    & 0 \\
+        -3p_1        & 1     & 0    & 0 \\
+        p_1 + 2p_1^2 & -2p_1 & 1    & 0 \\
+        -p_1^3       & p_1^2 & -p_1 & 1 \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        A_1 \\
+        A_2 \\
+        A_3 \\
+        A_4 \\
+    \end{bmatrix}
+\end{equation}
+

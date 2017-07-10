@@ -24,6 +24,11 @@ public:
     TransferFunction(const CoefficientPolynomial<T>& numerator, const CoefficientPolynomial<T>& denominator);
     TransferFunction(const RootPolynomial<T>& numerator, const RootPolynomial<T>& denominator);
 
+    RootPolynomial<T>& numerator();
+    RootPolynomial<T>& denominator();
+    const RootPolynomial<T>& numerator() const;
+    const RootPolynomial<T>& denominator() const;
+
     std::complex<T> evaluate(const std::complex<T>& value) const;
 
     PFEResultData partialFractionExpansion(int numZeroPoles=0) const;
@@ -36,6 +41,7 @@ public:
     template <class U>
     friend std::ostream& operator<<(std::ostream& os, const TransferFunction<U>& tf);
 
+private:
     RootPolynomial<T> numerator_;
     RootPolynomial<T> denominator_;
 };

@@ -77,7 +77,7 @@ void StandardLowOrderFilter::updateParameters()
          */
         case LOWPASS_1:
         case HIGHPASS_1:
-            system_->denominator_.setRoot(0, -wp_);
+            system_->denominator().setRoot(0, -wp_);
             break;
 
         /*
@@ -106,8 +106,8 @@ void StandardLowOrderFilter::updateParameters()
                 r2 -= wp_ * std::sqrt(1.0/(4.0*qp_*qp_) - 1.0);
             }
 
-            system_->denominator_.setRoot(0, r1);
-            system_->denominator_.setRoot(1, r2);
+            system_->denominator().setRoot(0, r1);
+            system_->denominator().setRoot(1, r2);
 
             break;
         }
@@ -120,20 +120,20 @@ void StandardLowOrderFilter::updateParameters()
     switch (filterType_)
     {
         case HIGHPASS_2:                         // k*s^2
-            system_->numerator_.setRoot(1, 0);
+            system_->numerator().setRoot(1, 0);
         case HIGHPASS_1:                         // k*s
-            system_->numerator_.setRoot(0, 0);
-            system_->numerator_.setFactor(k_);
+            system_->numerator().setRoot(0, 0);
+            system_->numerator().setFactor(k_);
             break;
 
         case LOWPASS_2:                          // k*wp^2
-            system_->numerator_.setFactor(k_ * wp_ * wp_);
+            system_->numerator().setFactor(k_ * wp_ * wp_);
             break;
 
         case BANDPASS:                           // k*s*wp
-            system_->numerator_.setRoot(0, 0);
+            system_->numerator().setRoot(0, 0);
         case LOWPASS_1:                          // k*wp
-            system_->numerator_.setFactor(k_ * wp_);
+            system_->numerator().setFactor(k_ * wp_);
             break;
 
         case FILTER_COUNT:
@@ -173,32 +173,32 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
     {
         case LOWPASS_1:
             qpadj_->setEnabled(false);
-            system_->numerator_.resize(0);
-            system_->denominator_.resize(1);
+            system_->numerator().resize(0);
+            system_->denominator().resize(1);
             break;
 
         case HIGHPASS_1:
             qpadj_->setEnabled(false);
-            system_->numerator_.resize(1);
-            system_->denominator_.resize(1);
+            system_->numerator().resize(1);
+            system_->denominator().resize(1);
             break;
 
         case LOWPASS_2:
             qpadj_->setEnabled(true);
-            system_->numerator_.resize(0);
-            system_->denominator_.resize(2);
+            system_->numerator().resize(0);
+            system_->denominator().resize(2);
             break;
 
         case BANDPASS:
             qpadj_->setEnabled(true);
-            system_->numerator_.resize(1);
-            system_->denominator_.resize(2);
+            system_->numerator().resize(1);
+            system_->denominator().resize(2);
             break;
 
         case HIGHPASS_2:
             qpadj_->setEnabled(true);
-            system_->numerator_.resize(2);
-            system_->denominator_.resize(2);
+            system_->numerator().resize(2);
+            system_->denominator().resize(2);
             break;
 
         default:

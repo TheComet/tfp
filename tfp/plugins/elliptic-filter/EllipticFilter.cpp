@@ -69,13 +69,13 @@ void EllipticFilter::updateParameters()
     double b = std::cosh(1.0/n_ * asinh(1.0/epsilon_));
     for (int m = 0; m < n_; ++m)
     {
-        system_->denominator_.setRoot(m, wc_ * typename Type<double>::Complex(
+        system_->denominator().setRoot(m, wc_ * typename Type<double>::Complex(
             a * std::sin(M_PI / 2.0 * (2.0*m+1)/n_),
             b * std::cos(M_PI / 2.0 * (2.0*m+1)/n_)
         ));
         reciFactor *= 2 / wc_;
     }
-    system_->numerator_.setFactor(k_ / (reciFactor * epsilon_));
+    system_->numerator().setFactor(k_ / (reciFactor * epsilon_));
 
     system_->notifyParametersChanged();
 }
@@ -84,7 +84,7 @@ void EllipticFilter::updateParameters()
 void EllipticFilter::setOrder(int n)
 {
     n_ = n;
-    system_->denominator_.resize(n_);
+    system_->denominator().resize(n_);
     system_->notifyStructureChanged();
     updateParameters();
 }
@@ -116,7 +116,7 @@ void EllipticFilter::onSetSystem()
     if (system_ == NULL)
         return;
 
-    system_->numerator_.resize(0);
+    system_->numerator().resize(0);
     setOrder(n_);
     updateParameters();
 }

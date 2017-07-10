@@ -33,6 +33,34 @@ TransferFunction<T>::TransferFunction(const PolynomialType& numerator,
 
 // ----------------------------------------------------------------------------
 template <class T>
+RootPolynomial<T>& TransferFunction<T>::numerator()
+{
+    return numerator_;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+RootPolynomial<T>& TransferFunction<T>::denominator()
+{
+    return denominator_;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+const RootPolynomial<T>& TransferFunction<T>::numerator() const
+{
+    return numerator_;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+const RootPolynomial<T>& TransferFunction<T>::denominator() const
+{
+    return denominator_;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
 std::complex<T> TransferFunction<T>::evaluate(const std::complex<T>& value) const
 {
     return numerator_.evaluate(value) / denominator_.evaluate(value);

@@ -51,7 +51,6 @@ set (QWTPLOT3D_SOURCES
     "src/qwt3d_types.cpp"
     "src/qwt3d_volumeplot.cpp")
 
-
 set (QWTPLOT3D_MOC_HEADERS
     "include/qwt3d_plot3d.h"
     "include/qwt3d_extglwidget.h"
@@ -82,21 +81,24 @@ target_link_libraries (qwtplot3d Qt5::Core Qt5::Gui)
 
 find_package (OpenGL REQUIRED)
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${OPENGL_INCLUDE_DIR}")
-list (APPEND QWTPLOT3D_LIBRARIES "${OPENGL_glu_LIBRARY}")
+target_link_libraries (qwtplot3d ${OPENGL_glu_LIBRARY})
 
 find_package (ZLIB REQUIRED)
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${ZLIB_INCLUDE_DIRS}")
-list (APPEND QWTPLOT3D_LIBRARIES "${ZLIB_LIBRARIES}")
+target_link_libraries (qwtplot3d ${ZLIB_LIBRARIES})
 
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include")
 
 include_directories (${QWTPLOT3D_INCLUDE_DIRS})
-target_link_libraries (qwtplot3d ${QWTPLOT3D_LIBRARIES})
 
 unset (QWTPLOT3D_INCLUDE_DIRS CACHE)
 set (QWTPLOT3D_INCLUDE_DIRS ${QWTPLOT3D_INCLUDE_DIRS} CACHE STRING "Qwt include directories")
 unset (QWTPLOT3D_LIBRARIES CACHE)
-set (QWTPLOT3D_LIBRARIES qwtplot3d CACHE STRING "qwtplot3d libraries")
+set (QWTPLOT3D_LIBRARIES
+    ${OPENGL_glu_LIBRARY}
+    ${ZLIB_LIBRARIES}
+    qwtplot3d
+    CACHE STRING "qwtplot3d libraries")
 
 ###############################################################################
 # install targets

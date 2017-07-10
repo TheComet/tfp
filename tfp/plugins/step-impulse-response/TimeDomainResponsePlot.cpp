@@ -46,7 +46,7 @@ void TimeDomainResponsePlot::onSystemParametersChanged()
     double begin = 0;
     double end = 50;
 
-    system_->getInterestingTimeInterval(&begin, &end);
+    system_->interestingTimeInterval(&begin, &end);
     system_->inverseLaplaceTransform(doPartialFractionExpansion(), xData, yData, begin, end, 1000);
     curve_->setSamples(xData, yData, 1000);
 

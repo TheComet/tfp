@@ -20,8 +20,8 @@ public:
 
     void notifyParametersChanged();
     void notifyStructureChanged();
-    void getInterestingFrequencyInterval(double* xStart, double* xEnd) const;
-    void getInterestingTimeInterval(double* xStart, double* xEnd) const;
+    void interestingFrequencyInterval(double* xStart, double* xEnd) const;
+    void interestingTimeInterval(double* xStart, double* xEnd) const;
 
     const QString& name() const;
 

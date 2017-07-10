@@ -80,7 +80,7 @@ void BodePlot::onSystemParametersChanged()
     double freqdata[1000];
     double xStart, xEnd;
 
-    system_->getInterestingFrequencyInterval(&xStart, &xEnd);
+    system_->interestingFrequencyInterval(&xStart, &xEnd);
     system_->frequencyResponse(freqdata, ampdata, phasedata, xStart, xEnd, 1000);
     amplitude_->setSamples(freqdata, ampdata, 1000);
     phase_->setSamples(freqdata, phasedata, 1000);
