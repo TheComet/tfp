@@ -66,8 +66,9 @@ MainWindow::MainWindow(QWidget *parent) :
     SystemManipulator* pzplot = pluginManager_->createSystemManipulator("Pole Zero Plot");
     SystemManipulator* stepPlot = pluginManager_->createSystemManipulator("Step Response");
     SystemManipulator* pzplot3d = pluginManager_->createSystemManipulator("Complex Plane 3D");
-    //SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Standard Low Order Filters");
-    SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Butterworth Filter");
+    SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Standard Low Order Filters");
+    //SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Butterworth Filter");
+    //SystemManipulator* manipulator = pluginManager_->createSystemManipulator("Chebyshev Filter");
     layout->addWidget(bodePlot, 0, 0, 2, 1);
     layout->addWidget(pzplot, 0, 1, 1, 1);
     layout->addWidget(stepPlot, 1, 1, 1, 1);

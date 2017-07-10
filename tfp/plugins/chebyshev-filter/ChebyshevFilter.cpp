@@ -1,16 +1,17 @@
-#include "ButterworthFilter.hpp"
+#include "ChebyshevFilter.hpp"
 #include "tfp/views/FloatAdjustmentWidget.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <QVBoxLayout>
 #include <QSpinBox>
 #include <QLabel>
+#include <complex>
 
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-ButterworthFilter::ButterworthFilter(QWidget* parent) :
+ChebyshevFilter::ChebyshevFilter(QWidget* parent) :
     SystemManipulator(parent),
-    n_(5), k_(1.0), wc_(1.0)
+    n_(5), k_(1.0), wc_(1.0), epsilon_(0.1)
 {
     QVBoxLayout* layout = new QVBoxLayout;
     setLayout(layout);
@@ -39,27 +40,38 @@ ButterworthFilter::ButterworthFilter(QWidget* parent) :
     wcadj->setValue(wc_);
     layout->addWidget(wcadj);
 
+    FloatAdjustmentWidget* epsilonadj = new FloatAdjustmentWidget;
+    epsilonadj->setName("epsilon");
+    epsilonadj->setValue(epsilon_);
+    layout->addWidget(epsilonadj);
+
     connect(nadjSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setOrder(int)));
     connect(kadj, SIGNAL(valueChanged(double)), this, SLOT(setScale(double)));
     connect(wcadj, SIGNAL(valueChanged(double)), this, SLOT(setCutoffFrequency(double)));
+    connect(epsilonadj, SIGNAL(valueChanged(double)), this, SLOT(setEpsilon(double)));
 }
 
 // ----------------------------------------------------------------------------
-void ButterworthFilter::updateParameters()
+void ChebyshevFilter::updateParameters()
 {
-    double factor = k_;
-    for (int k = 0; k < n_; ++k)
+    double reciFactor = 0.5;
+    double a = -std::sinh(1.0/n_ * asinh(1.0/epsilon_));
+    double b = std::cosh(1.0/n_ * asinh(1.0/epsilon_));
+    for (int m = 0; m < n_; ++m)
     {
-        system_->denominator_.setRoot(k, wc_ * std::exp(typename Type<double>::Complex(0, ((2*k+n_+1)*M_PI) / (2*n_))));
-        factor *= wc_;
+        system_->denominator_.setRoot(m, wc_ * typename Type<double>::Complex(
+            a * std::sin(M_PI / 2.0 * (2.0*m+1)/n_),
+            b * std::cos(M_PI / 2.0 * (2.0*m+1)/n_)
+        ));
+        reciFactor *= 2 / wc_;
     }
-    system_->numerator_.setFactor(factor);
+    system_->numerator_.setFactor(k_ / (reciFactor * epsilon_));
 
     system_->notifyParametersChanged();
 }
 
 // ----------------------------------------------------------------------------
-void ButterworthFilter::setOrder(int n)
+void ChebyshevFilter::setOrder(int n)
 {
     n_ = n;
     system_->denominator_.resize(n_);
@@ -68,21 +80,28 @@ void ButterworthFilter::setOrder(int n)
 }
 
 // ----------------------------------------------------------------------------
-void ButterworthFilter::setScale(double k)
+void ChebyshevFilter::setScale(double k)
 {
     k_ = k;
     updateParameters();
 }
 
 // ----------------------------------------------------------------------------
-void ButterworthFilter::setCutoffFrequency(double wc)
+void ChebyshevFilter::setCutoffFrequency(double wc)
 {
     wc_ = wc;
     updateParameters();
 }
 
 // ----------------------------------------------------------------------------
-void ButterworthFilter::onSetSystem()
+void ChebyshevFilter::setEpsilon(double epsilon)
+{
+    epsilon_ = epsilon;
+    updateParameters();
+}
+
+// ----------------------------------------------------------------------------
+void ChebyshevFilter::onSetSystem()
 {
     if (system_ == NULL)
         return;
