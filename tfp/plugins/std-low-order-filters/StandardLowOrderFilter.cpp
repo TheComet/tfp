@@ -65,7 +65,7 @@ StandardLowOrderFilter::StandardLowOrderFilter(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
+void StandardLowOrderFilter::updateParameters()
 {
     // Handle poles first
     switch (filterType_)
@@ -147,21 +147,21 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
 void StandardLowOrderFilter::setScale(double k)
 {
     k_ = k;
-    setParameters(k_, wp_, qp_);
+    updateParameters();
 }
 
 // ----------------------------------------------------------------------------
 void StandardLowOrderFilter::setPoleFrequency(double wp)
 {
     wp_ = wp;
-    setParameters(k_, wp_, qp_);
+    updateParameters();
 }
 
 // ----------------------------------------------------------------------------
 void StandardLowOrderFilter::setQualityFactor(double qp)
 {
     qp_ = qp;
-    setParameters(k_, wp_, qp_);
+    updateParameters();
 }
 
 // ----------------------------------------------------------------------------
@@ -205,25 +205,9 @@ void StandardLowOrderFilter::setFilterType(FilterType filterType)
             std::cerr << "Invalid filter type " << filterType_ << std::endl;
             break;
     }
-/*
-    // Butterworth filter
-    int N = 64;
-    denominator_..resize(N, 1);
-    for (int i = 0; i < N; ++i)
-        denominator_.(i) = std::pow(typename Type<double>::Complex(-1, 0), double(i+0.5)/(N)) * typename Type<double>::Complex(0, 1);
-
-    // Chebyshev
-    double eta = 1;
-    double a = -std::sinh(1.0/N * std::asinh(1.0/eta));
-    double b = std::cosh(1.0/N * std::asinh(1.0/eta));
-    for (int i = 0; i < N; ++i)
-        denominator_.(i) = typename Type<double>::Complex(
-            a * std::sin(M_PI / 2.0 * (2.0*i+1)/N),
-            b * std::cos(M_PI / 2.0 * (2.0*i+1)/N)
-        );*/
 
     system_->notifyStructureChanged();
-    setParameters(k_, wp_, qp_);
+    updateParameters();
 }
 
 // ----------------------------------------------------------------------------
@@ -235,5 +219,8 @@ void StandardLowOrderFilter::setFilterType(int index)
 // ----------------------------------------------------------------------------
 void StandardLowOrderFilter::onSetSystem()
 {
+    if (system_ == NULL)
+        return;
+
     setFilterType(filterType_);
 }
