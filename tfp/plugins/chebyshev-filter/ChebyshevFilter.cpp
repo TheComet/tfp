@@ -45,6 +45,13 @@ ChebyshevFilter::ChebyshevFilter(QWidget* parent) :
     epsilonadj->setValue(epsilon_);
     layout->addWidget(epsilonadj);
 
+    QLabel* infoBox = new QLabel;
+    infoBox->setText(
+        "Chebyshev filters have a steeper roll-off and more passband ripple (type I) or stopband ripple (type II) than Butterworth filters."
+    );
+    infoBox->setWordWrap(true);
+    layout->addWidget(infoBox);
+
     connect(nadjSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setOrder(int)));
     connect(kadj, SIGNAL(valueChanged(double)), this, SLOT(setScale(double)));
     connect(wcadj, SIGNAL(valueChanged(double)), this, SLOT(setCutoffFrequency(double)));
