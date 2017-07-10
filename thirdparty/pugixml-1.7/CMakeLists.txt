@@ -1,4 +1,4 @@
-option (PUGI_SHARED_LIB "Build shared instead of static library" OFF)
+option (PUGI_SHARED_LIB "Build shared instead of static library" ON)
 option (PUGI_TESTS "Build tests" OFF)
 option (PUGIXML_WCHAR_MODE "Enable wchar_t mode" OFF)
 option (PUGIXML_COMPACT "Enable compact mode" OFF)

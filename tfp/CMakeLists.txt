@@ -36,8 +36,7 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SystemVisualiser.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
@@ -74,6 +73,9 @@ set (tfp_RESOURCES
 set (tfp_TRANSLATION_FILES
         "")
 
+find_package (Qt5
+    COMPONENTS Core Widgets Gui OpenGL REQUIRED)
+
 qt5_wrap_cpp (tfp_SOURCES_MOC ${tfp_HEADERS_MOC})
 qt5_wrap_ui  (tfp_FORMS_MOC ${tfp_FORMS})
 qt5_add_resources (tfp_RESOURCES_GEN ${tfp_RESOURCES})
@@ -99,20 +101,25 @@ create_vcproj_userfile (tfp)
 # dependencies
 ###############################################################################
 
+# must be in this order due to linking
+include_directories (${KISS_FFT_INCLUDE_DIRS})
+include_directories (${QWT_INCLUDE_DIRS})
+include_directories (${QWTPLOT3D_INCLUDE_DIRS})
+include_directories (${EIGEN_INCLUDE_DIRS})
+include_directories (${PUGIXML_INCLUDE_DIRS})
+
 target_link_libraries (tfp Qt5::Core)
 target_link_libraries (tfp Qt5::Widgets)
 target_link_libraries (tfp Qt5::Gui)
-target_link_libraries (tfp Qt5::Concurrent)
-target_link_libraries (tfp Qt5::PrintSupport)
-target_link_libraries (tfp Qt5::OpenGL)
-target_link_libraries (tfp Qt5::Svg)
+#target_link_libraries (tfp Qt5::Concurrent)
+#target_link_libraries (tfp Qt5::PrintSupport)
+#target_link_libraries (tfp Qt5::OpenGL)
+#target_link_libraries (tfp Qt5::Svg)
 
-target_link_libraries (tfp qwtinternal)
-target_link_libraries (tfp qwtplot3d)
-target_link_libraries (tfp qwtmathml)
-target_link_libraries (tfp kiss_fft)
-target_link_libraries (tfp pugixml)
-target_link_libraries (tfp dl)
+target_link_libraries (tfp ${QWT_LIBRARIES})
+target_link_libraries (tfp ${QWTPLOT3D_LIBRARIES})
+target_link_libraries (tfp ${KISS_FFT_LIBRARIES})
+target_link_libraries (tfp ${PUGIXML_LIBRARIES})
 
 ###############################################################################
 # Compile translation files

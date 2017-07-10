@@ -119,30 +119,10 @@ message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message (STATUS "Platform is ${PLATFORM}")
 message (STATUS "------------------------------------------------------------")
 
-###############################################################################
-# Dependency settings
-###############################################################################
-
-find_package (Qt5Widgets REQUIRED)
-find_package (Qt5Gui REQUIRED)
-find_package (Qt5Concurrent REQUIRED)
-find_package (Qt5Core REQUIRED)
-find_package (Qt5PrintSupport REQUIRED)
-find_package (Qt5OpenGL REQUIRED)
-find_package (Qt5Svg REQUIRED)
-find_package (Qt5LinguistTools REQUIRED)
-find_package (Qt5Xml REQUIRED)
-
 # must be in this order due to linking
+set (EIGEN_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/thirdparty/eigen-3.3.4")
 add_subdirectory ("thirdparty/kiss_fft130")
-include_directories (${KISS_FFT_INCLUDE_DIRS})
 add_subdirectory ("thirdparty/qwt-6.1.2")
-include_directories ("${QWT_INCLUDE_DIRS}")
-include_directories ("${QWT_MATHML_INCLUDE_DIRS}")
 add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
-include_directories ("${QWTPLOT3D_INCLUDE_DIRS}")
-include_directories ("thirdparty/eigen-3.3.4")
 add_subdirectory ("thirdparty/pugixml-1.7")
-include_directories ("${PUGIXML_INCLUDE_DIRS}")
 add_subdirectory ("tfp")
-

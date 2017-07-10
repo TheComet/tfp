@@ -9,7 +9,6 @@
 #include <QSplitter>
 #include <QDir>
 #include <qwt_text.h>
-#include <qwt_mathml_text_engine.h>
 
 #include <dlfcn.h>
 
@@ -46,9 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Window icon and title
     setWindowIcon(QIcon(":/icons/icon.ico"));
     setWindowTitle("Transfer Function Plotter");
-
-    // Need to explicitly enable MathML rendering support
-    QwtText::setTextEngine(QwtText::MathMLText, new QwtMathMLTextEngine());
 
 /*
     mdiArea_->setViewMode(QMdiArea::TabbedView);

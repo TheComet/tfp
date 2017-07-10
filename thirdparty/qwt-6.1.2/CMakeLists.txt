@@ -36,7 +36,7 @@ option (QWT_OPENGL "If you want to use an OpenGL plot canvas" ON)
 option (QWT_MATHML "You can use the MathML renderer of the Qt solutions
 package to enable MathML support in Qwt. Because of license implications the (
 modified ) code of the MML Widget solution is included and linked together
-with the QwtMathMLTextEngine into an own lobrary." ON)
+with the QwtMathMLTextEngine into an own lobrary." OFF)
 
 option (QWT_DESIGNER "If you want to build the Qwt designer plugins." ON)
 

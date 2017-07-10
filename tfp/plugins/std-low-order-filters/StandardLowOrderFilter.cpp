@@ -5,22 +5,22 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 
-#if defined(STD_LOF_BUILDING)
-#  define STD_LOF_API Q_DECL_EXPORT
+#if defined(PLUGIN_BUILDING)
+#  define PLUGIN_API Q_DECL_EXPORT
 #else
-#  define STD_LOF_API Q_DECL_IMPORT
+#  define PLUGIN_API Q_DECL_IMPORT
 #endif
 
 using namespace tfp;
 
 extern "C" {
 
-STD_LOF_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
+PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
     return plugin->registerSystemManipulator<StandardLowOrderFilter>("Standard Low Order Filters");
 }
 
-STD_LOF_API void stop_plugin(Plugin* plugin)
+PLUGIN_API void stop_plugin(Plugin* plugin)
 {
 }
 
@@ -111,6 +111,9 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
 
             break;
         }
+
+        case FILTER_COUNT:
+            break;
     }
 
     // Handle zeros
@@ -133,7 +136,8 @@ void StandardLowOrderFilter::setParameters(double k, double wp, double qp)
             system_->numerator_.setFactor(k_ * wp_);
             break;
 
-        default: break;
+        case FILTER_COUNT:
+            break;
     }
 
     system_->notifyParametersChanged();

@@ -6,16 +6,10 @@ if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
     add_definitions (-W -Wall -Wstrict-prototypes -Wmissing-prototypes
             -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs
             -Wshadow -Wbad-function-cast -Wwrite-strings)
-    if (PREVIEWER_BUILD_TYPE STREQUAL "SHARED")
-        add_definitions (-fPIC)
-    endif ()
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
     add_definitions (-W -Wall -Wstrict-prototypes -Wmissing-prototypes
             -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs
             -Wshadow -Wbad-function-cast -Wwrite-strings)
-    if (PREVIEWER_BUILD_TYPE STREQUAL "SHARED")
-        add_definitions (-fPIC)
-    endif ()
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 endif ()
@@ -26,7 +20,7 @@ endif ()
 
 # Required by export.hpp.in and config.hpp.in
 set (LIBRARY_NAME KISS_FFT)
-set (BUILD_TYPE STATIC)
+set (BUILD_TYPE SHARED)
 
 set (KISS_FFT_DATATYPE "double" CACHE STRING "The datatype to use for all transforms. Can be 'float', 'int32_t', 'int16_t', 'simd', etc.")
 set (KISS_FFT_USE_SIMD "0")

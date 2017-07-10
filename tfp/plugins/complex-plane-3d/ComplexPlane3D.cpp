@@ -6,22 +6,22 @@
 #include <qwt3d_function.h>
 #include <QVBoxLayout>
 
-#if defined(COMPLEX_PLANE_3D_BUILDING)
-#  define COMPLEX_PLANE_3D_API Q_DECL_EXPORT
+#if defined(PLUGIN_BUILDING)
+#  define PLUGIN_API Q_DECL_EXPORT
 #else
-#  define COMPLEX_PLANE_3D_API Q_DECL_IMPORT
+#  define PLUGIN_API Q_DECL_IMPORT
 #endif
 
 using namespace tfp;
 
 extern "C" {
 
-COMPLEX_PLANE_3D_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
+PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
     return plugin->registerSystemManipulator<ComplexPlane3D>("Complex Plane 3D");
 }
 
-COMPLEX_PLANE_3D_API void stop_plugin(Plugin* plugin)
+PLUGIN_API void stop_plugin(Plugin* plugin)
 {
 }
 

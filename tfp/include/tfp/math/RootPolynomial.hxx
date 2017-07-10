@@ -3,7 +3,7 @@
 #include "tfp/config.hpp"
 #include "tfp/util/Type.hpp"
 #include "Eigen/Eigenvalues"
-#include <iostream>
+#include <vector>
 
 namespace tfp {
 

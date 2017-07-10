@@ -9,22 +9,22 @@
 #include <qwt_plot_curve.h>
 #include <QtCore/QtGlobal>
 
-#if defined(POLE_ZERO_PLOT_BUILDING)
-#  define POLE_ZERO_PLOT_API Q_DECL_EXPORT
+#if defined(PLUGIN_BUILDING)
+#  define PLUGIN_API Q_DECL_EXPORT
 #else
-#  define POLE_ZERO_PLOT_API Q_DECL_IMPORT
+#  define PLUGIN_API Q_DECL_IMPORT
 #endif
 
 using namespace tfp;
 
 extern "C" {
 
-POLE_ZERO_PLOT_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
+PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
     return plugin->registerSystemManipulator<PoleZeroPlot>("Pole Zero Plot");
 }
 
-POLE_ZERO_PLOT_API void stop_plugin(Plugin* plugin)
+PLUGIN_API void stop_plugin(Plugin* plugin)
 {
 }
 
