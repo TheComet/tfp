@@ -9,7 +9,7 @@ namespace tfp {
 
 // ----------------------------------------------------------------------------
 TimeDomainResponsePlot::TimeDomainResponsePlot(QWidget* parent) :
-    SystemVisualiser(parent),
+    Tool(parent),
     plot_(new RealtimePlot),
     curve_(new QwtPlotCurve)
 {
@@ -19,11 +19,6 @@ TimeDomainResponsePlot::TimeDomainResponsePlot(QWidget* parent) :
     layout()->addWidget(plot_);
 
     curve_->attach(plot_);
-}
-
-// ----------------------------------------------------------------------------
-void TimeDomainResponsePlot::onSetSystem()
-{
 }
 
 // ----------------------------------------------------------------------------

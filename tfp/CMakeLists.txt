@@ -53,8 +53,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/PluginManager.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/PluginWidget.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/Plugin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTree.cpp"
@@ -63,8 +62,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemManipulator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/SystemVisualiser.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/Tool.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
 set (tfp_RESOURCES
@@ -188,10 +186,11 @@ endif ()
 ###############################################################################
 
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/bode-plot")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/butterworth-filter")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/chebyshev-filter")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/complex-plane-3d")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/dpsfg")
+add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/elliptic-filter")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/pole-zero-plot")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/std-low-order-filters")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/step-impulse-response")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/butterworth-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/chebyshev-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/elliptic-filter")

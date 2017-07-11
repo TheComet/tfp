@@ -1,24 +1,18 @@
 #pragma once
 
+#include "tfp/config.hpp"
 #include "tfp/views/Tool.hpp"
 
-class QSpinBox;
+class QwtPlotCurve;
 
 namespace tfp {
 
-class FloatAdjustmentWidget;
+class RealtimePlot;
 
-class ButterworthFilter : public Tool
+class DPSFG : public Tool
 {
-    Q_OBJECT
-
 public:
-    explicit ButterworthFilter(QWidget* parent=NULL);
-
-public slots:
-    void setOrder(int n);
-    void setScale(double k);
-    void setCutoffFrequency(double wc);
+    explicit DPSFG(QWidget* parent=NULL);
 
 protected:
     virtual void onSetSystem() override;
@@ -28,10 +22,6 @@ protected:
     virtual void autoScale() override {}
 
 private:
-    void updateParameters();
-
-private:
-    double n_, k_, wc_;
 };
 
 }

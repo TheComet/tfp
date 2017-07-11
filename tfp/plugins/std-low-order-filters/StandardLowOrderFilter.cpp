@@ -1,7 +1,7 @@
 #include "StandardLowOrderFilter.hpp"
 #include "tfp/views/FloatAdjustmentWidget.hpp"
 #include "tfp/math/TransferFunction.hpp"
-#include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Plugin.hpp"
 #include <QVBoxLayout>
 #include <QComboBox>
 
@@ -17,7 +17,14 @@ extern "C" {
 
 PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
-    return plugin->registerSystemManipulator<StandardLowOrderFilter>("Standard Low Order Filters");
+    return plugin->registerTool<StandardLowOrderFilter>(
+        Plugin::GENERATOR,
+        Plugin::LTI_SYSTEM_DISCRETE,
+        "Standard Low Order Filters",
+        "Alex Murray",
+        "Calculate the transfer functions of standard 1st and 2nd order filters",
+        "alex.murray@gmx.ch"
+    );
 }
 
 PLUGIN_API void stop_plugin(Plugin* plugin)
@@ -28,7 +35,7 @@ PLUGIN_API void stop_plugin(Plugin* plugin)
 
 // ----------------------------------------------------------------------------
 StandardLowOrderFilter::StandardLowOrderFilter(QWidget* parent) :
-    SystemManipulator(parent),
+    Tool(parent),
     qpadj_(new FloatAdjustmentWidget),
     filterType_(LOWPASS_1),
     k_(1.0), wp_(1.0), qp_(1.0)

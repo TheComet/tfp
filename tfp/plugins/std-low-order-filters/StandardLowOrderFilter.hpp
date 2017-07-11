@@ -1,12 +1,12 @@
 #pragma once
 
-#include "tfp/views/SystemManipulator.hpp"
+#include "tfp/views/Tool.hpp"
 
 namespace tfp {
 
 class FloatAdjustmentWidget;
 
-class StandardLowOrderFilter : public SystemManipulator
+class StandardLowOrderFilter : public Tool
 {
     Q_OBJECT
 
@@ -33,6 +33,10 @@ public slots:
 
 protected:
     virtual void onSetSystem() override;
+    virtual void onSystemStructureChanged() override {}
+    virtual void onSystemParametersChanged() override {}
+    virtual void replot() override {}
+    virtual void autoScale() override {}
 
 private:
     void updateParameters();

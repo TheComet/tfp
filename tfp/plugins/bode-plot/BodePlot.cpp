@@ -2,7 +2,7 @@
 #include "tfp/views/RealtimePlot.hpp"
 #include "tfp/models/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
-#include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Plugin.hpp"
 #include <QVBoxLayout>
 #include <qwt_plot_curve.h>
 #include <qwt_scale_engine.h>
@@ -19,7 +19,14 @@ extern "C" {
 
 PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
-    return plugin->registerSystemManipulator<BodePlot>("Bode Plot");
+    return plugin->registerTool<BodePlot>(
+        Plugin::VISUALISER,
+        Plugin::LTI_SYSTEM_CONTINUOUS,
+        "Bode Plot",
+        "Alex Murray",
+        "Visualise the amplitude and phase of a system.",
+        "alex.murray@gmx.ch"
+    );
 }
 
 PLUGIN_API void stop_plugin(Plugin* plugin)
@@ -30,7 +37,7 @@ PLUGIN_API void stop_plugin(Plugin* plugin)
 
 // ----------------------------------------------------------------------------
 BodePlot::BodePlot(QWidget* parent) :
-    SystemVisualiser(parent),
+    Tool(parent),
     ampPlot_(new RealtimePlot),
     phasePlot_(new RealtimePlot),
     amplitude_(new QwtPlotCurve),
@@ -65,11 +72,6 @@ void BodePlot::replot()
 {
     ampPlot_->replot();
     phasePlot_->replot();
-}
-
-// ----------------------------------------------------------------------------
-void BodePlot::onSetSystem()
-{
 }
 
 // ----------------------------------------------------------------------------

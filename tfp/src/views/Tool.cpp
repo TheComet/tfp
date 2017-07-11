@@ -1,30 +1,32 @@
-#include "tfp/views/SystemVisualiser.hpp"
+#include "tfp/views/Tool.hpp"
 #include "tfp/models/System.hpp"
 
 namespace tfp {
 
 // ----------------------------------------------------------------------------
-SystemVisualiser::SystemVisualiser(QWidget* parent) :
-    SystemManipulator(parent)
+Tool::Tool(QWidget* parent) :
+    QWidget(parent)
 {
 }
 
 // ----------------------------------------------------------------------------
-SystemVisualiser::~SystemVisualiser()
+Tool::~Tool()
 {
     if (system_ != NULL)
         system_->dispatcher.removeListener(this);
+
 }
 
 // ----------------------------------------------------------------------------
-void SystemVisualiser::setSystem(System* system)
+void Tool::setSystem(System* system)
 {
     if (system_ != NULL)
     {
         system_->dispatcher.removeListener(this);
     }
 
-    SystemManipulator::setSystem(system);
+    system_ = system;
+    onSetSystem();
 
     if (system_ != NULL)
     {

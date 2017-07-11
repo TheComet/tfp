@@ -1,9 +1,10 @@
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
-#include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Plugin.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
 #include "tfp/views/MainWindow.hpp"
+#include "tfp/views/Tool.hpp"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QMdiArea>
@@ -13,8 +14,6 @@
 #include <QSplitter>
 #include <QDir>
 #include <qwt_text.h>
-
-#include <dlfcn.h>
 
 namespace tfp {
 
@@ -67,10 +66,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QGridLayout* layout = new QGridLayout;
     widget->setLayout(layout);
 
-    SystemManipulator* bodePlot = pluginManager_->createSystemManipulator("Bode Plot");
-    SystemManipulator* pzplot = pluginManager_->createSystemManipulator("Pole Zero Plot");
-    SystemManipulator* stepPlot = pluginManager_->createSystemManipulator("Step Response");
-    SystemManipulator* pzplot3d = pluginManager_->createSystemManipulator("Complex Plane 3D");
+    Tool* bodePlot = pluginManager_->createTool("Bode Plot");
+    Tool* pzplot = pluginManager_->createTool("Pole Zero Plot");
+    Tool* stepPlot = pluginManager_->createTool("Step Response");
+    Tool* pzplot3d = pluginManager_->createTool("Complex Plane 3D");
     layout->addWidget(bodePlot, 0, 0, 2, 1);
     layout->addWidget(pzplot, 0, 1, 1, 1);
     layout->addWidget(stepPlot, 1, 1, 1, 1);
@@ -142,7 +141,7 @@ void MainWindow::deleteSystem(System* system)
 // ----------------------------------------------------------------------------
 void MainWindow::setManipulator(const QString& name)
 {
-    SystemManipulator* manipulator = pluginManager_->createSystemManipulator(name);
+    Tool* manipulator = pluginManager_->createTool(name);
     if (manipulator == NULL)
     {
         std::cout << "Failed to create manipulator \"" << name.toStdString() << "\"" << std::endl;

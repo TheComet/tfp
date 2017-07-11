@@ -10,7 +10,7 @@ using namespace tfp;
 
 // ----------------------------------------------------------------------------
 ChebyshevFilter::ChebyshevFilter(QWidget* parent) :
-    SystemManipulator(parent),
+    Tool(parent),
     n_(5), k_(1.0), wc_(1.0), epsilon_(0.1)
 {
     QVBoxLayout* layout = new QVBoxLayout;

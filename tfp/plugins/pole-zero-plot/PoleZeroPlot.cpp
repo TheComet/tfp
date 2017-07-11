@@ -2,7 +2,7 @@
 #include "tfp/views/RealtimePlot.hpp"
 #include "tfp/models/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
-#include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Plugin.hpp"
 #include <QVBoxLayout>
 #include <QPainterPath>
 #include <qwt_plot_shapeitem.h>
@@ -21,7 +21,14 @@ extern "C" {
 
 PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
-    return plugin->registerSystemManipulator<PoleZeroPlot>("Pole Zero Plot");
+    return plugin->registerTool<PoleZeroPlot>(
+        Plugin::VISUALISER,
+        Plugin::LTI_SYSTEM_CONTINUOUS,
+        "Pole Zero Plot",
+        "Alex Murray",
+        "Plot the poles and zeros of a transfer function",
+        "alex.murray@gmx.ch"
+    );
 }
 
 PLUGIN_API void stop_plugin(Plugin* plugin)
@@ -32,7 +39,7 @@ PLUGIN_API void stop_plugin(Plugin* plugin)
 
 // ----------------------------------------------------------------------------
 PoleZeroPlot::PoleZeroPlot(QWidget* parent) :
-    SystemVisualiser(parent),
+    Tool(parent),
     plot_(new RealtimePlot)
 {
     plot_->enableRectangleZoom();
@@ -52,11 +59,6 @@ PoleZeroPlot::PoleZeroPlot(QWidget* parent) :
     unitCircle->setShape(unitCirclePath);
     unitCircle->setPen(pen);
     unitCircle->attach(plot_);
-}
-
-// ----------------------------------------------------------------------------
-void PoleZeroPlot::onSetSystem()
-{
 }
 
 // ----------------------------------------------------------------------------

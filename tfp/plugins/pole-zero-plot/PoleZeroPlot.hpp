@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tfp/views/SystemVisualiser.hpp"
+#include "tfp/views/Tool.hpp"
 #include <QVector>
 
 class QwtPlotShapeItem;
@@ -10,15 +10,16 @@ namespace tfp {
 
 class RealtimePlot;
 
-class PoleZeroPlot : public SystemVisualiser
+class PoleZeroPlot : public Tool
 {
 public:
     explicit PoleZeroPlot(QWidget* parent=NULL);
 
-protected:
-    virtual void onSetSystem() override;
     virtual void autoScale() override;
     virtual void replot() override;
+
+protected:
+    virtual void onSetSystem() override {}
     virtual void onSystemParametersChanged() override;
     virtual void onSystemStructureChanged() override;
 

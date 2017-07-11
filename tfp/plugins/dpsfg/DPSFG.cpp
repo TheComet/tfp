@@ -1,16 +1,14 @@
-#include "tfp/util/PluginWidget.hpp"
+#include "DPSFG.hpp"
 
-namespace tfp {
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
-PluginWidget::PluginWidget(QWidget* parent) :
-    QWidget(parent)
+DPSFG::DPSFG(QWidget* parent) :
+    Tool(parent)
 {
 }
 
 // ----------------------------------------------------------------------------
-PluginWidget::~PluginWidget()
+void DPSFG::onSetSystem()
 {
-}
-
 }

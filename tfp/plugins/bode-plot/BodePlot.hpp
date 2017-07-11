@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tfp/views/SystemVisualiser.hpp"
+#include "tfp/views/Tool.hpp"
 
 class QwtPlotCurve;
 
@@ -8,7 +8,7 @@ namespace tfp {
 
 class RealtimePlot;
 
-class BodePlot : public SystemVisualiser
+class BodePlot : public Tool
 {
 public:
     explicit BodePlot(QWidget* parent=NULL);
@@ -17,9 +17,9 @@ public:
     virtual void autoScale() override;
 
 protected:
-    virtual void onSetSystem() override;
-    virtual void onSystemParametersChanged() override;
+    virtual void onSetSystem() override {}
     virtual void onSystemStructureChanged() override;
+    virtual void onSystemParametersChanged() override;
 
 protected:
     RealtimePlot* ampPlot_;

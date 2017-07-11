@@ -1,4 +1,4 @@
-#include "EllipticFilter.hpp"
+#include "DPSFG.hpp"
 #include "tfp/util/Plugin.hpp"
 
 #if defined(PLUGIN_BUILDING)
@@ -13,12 +13,12 @@ extern "C" {
 
 PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
-    return plugin->registerTool<EllipticFilter>(
+    return plugin->registerTool<DPSFG>(
         Plugin::GENERATOR,
         Plugin::LTI_SYSTEM_CONTINUOUS,
-        "Elliptic Filter",
+        "DPSFG",
         "Alex Murray",
-        "Design an elliptic filter and compute its transfer function",
+        "Draw driving-point signal flow graphs and compute their transfer functions",
         "alex.murray@gmx.ch"
     );
 }

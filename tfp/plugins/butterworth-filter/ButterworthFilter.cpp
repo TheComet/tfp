@@ -9,7 +9,7 @@ using namespace tfp;
 
 // ----------------------------------------------------------------------------
 ButterworthFilter::ButterworthFilter(QWidget* parent) :
-    SystemManipulator(parent),
+    Tool(parent),
     n_(5), k_(1.0), wc_(1.0)
 {
     QVBoxLayout* layout = new QVBoxLayout;

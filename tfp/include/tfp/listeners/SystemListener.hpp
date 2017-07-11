@@ -7,8 +7,8 @@ namespace tfp {
 class SystemListener
 {
 public:
-    virtual void onSystemParametersChanged() = 0;
     virtual void onSystemStructureChanged() = 0;
+    virtual void onSystemParametersChanged() = 0;
 };
 
 }

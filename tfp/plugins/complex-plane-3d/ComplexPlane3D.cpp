@@ -1,8 +1,8 @@
 #include "ComplexPlane3D.hpp"
 #include "tfp/views/RealtimePlot3D.hpp"
-#include "tfp/views/SystemManipulator.hpp"
+#include "tfp/views/Tool.hpp"
 #include "tfp/models/System.hpp"
-#include "tfp/util/PluginManager.hpp"
+#include "tfp/util/Plugin.hpp"
 #include <qwt3d_function.h>
 #include <QVBoxLayout>
 
@@ -18,7 +18,14 @@ extern "C" {
 
 PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 {
-    return plugin->registerSystemManipulator<ComplexPlane3D>("Complex Plane 3D");
+    return plugin->registerTool<ComplexPlane3D>(
+        Plugin::VISUALISER,
+        Plugin::LTI_SYSTEM_CONTINUOUS,
+        "Complex Plane 3D",
+        "Alex Murray",
+        "Plot the poles and zeros of a transfer function in 3D",
+        "alex.murray@gmx.ch"
+    );
 }
 
 PLUGIN_API void stop_plugin(Plugin* plugin)
@@ -46,7 +53,7 @@ private:
 
 // ----------------------------------------------------------------------------
 ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
-    SystemVisualiser(parent),
+    Tool(parent),
     plot_(new Qwt3D::GridPlot)
 {
     setLayout(new QVBoxLayout);
@@ -70,11 +77,6 @@ ComplexPlane3D::ComplexPlane3D(QWidget* parent) :
     plot_->setOrtho(false);
 
     layout()->addWidget(plot_);
-}
-
-// ----------------------------------------------------------------------------
-void ComplexPlane3D::onSetSystem()
-{
 }
 
 // ----------------------------------------------------------------------------

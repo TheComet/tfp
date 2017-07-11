@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tfp/views/SystemVisualiser.hpp"
+#include "tfp/views/Tool.hpp"
 
 namespace Qwt3D {
     class GridPlot;
@@ -8,16 +8,16 @@ namespace Qwt3D {
 
 namespace tfp {
 
-class ComplexPlane3D : public SystemVisualiser
+class ComplexPlane3D : public Tool
 {
 public:
     explicit ComplexPlane3D(QWidget* parent=NULL);
 
-    virtual void onSetSystem() override;
     virtual void replot() override;
     virtual void autoScale() override;
 
 protected:
+    virtual void onSetSystem() override {}
     virtual void onSystemParametersChanged() override;
     virtual void onSystemStructureChanged() override;
 

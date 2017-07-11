@@ -17,14 +17,19 @@ class System;
  * parametersChanged() (if you only modified existing values) or
  * structureChanged() (if you added or removed roots).
  */
-class SystemManipulator : public QWidget
+class Tool : public QWidget,
+             public SystemListener
 {
 public:
-    explicit SystemManipulator(QWidget* parent=NULL);
+    explicit Tool(QWidget* parent=NULL);
+    ~Tool();
+
     virtual void setSystem(System* system);
 
 protected:
     virtual void onSetSystem() = 0;
+    virtual void replot() = 0;
+    virtual void autoScale() = 0;
 
 protected:
     Reference<System> system_;
