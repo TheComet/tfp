@@ -122,7 +122,7 @@ message (STATUS "------------------------------------------------------------")
 # must be in this order due to linking
 set (EIGEN_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/thirdparty/eigen-3.3.4")
 add_subdirectory ("thirdparty/kiss_fft130")
+add_subdirectory ("thirdparty/pugixml-1.7")
 add_subdirectory ("thirdparty/qwt-6.1.2")
 add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
-add_subdirectory ("thirdparty/pugixml-1.7")
 add_subdirectory ("tfp")

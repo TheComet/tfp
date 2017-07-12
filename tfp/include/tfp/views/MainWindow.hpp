@@ -34,9 +34,6 @@ public:
     System* newSystem(const QString& name);
     void deleteSystem(System* system);
 
-public slots:
-    void setManipulator(const QString& name);
-
 private:
     void loadPlugins();
 
@@ -44,8 +41,6 @@ private:
     Ui::MainWindow* ui;
     QMdiArea* mdiArea_;
     DataTree* dataTree_;
-    Reference<System> currentSystem_;
-    QGroupBox* manipulatorContainer_;
     Reference<PluginManager> pluginManager_;
 };
 

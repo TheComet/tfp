@@ -41,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mdiArea_(new QMdiArea),
     dataTree_(new DataTree),
-    manipulatorContainer_(new QGroupBox),
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
@@ -59,43 +58,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadPlugins();
 
-    // TODO Just for debugging.
-
+    System* system = newSystem("System");
     QWidget* widget = new QWidget;
-
-    QGridLayout* layout = new QGridLayout;
-    widget->setLayout(layout);
-
-    Tool* bodePlot = pluginManager_->createTool("Bode Plot");
-    Tool* pzplot = pluginManager_->createTool("Pole Zero Plot");
-    Tool* stepPlot = pluginManager_->createTool("Step Response");
-    Tool* pzplot3d = pluginManager_->createTool("Complex Plane 3D");
-    layout->addWidget(bodePlot, 0, 0, 2, 1);
-    layout->addWidget(pzplot, 0, 1, 1, 1);
-    layout->addWidget(stepPlot, 1, 1, 1, 1);
-    layout->addWidget(pzplot3d, 0, 2, 1, 1);
-
-    QWidget* manipulatorWidget = new QWidget;
-    manipulatorWidget->setLayout(new QVBoxLayout);
-    layout->addWidget(manipulatorWidget, 1, 2, 1, 1);
-
-    QComboBox* manipulators = new QComboBox;
-    manipulators->addItem("Standard Low Order Filters");
-    manipulators->addItem("Butterworth Filter");
-    manipulators->addItem("Chebyshev Filter");
-    manipulators->addItem("Elliptic Filter");
-    manipulatorWidget->layout()->addWidget(manipulators);
-
-    manipulatorContainer_->setLayout(new QVBoxLayout);
-    manipulatorContainer_->setTitle("Filter Settings");
-    manipulatorWidget->layout()->addWidget(manipulatorContainer_);
-
-    currentSystem_ = newSystem("System");
-    bodePlot->setSystem(currentSystem_);
-    pzplot->setSystem(currentSystem_);
-    pzplot3d->setSystem(currentSystem_);
-    stepPlot->setSystem(currentSystem_);
-    setManipulator("Standard Low Order Filters");
+    widget->setLayout(new QHBoxLayout);
+    Tool* dpsfg = pluginManager_->createTool("DPSFG");
+    dpsfg->setSystem(system);
+    widget->layout()->addWidget(dpsfg);
 
     QSplitter* splitter = new QSplitter;
     ui->centralWidget->layout()->addWidget(splitter);
@@ -103,8 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->addWidget(widget);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
-
-    connect(manipulators, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setManipulator(const QString&)));
 }
 
 // ----------------------------------------------------------------------------
@@ -136,21 +102,6 @@ void MainWindow::deleteSystem(System* system)
 {
     dataTree_->removeSystem(system);
     delete system;
-}
-
-// ----------------------------------------------------------------------------
-void MainWindow::setManipulator(const QString& name)
-{
-    Tool* manipulator = pluginManager_->createTool(name);
-    if (manipulator == NULL)
-    {
-        std::cout << "Failed to create manipulator \"" << name.toStdString() << "\"" << std::endl;
-        return;
-    }
-
-    Util::clearLayout(manipulatorContainer_->layout());
-    manipulatorContainer_->layout()->addWidget(manipulator);
-    manipulator->setSystem(currentSystem_);
 }
 
 } // namespace tfp

@@ -1,15 +1,10 @@
 #pragma once
 
-#include "tfp/config.hpp"
 #include "tfp/views/Tool.hpp"
 
-class QwtPlotCurve;
+class DPSFGView;
 
-namespace tfp {
-
-class RealtimePlot;
-
-class DPSFG : public Tool
+class DPSFG : public tfp::Tool
 {
 public:
     explicit DPSFG(QWidget* parent=NULL);
@@ -22,6 +17,5 @@ protected:
     virtual void autoScale() override {}
 
 private:
+    DPSFGView* dpsfgView_;
 };
-
-}

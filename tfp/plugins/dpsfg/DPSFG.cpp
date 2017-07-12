@@ -1,11 +1,15 @@
 #include "DPSFG.hpp"
-
-using namespace tfp;
+#include "DPSFGView.hpp"
+#include "DPSFGScene.hpp"
+#include <QHBoxLayout>
 
 // ----------------------------------------------------------------------------
 DPSFG::DPSFG(QWidget* parent) :
-    Tool(parent)
+    Tool(parent),
+    dpsfgView_(new DPSFGView(new DPSFGScene))
 {
+    setLayout(new QHBoxLayout);
+    layout()->addWidget(dpsfgView_);
 }
 
 // ----------------------------------------------------------------------------
