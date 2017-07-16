@@ -2,7 +2,6 @@
 #ifndef valueptr_h__2009_10_11_13_32_13_begin_guarded_code
 #define valueptr_h__2009_10_11_13_32_13_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include <algorithm> 
 
 namespace Qwt3D

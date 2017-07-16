@@ -3,7 +3,6 @@
 #define qwt3d_drawable_h__2009_10_11_14_17_08_begin_guarded_code
 
 #include <list>
-#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 #include "qwt3d_types.h"
 

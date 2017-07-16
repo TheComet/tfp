@@ -18,7 +18,6 @@
     #define IS_NAN(x) std::isnan(x)
 #endif
 
-#include "qwt3d_export.h"
 #include "qwt3d_portability.h"
 #include "qwt3d_helper.h"
 #include "qwt3d_openglhelper.h"

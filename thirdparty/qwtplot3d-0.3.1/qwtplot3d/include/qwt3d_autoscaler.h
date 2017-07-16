@@ -3,7 +3,6 @@
 #define qwt3d_autoscaler_h__2009_10_11_14_15_04_begin_guarded_code
 
 #include <vector>
-#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 #include "qwt3d_valueptr.h"
 

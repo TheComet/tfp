@@ -2,7 +2,6 @@
 #ifndef qwt3d_meshplot_h__2005_7_10_begin_guarded_code
 #define qwt3d_meshplot_h__2005_7_10_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_surfaceplot.h"
 
 namespace Qwt3D

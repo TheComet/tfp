@@ -2,7 +2,6 @@
 #ifndef qwt3d_graphplot_h__2009_10_11_14_19_41_begin_guarded_code
 #define qwt3d_graphplot_h__2009_10_11_14_19_41_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_plot3d.h"
 #include "qwt3d_data.h"
 

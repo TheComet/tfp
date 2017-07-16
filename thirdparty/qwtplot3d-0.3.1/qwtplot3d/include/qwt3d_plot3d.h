@@ -4,7 +4,6 @@
 
 #include <cassert>
 
-#include "qwt3d_export.h"
 #include "qwt3d_data.h"
 #include "qwt3d_extglwidget.h"
 #include "qwt3d_coordsys.h"

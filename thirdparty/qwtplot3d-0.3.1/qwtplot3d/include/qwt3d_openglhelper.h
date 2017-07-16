@@ -3,7 +3,6 @@
 #define qwt3d_openglhelper_h__2009_10_11_14_23_25_begin_guarded_code
 
 //#include <qglobal.h>
-#include "qwt3d_export.h"
 #include <QtOpenGL/qgl.h>
 #ifdef Q_OS_MAC
 #include <OpenGL/glu.h>

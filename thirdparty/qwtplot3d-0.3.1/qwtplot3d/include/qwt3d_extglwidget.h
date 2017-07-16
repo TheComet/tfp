@@ -2,7 +2,6 @@
 #ifndef qwt3d_extglwidget_h__2009_10_11_14_18_36_begin_guarded_code
 #define qwt3d_extglwidget_h__2009_10_11_14_18_36_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_types.h"
 
 class QMouseEvent;

@@ -2,7 +2,6 @@
 #ifndef qwt3d_data_h__2004_12_20_02_55_begin_guarded_code
 #define qwt3d_data_h__2004_12_20_02_55_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_types.h"
 
 namespace Qwt3D

@@ -14,10 +14,10 @@ endif ()
 # config
 ###############################################################################
 
-set (QWTPLOT3D_VER_MAJ 0)
-set (QWTPLOT3D_VER_MIN 3)
-set (QWTPLOT3D_VER_PAT 1)
-set (QWTPLOT3D_VERSION "${QWTPLOT3D_VER_MAJ}.${QWTPLOT3D_VER_MIN}.${QWTPLOT3D_VER_PAT}")
+set (QWT3D_MAJOR_VERSION 0)
+set (QWT3D_MINOR_VERSION 3)
+set (QWT3D_PATCH_VERSION 1)
+set (QWT3D_VERSION "${QWT3D_MAJOR_VERSION}.${QWT3D_MINOR_VERSION}.${QWT3D_PATCH_VERSION}")
 
 option (QWTPLOT3D_SHARED_LIB "Enable this to build Qwt as a shared library. Disable to build as a static library" ON)
 

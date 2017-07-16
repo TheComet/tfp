@@ -15,14 +15,17 @@ endif ()
 ###############################################################################
 
 # Required by export.hpp.in
-set (LIBRARY_NAME "TFP")
+set (LIBRARY_NAME "QWT3D")
 
 if (QWTPLOT3D_SHARED_LIB)
     set (BUILD_TYPE "SHARED")
     add_definitions (-DQWT3D_BUILDING)
+else ()
+    set (BUILD_TYPE "STATIC")
 endif ()
 
 configure_file (${TEMPLATE_EXPORT_H} "include/qwt3d_export.h")
+configure_file ("include/qwt3d_global.h.in" "include/qwt3d_global.h")
 
 ###############################################################################
 # Library, source and header files
@@ -88,10 +91,10 @@ list (APPEND QWTPLOT3D_INCLUDE_DIRS "${OPENGL_INCLUDE_DIR}")
 target_link_libraries (qwtplot3d ${OPENGL_LIBRARIES})
 
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include")
-list (APPEND QWTPLOT3D_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/include") # qwt3d_export.h
+list (APPEND QWTPLOT3D_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/include") # qwt3d_export.h, qwt3d_global.h
 
 include_directories (${QWTPLOT3D_INCLUDE_DIRS})
-include_directories ("${CMAKE_CURRENT_BINARY_DIR}/include") # qwt3d_export.h
+include_directories ("${CMAKE_CURRENT_BINARY_DIR}/include") # qwt3d_export.h, qwt3d_global.h
 
 unset (QWTPLOT3D_INCLUDE_DIRS CACHE)
 set (QWTPLOT3D_INCLUDE_DIRS ${QWTPLOT3D_INCLUDE_DIRS} CACHE STRING "Qwt include directories")

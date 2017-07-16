@@ -2,7 +2,6 @@
 #ifndef qwt3d_enrichment_h__2004_02_23_19_24_begin_guarded_code
 #define qwt3d_enrichment_h__2004_02_23_19_24_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 #include "qwt3d_types.h"
 

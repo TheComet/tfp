@@ -2,7 +2,6 @@
 #ifndef qwt3d_io_reader_h__2009_10_11_14_21_43_begin_guarded_code
 #define qwt3d_io_reader_h__2009_10_11_14_21_43_begin_guarded_code
 
-#include "qwt3d_export.h"
 #include "qwt3d_io.h"
 
 namespace Qwt3D

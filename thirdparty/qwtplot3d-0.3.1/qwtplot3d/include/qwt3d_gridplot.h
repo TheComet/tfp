@@ -3,7 +3,6 @@
 
 #include <QtCore/QThread>
 
-#include "qwt3d_export.h"
 #include "qwt3d_surfaceplot.h"
 
 namespace Qwt3D

@@ -8,7 +8,6 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 
 namespace Qwt3D

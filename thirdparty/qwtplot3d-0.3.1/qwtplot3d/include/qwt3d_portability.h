@@ -5,7 +5,6 @@
 //! Portability classes providing transparent Qt3/4 support
 
 //#include <qnamespace.h>
-#include "qwt3d_export.h"
 #include <QMouseEvent>
 #include "qwt3d_global.h"
 
