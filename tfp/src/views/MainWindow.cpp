@@ -1,6 +1,7 @@
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
 #include "tfp/plugin/Plugin.hpp"
+#include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Tool.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
@@ -99,6 +100,17 @@ void MainWindow::loadPlugins()
                 pluginManager_->loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
                 break;
             }
+
+    std::cout << "Available tools:" << std::endl;
+    QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();
+    for (QVector<ToolFactory*>::const_iterator it = toolsList.begin(); it != toolsList.end(); ++it)
+    {
+        std::cout << "  + "
+            << (*it)->name.toStdString() << " ("
+            << (*it)->blurb.toStdString() << ") -- "
+            << (*it)->author.toStdString()
+            << std::endl;
+    }
 }
 
 // ----------------------------------------------------------------------------

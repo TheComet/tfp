@@ -51,10 +51,12 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Plugin.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/PluginManager.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Tool.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Plugin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTree.cpp"
@@ -62,8 +64,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/Tool.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
 set (tfp_RESOURCES

@@ -53,6 +53,8 @@ public:
         return registerTool(new ToolFactoryImpl<T>(), category, subCategory, name, author, blurb, contactInfo);
     }
 
+    QVector<ToolFactory*> getToolsList() const;
+
     Tool* createTool(const QString& name);
 
     ListenerDispatcher<PluginListener> dispatcher;
@@ -78,22 +80,6 @@ private:
     stop_plugin_func stop;
     QLibrary* library_;
     ToolFactories toolFactories_;
-};
-
-class PluginManager : public RefCounted
-{
-public:
-    PluginManager(DataTree* dataTree);
-
-    bool loadPlugin(const QString& name);
-
-    Tool* createTool(const QString& name);
-
-private:
-    typedef QVector< Reference<Plugin> > Plugins;
-    Plugins plugins_;
-    // Stuff to pass to plugins in start()
-    DataTree* dataTree_;
 };
 
 struct ToolFactory : public RefCounted

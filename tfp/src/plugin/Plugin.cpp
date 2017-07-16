@@ -98,8 +98,21 @@ bool Plugin::registerTool(ToolFactory* factory,
 {
     if (toolFactories_.find(name) != toolFactories_.end())
         return false;
+    factory->name = name;
+    factory->author = author;
+    factory->blurb = blurb;
+    factory->contactInfo = contactInfo;
     toolFactories_.insert(name, factory);
     return true;
+}
+
+// ----------------------------------------------------------------------------
+QVector<ToolFactory*> Plugin::getToolsList() const
+{
+    QVector<ToolFactory*> list;
+    for (ToolFactories::const_iterator it = toolFactories_.begin(); it != toolFactories_.end(); ++it)
+        list.push_back(it.value());
+    return list;
 }
 
 // ----------------------------------------------------------------------------
@@ -109,55 +122,6 @@ Tool* Plugin::createTool(const QString& name)
     if (it == toolFactories_.end())
         return NULL;
     return new ToolDecorator(it.value(), this);
-}
-
-// ----------------------------------------------------------------------------
-PluginManager::PluginManager(DataTree* dataTree) :
-    dataTree_(dataTree)
-{
-}
-
-// ----------------------------------------------------------------------------
-bool PluginManager::loadPlugin(const QString& name)
-{
-    Reference<Plugin> plugin(new Plugin);
-    plugin->library_->setFileName(name);
-    if (plugin->library_->load() == false)
-    {
-        std::cout << "Failed to load plugin: " << plugin->library_->errorString().toStdString() << std::endl;
-        return false;
-    }
-
-    if ((plugin->start = (Plugin::start_plugin_func)plugin->library_->resolve("start_plugin")) == NULL)
-    {
-        std::cout << "Failed to load plugin: " << "symbol start_plugin() not found" << std::endl;
-        return false;
-    }
-    if ((plugin->stop = (Plugin::stop_plugin_func)plugin->library_->resolve("stop_plugin")) == NULL)
-    {
-        std::cout << "Failed to load plugin: " << "symbol start_plugin() not found" << std::endl;
-        return false;
-    }
-    if (plugin->start(plugin, dataTree_) == false)
-    {
-        std::cout << "Failed to load plugin: " << "start_plugin() returned an error" << std::endl;
-        return false;
-    }
-
-    std::cout << "Loaded plugin " << name.toStdString() << std::endl;
-    plugins_.push_back(plugin);
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-Tool* PluginManager::createTool(const QString& name)
-{
-    Tool* ret = NULL;
-    for (Plugins::iterator it = plugins_.begin(); it != plugins_.end(); ++it)
-        if ((ret = (*it)->createTool(name)) != NULL)
-            break;
-    return ret;
 }
 
 }
