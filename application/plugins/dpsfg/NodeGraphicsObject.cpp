@@ -28,5 +28,17 @@ void NodeGraphicsObject::paint(QPainter* painter, const QStyleOptionGraphicsItem
 // ----------------------------------------------------------------------------
 QRectF NodeGraphicsObject::boundingRect() const
 {
-    return QRectF(-10, -10, 20, 20);
+    return QRectF(-5, -5, 10, 10);
+}
+
+// ----------------------------------------------------------------------------
+void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    qDebug() << "press";
+}
+
+// ----------------------------------------------------------------------------
+void NodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    qDebug() << "release";
 }

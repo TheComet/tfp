@@ -1,3 +1,4 @@
+#include "tfp/views/MainWindow.hpp"
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
 #include "tfp/plugin/Plugin.hpp"
@@ -5,7 +6,6 @@
 #include "tfp/plugin/Tool.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
-#include "tfp/views/MainWindow.hpp"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QMdiArea>
@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mdiArea_(new QMdiArea),
     dataTree_(new DataTree),
+    tools1_(new QComboBox),
+    tools2_(new QComboBox),
     toolContainer1_(new QWidget),
     toolContainer2_(new QWidget),
     pluginManager_(new PluginManager(dataTree_))
@@ -60,31 +62,24 @@ MainWindow::MainWindow(QWidget *parent) :
     mdiArea_->setVisible(false);*/
 
     loadPlugins();
-    QComboBox* tools1 = new QComboBox;
-    QComboBox* tools2 = new QComboBox;
+    tools1_ = new QComboBox;
+    tools2_ = new QComboBox;
     QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();
     for (QVector<ToolFactory*>::const_iterator it = toolsList.begin(); it != toolsList.end(); ++it)
     {
-        tools1->addItem((*it)->name);
-        tools2->addItem((*it)->name);
+        tools1_->addItem((*it)->name);
+        tools2_->addItem((*it)->name);
     }
 
     QWidget* leftPane = new QWidget;
     leftPane->setLayout(new QVBoxLayout);
     leftPane->layout()->addWidget(dataTree_);
-    leftPane->layout()->addWidget(tools1);
-    leftPane->layout()->addWidget(tools2);
+    leftPane->layout()->addWidget(tools1_);
+    leftPane->layout()->addWidget(tools2_);
 
     activeSystem_ = newSystem("System");
     toolContainer1_->setLayout(new QHBoxLayout);
     toolContainer2_->setLayout(new QHBoxLayout);
-    
-    Tool* tool = pluginManager_->createTool("DPSFG");
-    tool->setSystem(activeSystem_);
-    toolContainer1_->layout()->addWidget(tool);
-    tool = pluginManager_->createTool("Bode Plot");
-    tool->setSystem(activeSystem_);
-    toolContainer2_->layout()->addWidget(tool);
 
     QSplitter* splitter = new QSplitter;
     ui->centralWidget->layout()->addWidget(splitter);
@@ -94,8 +89,11 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
 
-    connect(tools1, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool1(const QString&)));
-    connect(tools2, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool2(const QString&)));
+    connect(tools1_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool1(const QString&)));
+    connect(tools2_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool2(const QString&)));
+
+    loadTool1("DPSFG");
+    loadTool2("Bode Plot");
 }
 
 // ----------------------------------------------------------------------------
@@ -158,6 +156,16 @@ void MainWindow::loadTool1(const QString& name)
     if (tool == NULL)
         return;
 
+    // Update combo box
+    for (int i = 0; i < tools1_->count(); ++i)
+        if (tools1_->itemText(i) == name)
+        {
+            bool blocked = blockSignals(true);
+            tools1_->setCurrentIndex(i);
+            blockSignals(blocked);
+            break;
+        }
+
     Util::clearLayout(toolContainer1_->layout());
     tool->setSystem(activeSystem_);
     toolContainer1_->layout()->addWidget(tool);
@@ -167,6 +175,16 @@ void MainWindow::loadTool2(const QString& name)
     Tool* tool = pluginManager_->createTool(name);
     if (tool == NULL)
         return;
+
+    // Update combo box
+    for (int i = 0; i < tools2_->count(); ++i)
+        if (tools2_->itemText(i) == name)
+        {
+            bool blocked = blockSignals(true);
+            tools2_->setCurrentIndex(i);
+            blockSignals(blocked);
+            break;
+        }
 
     Util::clearLayout(toolContainer2_->layout());
     tool->setSystem(activeSystem_);

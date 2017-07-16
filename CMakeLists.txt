@@ -21,6 +21,9 @@ else()
 endif()
 message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+include(CMakeToolsHelpers OPTIONAL)
+include (CheckCXXSourceCompiles)
+
 ###############################################################################
 # Project name
 ###############################################################################
@@ -108,8 +111,6 @@ endif ()
 ###############################################################################
 # Options
 ###############################################################################
-
-include (CheckCXXSourceCompiles)
 
 set (REAL_TYPE "double" CACHE STRING "The type to use for numerical computations")
 

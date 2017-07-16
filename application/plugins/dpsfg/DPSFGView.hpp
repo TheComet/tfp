@@ -28,6 +28,7 @@ private:
 
 private:
     DPSFGScene* scene_;
-    QPointF lastClickPosition_;
+    QPointF lastMiddleClickPosition_;
+    QPointF lastRightClickPosition_;
     ConnectionGraphicsObject* activeConnection_;
 };

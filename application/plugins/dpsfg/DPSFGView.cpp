@@ -2,6 +2,7 @@
 #include "DPSFGScene.hpp"
 #include "NodeGraphicsObject.hpp"
 #include "ConnectionGraphicsObject.hpp"
+#include <QDebug>
 #include <QPainter>
 #include <QMouseEvent>
 #include <cmath>
@@ -19,22 +20,32 @@ DPSFGView::DPSFGView(DPSFGScene* scene) :
 void DPSFGView::mousePressEvent(QMouseEvent* event)
 {
     QGraphicsView::mousePressEvent(event);
+
     QPointF pos = mapToScene(event->pos());
 
     if (event->button() == Qt::MiddleButton)
-        lastClickPosition_ = pos;
+        lastMiddleClickPosition_ = pos;
 
     if (event->button() == Qt::RightButton)
+        lastRightClickPosition_ = pos;
+
+    if (scene_->mouseGrabberItem() && event->button() == Qt::RightButton)
         activateConnection(pos);
 }
 
 // ----------------------------------------------------------------------------
 void DPSFGView::mouseReleaseEvent(QMouseEvent* event)
 {
+    QGraphicsView::mouseReleaseEvent(event);
     if (event->button() == Qt::RightButton)
     {
         QPointF pos = mapToScene(event->pos());
-        spawnNode(pos);
+
+        float dx = pos.x() - lastRightClickPosition_.x();
+        float dy = pos.y() - lastRightClickPosition_.y();
+        if (dx*dx + dy*dy < 50)
+            spawnNode(pos);
+
         finaliseConnection(pos, true);
     }
 }
@@ -47,7 +58,7 @@ void DPSFGView::mouseMoveEvent(QMouseEvent* event)
 
     if (scene_->mouseGrabberItem() == NULL && event->buttons() & Qt::MiddleButton)
     {
-        QPointF diff = lastClickPosition_ - pos;
+        QPointF diff = lastMiddleClickPosition_ - pos;
         setSceneRect(sceneRect().translated(diff.x(), diff.y()));
     }
 

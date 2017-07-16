@@ -9,7 +9,7 @@ namespace Ui {
 }
 
 class QMdiArea;
-class QGroupBox;
+class QComboBox;
 
 namespace tfp {
 
@@ -45,6 +45,8 @@ private:
     Ui::MainWindow* ui;
     QMdiArea* mdiArea_;
     DataTree* dataTree_;
+    QComboBox* tools1_;
+    QComboBox* tools2_;
     QWidget* toolContainer1_;
     QWidget* toolContainer2_;
     Reference<PluginManager> pluginManager_;
