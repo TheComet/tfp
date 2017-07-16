@@ -14,7 +14,7 @@ endif ()
 # Defines
 ###############################################################################
 
-if (QWTPLOT3D_SHARED)
+if (QWTPLOT3D_SHARED_LIB)
     add_definitions (-DQT_DLL)
     add_definitions (-DQWT3D_DLL)
     add_definitions (-DQWT3D_MAKEDLL)
@@ -57,7 +57,7 @@ set (QWTPLOT3D_MOC_HEADERS
     "include/qwt3d_gridplot.h"
     "include/qwt3d_surfaceplot.h")
 
-find_package (Qt5 COMPONENTS Core Gui REQUIRED)
+find_package (Qt5 COMPONENTS Core Gui OpenGL REQUIRED)
 
 qt5_wrap_cpp (QWTPLOT3D_MOC_SOURCES ${QWTPLOT3D_MOC_HEADERS})
 
@@ -77,15 +77,11 @@ add_library (qwtplot3d ${BUILD_TYPE}
 # debug working directory and other stuff
 create_vcproj_userfile (qwtplot3d)
 
-target_link_libraries (qwtplot3d Qt5::Core Qt5::Gui)
+target_link_libraries (qwtplot3d Qt5::Core Qt5::Gui Qt5::OpenGL)
 
 find_package (OpenGL REQUIRED)
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${OPENGL_INCLUDE_DIR}")
-target_link_libraries (qwtplot3d ${OPENGL_glu_LIBRARY})
-
-find_package (ZLIB REQUIRED)
-list (APPEND QWTPLOT3D_INCLUDE_DIRS "${ZLIB_INCLUDE_DIRS}")
-target_link_libraries (qwtplot3d ${ZLIB_LIBRARIES})
+target_link_libraries (qwtplot3d ${OPENGL_LIBRARIES})
 
 list (APPEND QWTPLOT3D_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include")
 

@@ -2,6 +2,7 @@
 #include "tfp/views/RealtimePlot.hpp"
 #include "tfp/models/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
+#include "tfp/math/Math.hpp"
 #include "tfp/util/Plugin.hpp"
 #include <QVBoxLayout>
 #include <QPainterPath>
@@ -115,7 +116,7 @@ void PoleZeroPlot::onSystemChanged()
 
     for (int i = 0; i < system_->numerator().size(); ++i)
     {
-        const typename Type<double>::Complex& root = system_->numerator().root(i);
+        const Type<double>::Complex& root = system_->numerator().root(i);
 
         QPainterPath path;
         path.addEllipse(root.real()-radius, root.imag()-radius, radius*2, radius*2);
@@ -124,7 +125,7 @@ void PoleZeroPlot::onSystemChanged()
 
     for (int i = 0; i < system_->denominator().size(); ++i)
     {
-        const typename Type<double>::Complex& root = system_->denominator().root(i);
+        const Type<double>::Complex& root = system_->denominator().root(i);
 
         QPainterPath path;
         path.moveTo(root.real()-radius, root.imag()+radius);

@@ -14,7 +14,6 @@ Tool::~Tool()
 {
     if (system_ != NULL)
         system_->dispatcher.removeListener(this);
-
 }
 
 // ----------------------------------------------------------------------------

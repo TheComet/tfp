@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
+#include "tfp/util/Type.hpp"
 #include "kiss_fft/kiss_fft.h"
 
 #include <string>
@@ -26,6 +27,19 @@ extern const double pi;
 template <typename T> int sign(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+#if !HAVE_ASINH
+double asinh(const double d);
+Type<Real>::Complex asinh(const Type<Real>::Complex& c);
+#endif
+#if !HAVE_ACOSH
+double acosh(const double d);
+Type<Real>::Complex acosh(const Type<Real>::Complex& c);
+#endif
+#if !HAVE_ATANH
+double atanh(const double d);
+Type<Real>::Complex atanh(const Type<Real>::Complex& c);
+#endif
 
 void complexMagnitude(double* magnitude, const kiss_fft_cpx* transformedSignal, unsigned len);
 void complexPhase(double* phase, const kiss_fft_cpx* transformedSignal, unsigned len);

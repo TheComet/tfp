@@ -57,7 +57,7 @@ void ButterworthFilter::updateParameters()
     double factor = k_;
     for (int k = 0; k < n_; ++k)
     {
-        system_->denominator().setRoot(k, wc_ * std::exp(typename Type<double>::Complex(0, ((2*k+n_+1)*M_PI) / (2*n_))));
+        system_->denominator().setRoot(k, wc_ * std::exp(Type<double>::Complex(0, ((2*k+n_+1)*M_PI) / (2*n_))));
         factor *= wc_;
     }
     system_->numerator().setFactor(factor);

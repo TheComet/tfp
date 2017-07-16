@@ -47,9 +47,9 @@ function (add_plugin TARGET)
     #target_link_libraries (${TARGET} Qt5::OpenGL)
     #target_link_libraries (${TARGET} Qt5::Svg)
 
-    #target_link_libraries (${TARGET} qwtinternal)
-    #target_link_libraries (${TARGET} qwtplot3d)
-    #target_link_libraries (${TARGET} kiss_fft)
-    #target_link_libraries (${TARGET} pugixml)
+    target_link_libraries (${TARGET} qwtinternal)
+    target_link_libraries (${TARGET} qwtplot3d)
+    target_link_libraries (${TARGET} kiss_fft)
+    target_link_libraries (${TARGET} pugixml)
 
 endfunction ()

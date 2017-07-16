@@ -98,8 +98,8 @@ void StandardLowOrderFilter::updateParameters()
         {
 
             // Real part
-            typename Type<double>::Complex r1(-wp_ / (2.0 * qp_), 0);
-            typename Type<double>::Complex r2(-wp_ / (2.0 * qp_), 0);
+            Type<double>::Complex r1(-wp_ / (2.0 * qp_), 0);
+            Type<double>::Complex r2(-wp_ / (2.0 * qp_), 0);
 
             // Roots are complex conjugates if qp > 0.5
             if (qp_ > 0.5)

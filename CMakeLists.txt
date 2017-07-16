@@ -111,8 +111,50 @@ endif ()
 
 include (CheckCXXSourceCompiles)
 
+set (REAL_TYPE "double" CACHE STRING "The type to use for numerical computations")
+
 # This is used by the other libraries to generate their export.h
 set (TEMPLATE_EXPORT_H "${CMAKE_SOURCE_DIR}/CMake/Templates/export.hpp.in")
+
+# complex hyperbolic functions
+function (check_complex_hyperbolic SYMBOL RESULT_HAVE RESULT_SYMBOL)
+	set (INCLUDES "#include <cmath>\n#include <complex>")
+	
+	# First, try to see if it is under std::
+    check_cxx_source_compiles ("
+		${INCLUDES}\n
+		int main() {
+			std::complex<double> c(1, 4);
+			std::complex<double> res = std::${SYMBOL}(c);
+		}" ${SYMBOL}_RESULT)
+
+	if (${SYMBOL}_RESULT)
+		set (${RESULT_SYMBOL} "std::${SYMBOL}" PARENT_SCOPE)
+		set (${RESULT_HAVE} 1 PARENT_SCOPE) 
+	else ()
+		# kay, maybe it's global
+		check_cxx_source_compiles ("
+		${INCLUDES}
+		int main() {
+			std::complex<double> c(1, 4);
+			std::complex<double> res = ${SYMBOL}(c);
+		}" ${SYMBOL}_RESULT)
+		if (${SYMBOL}_RESULT)
+			set (${RESULT_SYMBOL} "${SYMBOL}" PARENT_SCOPE)
+			set (${RESULT_HAVE} 1 PARENT_SCOPE)
+		else ()
+			set (${RESULT_SYMBOL} "tfp::${SYMBOL}" PARENT_SCOPE)
+			set (${RESULT_HAVE} 0 PARENT_SCOPE)
+		endif ()
+	endif ()
+endfunction ()
+
+check_complex_hyperbolic ("sinh" HAVE_SINH SINH_SYMBOL)
+check_complex_hyperbolic ("cosh" HAVE_COSH COSH_SYMBOL)
+check_complex_hyperbolic ("tanh" HAVE_TANH TANH_SYMBOL)
+check_complex_hyperbolic ("asinh" HAVE_ASINH ASINH_SYMBOL)
+check_complex_hyperbolic ("acosh" HAVE_ACOSH ACOSH_SYMBOL)
+check_complex_hyperbolic ("atanh" HAVE_ATANH ATANH_SYMBOL)
 
 message (STATUS "------------------------------------------------------------")
 message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")

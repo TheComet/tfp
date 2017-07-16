@@ -44,7 +44,7 @@ public:
 
     double operator()(double x, double y)
     {
-        return std::log10(20 * std::abs(tf_->evaluate(typename Type<double>::Complex(x, y))));
+        return std::log10(20 * std::abs(tf_->evaluate(Type<double>::Complex(x, y))));
     }
 
 private:

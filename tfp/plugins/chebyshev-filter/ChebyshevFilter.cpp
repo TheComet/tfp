@@ -1,5 +1,6 @@
 #include "ChebyshevFilter.hpp"
 #include "tfp/views/FloatAdjustmentWidget.hpp"
+#include "tfp/math/Math.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <QVBoxLayout>
 #include <QSpinBox>
@@ -62,11 +63,11 @@ ChebyshevFilter::ChebyshevFilter(QWidget* parent) :
 void ChebyshevFilter::updateParameters()
 {
     double reciFactor = 0.5;
-    double a = -std::sinh(1.0/n_ * asinh(1.0/epsilon_));
-    double b = std::cosh(1.0/n_ * asinh(1.0/epsilon_));
+    double a = -SINH(1.0/n_ * ASINH(1.0/epsilon_));
+    double b = COSH(1.0/n_ * ASINH(1.0/epsilon_));
     for (int m = 0; m < n_; ++m)
     {
-        system_->denominator().setRoot(m, wc_ * typename Type<double>::Complex(
+        system_->denominator().setRoot(m, wc_ * Type<double>::Complex(
             a * std::sin(M_PI / 2.0 * (2.0*m+1)/n_),
             b * std::cos(M_PI / 2.0 * (2.0*m+1)/n_)
         ));
