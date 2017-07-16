@@ -35,8 +35,6 @@ function (add_plugin TARGET)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
         PREFIX "")
 
-    add_dependencies (tfp ${TARGET})
-
     ###############################################################################
     # dependencies
     ###############################################################################
@@ -53,5 +51,6 @@ function (add_plugin TARGET)
     target_link_libraries (${TARGET} qwtplot3d)
     target_link_libraries (${TARGET} kiss_fft)
     target_link_libraries (${TARGET} pugixml)
+	target_link_libraries (${TARGET} tfp)
 
 endfunction ()

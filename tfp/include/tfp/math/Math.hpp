@@ -37,7 +37,7 @@ TFP_PUBLIC_API double acosh(const double d);
 TFP_PUBLIC_API Type<Real>::Complex acosh(const Type<Real>::Complex& c);
 #endif
 #if !HAVE_ATANH
-double atanh(const double d);
+TFP_PUBLIC_API double atanh(const double d);
 TFP_PUBLIC_API Type<Real>::Complex atanh(const Type<Real>::Complex& c);
 #endif
 

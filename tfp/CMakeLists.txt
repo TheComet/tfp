@@ -20,6 +20,8 @@ add_definitions (-D_USE_MATH_DEFINES)
 set (LIBRARY_NAME "TFP")
 set (BUILD_TYPE "SHARED")
 
+add_definitions (-DTFP_BUILDING)
+
 configure_file (${TEMPLATE_EXPORT_H} "include/tfp/export.hpp")
 configure_file ("include/tfp/config.hpp.in" "include/tfp/config.hpp")
 
