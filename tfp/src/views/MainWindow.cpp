@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
-
+    
     // Window icon and title
     setWindowIcon(QIcon(":/icons/icon.ico"));
     setWindowTitle("Transfer Function Plotter");
@@ -55,12 +55,13 @@ MainWindow::MainWindow(QWidget *parent) :
     mdiArea_->setTabsMovable(true);
     ui->centralWidget->layout()->addWidget(mdiArea_);
     mdiArea_->setVisible(false);*/
-
+    
     loadPlugins();
 
     System* system = newSystem("System");
     QWidget* widget = new QWidget;
     widget->setLayout(new QHBoxLayout);
+    
     Tool* dpsfg = pluginManager_->createTool("DPSFG");
     dpsfg->setSystem(system);
     widget->layout()->addWidget(dpsfg);
@@ -85,8 +86,19 @@ void MainWindow::loadPlugins()
     QDir pluginsDir("plugins");
     QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
 
+    QStringList validExtensions;
+    validExtensions += ".dll";
+    validExtensions += ".so";
+    validExtensions += ".dylib";
+    validExtensions += ".dynlib";
+
     for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
-        pluginManager_->loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
+        for (QStringList::const_iterator ext = validExtensions.begin(); ext != validExtensions.end(); ++ext)
+            if (it->endsWith(*ext, Qt::CaseInsensitive))
+            {
+                pluginManager_->loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
+                break;
+            }
 }
 
 // ----------------------------------------------------------------------------

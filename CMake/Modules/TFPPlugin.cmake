@@ -31,9 +31,13 @@ function (add_plugin TARGET)
         ${QM_FILES}
     )
 
-    set_target_properties (${TARGET} PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
-        PREFIX "")
+	set_target_properties (${TARGET}
+		PROPERTIES
+			LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+			RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+			LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+			RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+		PREFIX "")
 
     ###############################################################################
     # dependencies

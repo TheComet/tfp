@@ -21,7 +21,7 @@ class System;
  * @brief The top-most Qt widget of this application. Handles the menu bar
  * actions and sets up global stuff (like shortcuts, icons, etc.)
  */
-class MainWindow : public QMainWindow
+class TFP_PUBLIC_API MainWindow : public QMainWindow
 {
     Q_OBJECT
 
