@@ -20,7 +20,7 @@ The strings contain what eventually will be shown as tic labels.\n
 Standard linear and logarithmic scales have been integrated yet into the Axis 
 interface. User-defined axes can be derived from Scale, LinearScale et al.
 */
-class QWT3D_EXPORT Scale
+class QWT3D_PUBLIC_API Scale
 {
   friend class Axis;
   friend class ValuePtr<Scale>;
@@ -54,7 +54,7 @@ class QWT3D_EXPORT Scale
 };
 
 //! The standard (1:1) mapping class for axis numbering
-class QWT3D_EXPORT LinearScale : public Scale
+class QWT3D_PUBLIC_API LinearScale : public Scale
 {
   friend class Axis;
   //friend struct ValuePtrTraits<Scale>;
@@ -68,7 +68,7 @@ class QWT3D_EXPORT LinearScale : public Scale
 };
 
 //! log10 scale
-class QWT3D_EXPORT LogScale : public Scale
+class QWT3D_PUBLIC_API LogScale : public Scale
 {
   friend class Axis;
   //friend struct ValuePtrTraits<Scale>;

@@ -15,7 +15,7 @@ class GridPlot;
 	A Function encapsulates a mathematical function with rectangular domain. The user has to adapt the pure virtual operator() 
 	to get a working object. Also, the client code should call setDomain, setMesh and create for reasonable operating conditions.
 */
-class QWT3D_EXPORT Function : public GridMapping
+class QWT3D_PUBLIC_API Function : public GridMapping
 {
 public:
   Function(); //!< Constructs Function object w/o assigned GridPlot.

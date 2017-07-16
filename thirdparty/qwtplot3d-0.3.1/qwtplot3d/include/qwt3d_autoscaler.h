@@ -11,7 +11,7 @@ namespace Qwt3D
 {
 
 //! ABC for autoscaler
-class QWT3D_EXPORT AutoScaler
+class QWT3D_PUBLIC_API AutoScaler
 {
 //friend struct ValuePtrTraits<AutoScaler>;
 protected:
@@ -23,7 +23,7 @@ protected:
 };
 
 //! Automatic beautifying of linear scales
-class QWT3D_EXPORT LinearAutoScaler : public AutoScaler
+class QWT3D_PUBLIC_API LinearAutoScaler : public AutoScaler
 {
 friend class LinearScale;
 protected:

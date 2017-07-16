@@ -19,7 +19,7 @@ function clone(). 2 additional functions are per default empty and could also ge
 in derived classes. They can be used for initialization issues or actions not depending on the related
 primitive. 
 */
-class QWT3D_EXPORT Enrichment
+class QWT3D_PUBLIC_API Enrichment
 {
 public:
   enum TYPE{
@@ -48,7 +48,7 @@ protected:
 UserEnrichments introduce a draw routine for customized visible objects, not covered by the 
 other types design. draw() is called, when the Plot creates its internal OpenGL data representation 
 */
-class QWT3D_EXPORT UserEnrichment : public Enrichment
+class QWT3D_PUBLIC_API UserEnrichment : public Enrichment
 {
 public:
   
@@ -64,7 +64,7 @@ VertexEnrichments introduce a specialized draw routine for vertex dependent data
 draw() is called, when the Plot creates its internal OpenGL data representation 
 for every vertex associated to his argument.
 */
-class QWT3D_EXPORT VertexEnrichment : public Enrichment
+class QWT3D_PUBLIC_API VertexEnrichment : public Enrichment
 {
 public:
   
@@ -80,7 +80,7 @@ EdgeEnrichments introduce a specialized draw routine for edge dependent data.
 draw() is called, when the Plot creates its internal OpenGL data representation 
 for every edge associated to his argument.
 */
-class QWT3D_EXPORT EdgeEnrichment : public Enrichment
+class QWT3D_PUBLIC_API EdgeEnrichment : public Enrichment
 {
 public:
   

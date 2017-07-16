@@ -18,7 +18,7 @@ Colors destructor has been declared \c protected, in order to use only heap base
 will handle the objects destruction.
 See StandardColor for an example
 */
-class QWT3D_EXPORT Color
+class QWT3D_PUBLIC_API Color
 {
 public:
   virtual ~Color(){}

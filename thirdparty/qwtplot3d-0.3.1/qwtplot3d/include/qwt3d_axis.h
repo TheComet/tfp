@@ -16,7 +16,7 @@ namespace Qwt3D
   Axes are highly customizable especially in terms
   of labeling and scaling.
 */
-class QWT3D_EXPORT Axis : public Drawable
+class QWT3D_PUBLIC_API Axis : public Drawable
 {
 
 public:

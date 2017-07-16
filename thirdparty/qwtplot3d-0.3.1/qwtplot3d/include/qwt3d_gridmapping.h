@@ -15,7 +15,7 @@ class GridPlot;
 /**
 
 */
-class QWT3D_EXPORT GridMapping : public Mapping
+class QWT3D_PUBLIC_API GridMapping : public Mapping
 {
 public:
   GridMapping(); //!< Constructs GridMapping object w/o assigned SurfacePlot.

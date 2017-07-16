@@ -120,7 +120,7 @@ enum ANCHOR
 
 
 //! Tuple <tt>[x,y]</tt>
-struct QWT3D_EXPORT Tuple
+struct QWT3D_PUBLIC_API Tuple
 {
 	Tuple() : x(0), y(0) {} //!< Calls Tuple(0,0)
 	Tuple(double X, double Y) : x(X), y(Y) {} //!< Initialize Tuple with x and y
@@ -132,7 +132,7 @@ struct QWT3D_EXPORT Tuple
 /**
 Consider Triples also as vectors in R^3
 */
-struct QWT3D_EXPORT Triple
+struct QWT3D_PUBLIC_API Triple
 {
 	//! Initialize Triple with x,y and z
 	explicit Triple(double xv = 0,double yv = 0,double zv = 0) 
@@ -299,7 +299,7 @@ minVertex.x <= maxVertex.x\n
 minVertex.y <= maxVertex.y\n
 minVertex.z <= maxVertex.z\n
 */
-struct QWT3D_EXPORT ParallelEpiped
+struct QWT3D_PUBLIC_API ParallelEpiped
 {
 	//! Construct non-initialized Parallelepiped
 	ParallelEpiped()
@@ -339,7 +339,7 @@ inline ParallelEpiped sum(const ParallelEpiped& a, const ParallelEpiped& b)
 /**
 	FreeVectors represent objects like normal vectors and other vector fields inside R^3 
 */
-struct QWT3D_EXPORT FreeVector
+struct QWT3D_PUBLIC_API FreeVector
 {
 	FreeVector()
 	{
@@ -375,10 +375,10 @@ typedef std::vector<Cell> CellVector;
 //! Returns the sum over the sizes of the single cells
 unsigned tesselationSize(Qwt3D::CellVector const& t);
 //! Rectangular hull for point cloud
-QWT3D_EXPORT Qwt3D::ParallelEpiped hull(TripleVector const& data);
+QWT3D_PUBLIC_API Qwt3D::ParallelEpiped hull(TripleVector const& data);
 
 //! Red-Green-Blue-Alpha value
-struct QWT3D_EXPORT RGBA
+struct QWT3D_PUBLIC_API RGBA
 {
 	RGBA()
 		: r(0), g(0), b(0), a(1)
@@ -408,8 +408,8 @@ typedef std::vector<RGBA> ColorVector;
 
 #ifndef QWT3D_NOT_FOR_DOXYGEN
 
-QWT3D_EXPORT QColor GL2Qt(GLdouble r, GLdouble g, GLdouble b); //!< RGB -> QColor
-QWT3D_EXPORT Qwt3D::RGBA Qt2GL(QColor col); //!< QColor -> RGBA
+QWT3D_PUBLIC_API QColor GL2Qt(GLdouble r, GLdouble g, GLdouble b); //!< RGB -> QColor
+QWT3D_PUBLIC_API Qwt3D::RGBA Qt2GL(QColor col); //!< QColor -> RGBA
 
 inline Triple normalizedcross(Triple const& u, Triple const& v)
 {

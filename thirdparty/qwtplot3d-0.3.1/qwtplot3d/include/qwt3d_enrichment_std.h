@@ -11,7 +11,7 @@ namespace Qwt3D
 class Plot3D;
 
 //! The Cross Hair Style
-class QWT3D_EXPORT CrossHair : public VertexEnrichment
+class QWT3D_PUBLIC_API CrossHair : public VertexEnrichment
 {
 public:
   CrossHair();
@@ -31,7 +31,7 @@ private:
 };
 
 //! The Point Style
-class QWT3D_EXPORT Dot : public VertexEnrichment
+class QWT3D_PUBLIC_API Dot : public VertexEnrichment
 {
 public: 
   Dot();
@@ -51,7 +51,7 @@ private:
 };
 
 //! The Ball Style
-class QWT3D_EXPORT Ball : public VertexEnrichment
+class QWT3D_PUBLIC_API Ball : public VertexEnrichment
 {
 public:
   Ball();
@@ -73,7 +73,7 @@ private:
 };
 
 //! The Cone Style
-class QWT3D_EXPORT Cone : public VertexEnrichment
+class QWT3D_PUBLIC_API Cone : public VertexEnrichment
 {
 public:
   Cone();
@@ -101,7 +101,7 @@ The class encapsulates a vector field including his OpenGL representation as arr
 The arrows can be configured in different aspects (color, shape, painting quality).
 
 */
-class QWT3D_EXPORT Arrow : public VertexEnrichment
+class QWT3D_PUBLIC_API Arrow : public VertexEnrichment
 {
 public:
 
@@ -143,7 +143,7 @@ Defines a field of cylindrical edge
 The edges can be configured in different aspects (color, painting quality, closed or open).
 
 */
-class QWT3D_EXPORT Stick : public EdgeEnrichment
+class QWT3D_PUBLIC_API Stick : public EdgeEnrichment
 {
 public:
 

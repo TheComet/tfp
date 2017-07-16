@@ -13,7 +13,7 @@ namespace Qwt3D
   A GridPlot ...
   
 */
-class QWT3D_EXPORT GridPlot : public SurfacePlot
+class QWT3D_PUBLIC_API GridPlot : public SurfacePlot
 {
     Q_OBJECT
 

@@ -15,7 +15,7 @@ namespace Qwt3D
 {
 
 //! A Qt string or an output device dependent string
-class QWT3D_EXPORT Label : public Drawable 
+class QWT3D_PUBLIC_API Label : public Drawable 
 {
 		
 public:

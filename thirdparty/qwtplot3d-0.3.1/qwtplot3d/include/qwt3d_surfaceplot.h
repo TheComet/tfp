@@ -12,7 +12,7 @@ namespace Qwt3D
 	A SurfacePlot ...
 	
 */
-class QWT3D_EXPORT SurfacePlot : public Plot3D
+class QWT3D_PUBLIC_API SurfacePlot : public Plot3D
 {
   Q_OBJECT
 

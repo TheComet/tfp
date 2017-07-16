@@ -22,7 +22,7 @@ framework.\n
 The interface mimics roughly Qt's QImageIO functions for defining  
 image input/output functions. 
 */
-class QWT3D_EXPORT IO
+class QWT3D_PUBLIC_API IO
 {
 
 public:
@@ -126,7 +126,7 @@ private:
 };
 
 //! Provides Qt's Pixmap output facilities
-class QWT3D_EXPORT PixmapWriter : public IO::Functor
+class QWT3D_PUBLIC_API PixmapWriter : public IO::Functor
 {
 friend class IO;
 public:  

@@ -17,7 +17,7 @@ namespace Qwt3D
   The class covers mouse/keyboard handling, lighting and basic transformations, like
   scaling, shifting and rotating objects.
 */
-class QWT3D_EXPORT ExtGLWidget : public QGLWidget
+class QWT3D_PUBLIC_API ExtGLWidget : public QGLWidget
 {
   Q_OBJECT
 

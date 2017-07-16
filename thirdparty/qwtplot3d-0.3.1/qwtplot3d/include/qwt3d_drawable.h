@@ -11,7 +11,7 @@ namespace Qwt3D
 {
 
 //! ABC for Drawables
-class QWT3D_EXPORT Drawable 
+class QWT3D_PUBLIC_API Drawable 
 {
 public:
 	virtual ~Drawable() = 0;

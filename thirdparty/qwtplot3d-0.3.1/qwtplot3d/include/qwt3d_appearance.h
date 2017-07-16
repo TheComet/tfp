@@ -22,7 +22,7 @@ namespace Qwt3D
   a new data set. The data's visual properties are accessible by 
   exploiting the associated Appearance object.
   */
-class QWT3D_EXPORT Appearance
+class QWT3D_PUBLIC_API Appearance
 {
 public:
   explicit Appearance(unsigned colors = 100);

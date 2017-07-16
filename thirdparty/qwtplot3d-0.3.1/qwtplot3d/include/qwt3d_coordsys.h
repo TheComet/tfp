@@ -10,7 +10,7 @@ namespace Qwt3D
 {
 
 //! A coordinate system with different styles (BOX, FRAME)
-class QWT3D_EXPORT CoordinateSystem : public Drawable
+class QWT3D_PUBLIC_API CoordinateSystem : public Drawable
 {
 public:
 	explicit CoordinateSystem(Qwt3D::Triple blb = Qwt3D::Triple(0,0,0), Qwt3D::Triple ftr = Qwt3D::Triple(0,0,0), Qwt3D::COORDSTYLE = Qwt3D::BOX);

@@ -14,7 +14,7 @@ namespace Qwt3D
 /**
 
 */
-class QWT3D_EXPORT Mapping
+class QWT3D_PUBLIC_API Mapping
 {
 
 public:

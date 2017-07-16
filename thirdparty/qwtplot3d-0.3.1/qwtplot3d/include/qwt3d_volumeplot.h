@@ -49,7 +49,7 @@ struct Voxel
     To create the data, use createDataset() method.
     \since 0.3.1
 */
-class QWT3D_EXPORT VolumePlot : public Plot3D
+class QWT3D_PUBLIC_API VolumePlot : public Plot3D
 {
 public:
     VolumePlot(QWidget *parent = 0, const QGLWidget *shareWidget = 0);

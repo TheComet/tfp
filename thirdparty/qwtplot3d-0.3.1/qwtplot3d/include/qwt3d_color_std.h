@@ -12,7 +12,7 @@ class Plot3D;
 /*!
 The class has a ColorVector representing z values, which will be used by operator()(double x, double y, double z)
 */
-class QWT3D_EXPORT StandardColor : public Color
+class QWT3D_PUBLIC_API StandardColor : public Color
 {
 public:
 	//! Initializes with data and set up a ColorVector with a size of 100 z values (default);

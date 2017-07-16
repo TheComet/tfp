@@ -32,13 +32,13 @@
   #ifdef QWT3D_PUBLIC_API
     #if defined(QWT3D_BUILDING)     /* create a Qwt3d DLL library */
       #undef QWT3D_PUBLIC_API
-      #define QWT3D_EXPORT  __declspec(dllexport)
+      #define QWT3D_PUBLIC_API  __declspec(dllexport)
       #define QWT3D_TEMPLATEDLL
     #endif
   #endif
 
   #if defined(QWT3D_PUBLIC_API)     /* use a Qwt3d DLL library */
-    #define QWT3D_EXPORT  __declspec(dllimport)
+    #define QWT3D_PUBLIC_API  __declspec(dllimport)
     #define QWT3D_TEMPLATEDLL
   #endif
 
@@ -48,8 +48,8 @@
   #undef QWT3D_TEMPLATEDLL
 #endif
 
-#ifndef QWT3D_EXPORT
-  #define QWT3D_EXPORT
+#ifndef QWT3D_PUBLIC_API
+  #define QWT3D_PUBLIC_API
 #endif
 
 #endif /* include guard */

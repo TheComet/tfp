@@ -16,7 +16,7 @@ namespace Qwt3D
 	The class visualizes a ColorVector together with a scale (axis)  and a caption. ColorLegends are vertical 
 	or horizontal
 */
-class QWT3D_EXPORT ColorLegend : public Drawable
+class QWT3D_PUBLIC_API ColorLegend : public Drawable
 {
 
 public:

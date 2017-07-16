@@ -15,7 +15,7 @@ class GridPlot;
 /**
 
 */
-class QWT3D_EXPORT ParametricSurface : public GridMapping
+class QWT3D_PUBLIC_API ParametricSurface : public GridMapping
 {
 
 public:

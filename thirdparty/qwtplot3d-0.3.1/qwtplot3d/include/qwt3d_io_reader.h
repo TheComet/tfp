@@ -13,7 +13,7 @@ Functor for reading of native files containing grid data.
 As a standart input functor associated with "mes" and "MES"
 file extensions.   
 */
-class QWT3D_EXPORT NativeReader : public IO::Functor
+class QWT3D_PUBLIC_API NativeReader : public IO::Functor
 {
 friend class IO;
 

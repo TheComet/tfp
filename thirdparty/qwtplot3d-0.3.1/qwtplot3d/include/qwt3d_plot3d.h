@@ -20,7 +20,7 @@ namespace Qwt3D
   in this respect - an abstract base class. It's nevertheless no pure interface.
     The class provides interfaces for basic data controlled color allocation.
 */
-class QWT3D_EXPORT Plot3D : public ExtGLWidget
+class QWT3D_PUBLIC_API Plot3D : public ExtGLWidget
 {
     Q_OBJECT
 

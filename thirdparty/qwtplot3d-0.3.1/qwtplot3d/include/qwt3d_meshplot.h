@@ -13,7 +13,7 @@ namespace Qwt3D
   surface elements built not from a fixed rectangular grid. There is a cost, 
   as usual. In this case, it means efficiency.
 */
-class QWT3D_EXPORT MeshPlot : public SurfacePlot
+class QWT3D_PUBLIC_API MeshPlot : public SurfacePlot
 {
 public:
   MeshPlot( QWidget * parent = 0, const QGLWidget * shareWidget = 0 );
