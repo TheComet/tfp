@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tfp/config.hpp"
 #include <qwt_plot.h>
 
 namespace tfp {
@@ -12,7 +13,7 @@ class RealtimePlotListener;
 /*!
  *
  */
-class RealtimePlot : public QwtPlot
+class TFP_PUBLIC_API RealtimePlot : public QwtPlot
 {
     Q_OBJECT
 

@@ -10,7 +10,7 @@
 namespace tfp {
 
 
-class InfiniSliderWidget : public QSlider
+class TFP_PUBLIC_API InfiniSliderWidget : public QSlider
 {
     Q_OBJECT
 

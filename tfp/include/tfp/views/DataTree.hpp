@@ -7,7 +7,7 @@ namespace tfp {
 
 class System;
 
-class DataTree : public QTreeWidget
+class TFP_PUBLIC_API DataTree : public QTreeWidget
 {
 public:
     explicit DataTree(QWidget* parent=NULL);

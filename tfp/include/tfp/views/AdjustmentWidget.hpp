@@ -7,7 +7,7 @@ class QLabel;
 
 namespace tfp {
 
-class AdjustmentWidget : public QWidget
+class TFP_PUBLIC_API AdjustmentWidget : public QWidget
 {
     Q_OBJECT
 

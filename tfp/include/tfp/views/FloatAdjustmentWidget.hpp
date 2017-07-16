@@ -9,7 +9,7 @@ namespace tfp {
 
 class InfiniSliderWidget;
 
-class FloatAdjustmentWidget : public AdjustmentWidget
+class TFP_PUBLIC_API FloatAdjustmentWidget : public AdjustmentWidget
 {
     Q_OBJECT
 
