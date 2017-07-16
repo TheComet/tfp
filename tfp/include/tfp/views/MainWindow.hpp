@@ -34,6 +34,10 @@ public:
     System* newSystem(const QString& name);
     void deleteSystem(System* system);
 
+public slots:
+    void loadTool1(const QString& name);
+    void loadTool2(const QString& name);
+
 private:
     void loadPlugins();
 
@@ -41,7 +45,10 @@ private:
     Ui::MainWindow* ui;
     QMdiArea* mdiArea_;
     DataTree* dataTree_;
+    QWidget* toolContainer1_;
+    QWidget* toolContainer2_;
     Reference<PluginManager> pluginManager_;
+    Reference<System> activeSystem_;
 };
 
 } // namespace tfp

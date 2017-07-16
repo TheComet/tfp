@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mdiArea_(new QMdiArea),
     dataTree_(new DataTree),
+    toolContainer1_(new QWidget),
+    toolContainer2_(new QWidget),
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
@@ -56,23 +58,44 @@ MainWindow::MainWindow(QWidget *parent) :
     mdiArea_->setTabsMovable(true);
     ui->centralWidget->layout()->addWidget(mdiArea_);
     mdiArea_->setVisible(false);*/
-    
-    loadPlugins();
 
-    System* system = newSystem("System");
-    QWidget* widget = new QWidget;
-    widget->setLayout(new QHBoxLayout);
+    loadPlugins();
+    QComboBox* tools1 = new QComboBox;
+    QComboBox* tools2 = new QComboBox;
+    QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();
+    for (QVector<ToolFactory*>::const_iterator it = toolsList.begin(); it != toolsList.end(); ++it)
+    {
+        tools1->addItem((*it)->name);
+        tools2->addItem((*it)->name);
+    }
+
+    QWidget* leftPane = new QWidget;
+    leftPane->setLayout(new QVBoxLayout);
+    leftPane->layout()->addWidget(dataTree_);
+    leftPane->layout()->addWidget(tools1);
+    leftPane->layout()->addWidget(tools2);
+
+    activeSystem_ = newSystem("System");
+    toolContainer1_->setLayout(new QHBoxLayout);
+    toolContainer2_->setLayout(new QHBoxLayout);
     
-    Tool* dpsfg = pluginManager_->createTool("DPSFG");
-    dpsfg->setSystem(system);
-    widget->layout()->addWidget(dpsfg);
+    Tool* tool = pluginManager_->createTool("DPSFG");
+    tool->setSystem(activeSystem_);
+    toolContainer1_->layout()->addWidget(tool);
+    tool = pluginManager_->createTool("Bode Plot");
+    tool->setSystem(activeSystem_);
+    toolContainer2_->layout()->addWidget(tool);
 
     QSplitter* splitter = new QSplitter;
     ui->centralWidget->layout()->addWidget(splitter);
-    splitter->addWidget(dataTree_);
-    splitter->addWidget(widget);
+    splitter->addWidget(leftPane);
+    splitter->addWidget(toolContainer1_);
+    splitter->addWidget(toolContainer2_);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
+
+    connect(tools1, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool1(const QString&)));
+    connect(tools2, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool2(const QString&)));
 }
 
 // ----------------------------------------------------------------------------
@@ -126,6 +149,28 @@ void MainWindow::deleteSystem(System* system)
 {
     dataTree_->removeSystem(system);
     delete system;
+}
+
+// ----------------------------------------------------------------------------
+void MainWindow::loadTool1(const QString& name)
+{
+    Tool* tool = pluginManager_->createTool(name);
+    if (tool == NULL)
+        return;
+
+    Util::clearLayout(toolContainer1_->layout());
+    tool->setSystem(activeSystem_);
+    toolContainer1_->layout()->addWidget(tool);
+}
+void MainWindow::loadTool2(const QString& name)
+{
+    Tool* tool = pluginManager_->createTool(name);
+    if (tool == NULL)
+        return;
+
+    Util::clearLayout(toolContainer2_->layout());
+    tool->setSystem(activeSystem_);
+    toolContainer2_->layout()->addWidget(tool);
 }
 
 } // namespace tfp
