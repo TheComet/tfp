@@ -4,7 +4,7 @@
 
 namespace tfp {
 
-class SystemListener
+class TFP_PUBLIC_API SystemListener
 {
 public:
     virtual void onSystemStructureChanged() = 0;

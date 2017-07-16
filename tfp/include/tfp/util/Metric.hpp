@@ -7,7 +7,7 @@
 
 namespace tfp {
 
-class Metric
+class TFP_PUBLIC_API Metric
 {
 public:
 

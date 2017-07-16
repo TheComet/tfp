@@ -1,10 +1,10 @@
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
-#include "tfp/util/Plugin.hpp"
+#include "tfp/plugin/Plugin.hpp"
+#include "tfp/plugin/Tool.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
 #include "tfp/views/MainWindow.hpp"
-#include "tfp/views/Tool.hpp"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QMdiArea>

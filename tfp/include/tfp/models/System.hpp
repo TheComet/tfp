@@ -11,8 +11,8 @@ class QTreeWidgetItem;
 
 namespace tfp {
 
-class System : public RefCounted,
-               public TransferFunction<double>
+class TFP_PUBLIC_API System : public RefCounted,
+                              public TransferFunction<double>
 {
 public:
     System(const QString& name);

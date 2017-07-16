@@ -1,6 +1,6 @@
-#include "tfp/util/Plugin.hpp"
+#include "tfp/plugin/Plugin.hpp"
+#include "tfp/plugin/Tool.hpp"
 #include "tfp/listeners/PluginListener.hpp"
-#include "tfp/views/Tool.hpp"
 #include <QLibrary>
 #include <QHBoxLayout>
 #include <iostream>

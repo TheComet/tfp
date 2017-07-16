@@ -31,7 +31,7 @@ namespace tfp {
 
 /// Shared pointer template class with intrusive reference counting.
 template <class T>
-class Reference
+class TFP_PUBLIC_API Reference
 {
 public:
 
@@ -246,7 +246,7 @@ Reference<T> dynamicCast(const Reference<U>& ptr)
 
 /// Weak pointer template class with intrusive reference counting. Does not keep the object pointed to alive.
 template <class T>
-class WeakReference
+class TFP_PUBLIC_API WeakReference
 {
 public:
     /// Construct a null weak pointer.

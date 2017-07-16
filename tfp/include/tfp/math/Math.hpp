@@ -29,22 +29,22 @@ template <typename T> int sign(T val) {
 }
 
 #if !HAVE_ASINH
-double asinh(const double d);
-Type<Real>::Complex asinh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API double asinh(const double d);
+TFP_PUBLIC_API Type<Real>::Complex asinh(const Type<Real>::Complex& c);
 #endif
 #if !HAVE_ACOSH
-double acosh(const double d);
-Type<Real>::Complex acosh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API double acosh(const double d);
+TFP_PUBLIC_API Type<Real>::Complex acosh(const Type<Real>::Complex& c);
 #endif
 #if !HAVE_ATANH
 double atanh(const double d);
-Type<Real>::Complex atanh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API Type<Real>::Complex atanh(const Type<Real>::Complex& c);
 #endif
 
-void complexMagnitude(double* magnitude, const kiss_fft_cpx* transformedSignal, unsigned len);
-void complexPhase(double* phase, const kiss_fft_cpx* transformedSignal, unsigned len);
-void copyDoublesIntoCpxBuffer(kiss_fft_cpx* target, const double* src, unsigned len);
-void multiplyCpxBuffer(kiss_fft_cpx* target, const double product, unsigned len);
+TFP_PUBLIC_API void complexMagnitude(double* magnitude, const kiss_fft_cpx* transformedSignal, unsigned len);
+TFP_PUBLIC_API void complexPhase(double* phase, const kiss_fft_cpx* transformedSignal, unsigned len);
+TFP_PUBLIC_API void copyDoublesIntoCpxBuffer(kiss_fft_cpx* target, const double* src, unsigned len);
+TFP_PUBLIC_API void multiplyCpxBuffer(kiss_fft_cpx* target, const double product, unsigned len);
 
 template <class T, class U>
 void copyBuffer(T* target, const U* src, unsigned len)

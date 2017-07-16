@@ -18,7 +18,7 @@ add_definitions (-D_USE_MATH_DEFINES)
 
 # Required by export.hpp.in
 set (LIBRARY_NAME "TFP")
-set (BUILD_TYPE "STATIC")
+set (BUILD_TYPE "SHARED")
 
 configure_file (${TEMPLATE_EXPORT_H} "include/tfp/export.hpp")
 configure_file ("include/tfp/config.hpp.in" "include/tfp/config.hpp")
@@ -39,7 +39,6 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
 
 set (tfp_SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
@@ -79,11 +78,9 @@ qt5_wrap_ui  (tfp_FORMS_MOC ${tfp_FORMS})
 qt5_add_resources (tfp_RESOURCES_GEN ${tfp_RESOURCES})
 #qt5_add_translation (tfp_QM_FILES ${tfp_TRANSLATION_FILES})
 
-include_directories ("${CMAKE_CURRENT_LIST_DIR}/include")
-include_directories (${CMAKE_BINARY_DIR})                    # need this because MOC outputs to binary_dir/tfp
-include_directories ("${CMAKE_CURRENT_BINARY_DIR}/include")  # need this for config.hpp and export.hpp
+include_directories ("include")
 
-add_executable (tfp
+add_library (tfp ${BUILD_TYPE}
     ${tfp_SOURCES}
     ${tfp_SOURCES_MOC}
     ${tfp_FORMS_MOC}
@@ -109,10 +106,6 @@ include_directories (${PUGIXML_INCLUDE_DIRS})
 target_link_libraries (tfp Qt5::Core)
 target_link_libraries (tfp Qt5::Widgets)
 target_link_libraries (tfp Qt5::Gui)
-#target_link_libraries (tfp Qt5::Concurrent)
-#target_link_libraries (tfp Qt5::PrintSupport)
-#target_link_libraries (tfp Qt5::OpenGL)
-#target_link_libraries (tfp Qt5::Svg)
 
 target_link_libraries (tfp ${QWT_LIBRARIES})
 target_link_libraries (tfp ${QWTPLOT3D_LIBRARIES})
@@ -180,17 +173,3 @@ if (PLATFORM MATCHES "WINDOWS")
         add_dependencies (tfp Qt5CopyBinaries)
     endif ()
 endif ()
-
-###############################################################################
-# plugins
-###############################################################################
-
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/bode-plot")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/butterworth-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/chebyshev-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/complex-plane-3d")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/dpsfg")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/elliptic-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/pole-zero-plot")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/std-low-order-filters")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/step-impulse-response")

@@ -1,4 +1,4 @@
-#include "tfp/views/Tool.hpp"
+#include "tfp/plugin/Tool.hpp"
 #include "tfp/models/System.hpp"
 
 namespace tfp {

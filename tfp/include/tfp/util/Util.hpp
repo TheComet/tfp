@@ -7,7 +7,7 @@ class QwtPlotTextLabel;
 
 namespace tfp {
 
-struct Util
+struct TFP_PUBLIC_API Util
 {
     /*!
      * @brief Deletes all widgets, layouts, and spacer items from a layout,

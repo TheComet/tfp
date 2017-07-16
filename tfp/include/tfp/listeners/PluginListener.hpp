@@ -4,7 +4,7 @@
 
 namespace tfp {
 
-class PluginListener
+class TFP_PUBLIC_API PluginListener
 {
 public:
     virtual void onPluginUnloading() = 0;

@@ -6,6 +6,8 @@ function (add_plugin TARGET)
         message (FATAL_ERROR "Require a target name to add_plugin() call: add_plugin(<target name> [...])")
     endif ()
 
+    find_package (Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+
     if (add_plugin_HEADERS)
         qt5_wrap_cpp (SOURCES_MOC ${add_plugin_HEADERS})
     endif ()
