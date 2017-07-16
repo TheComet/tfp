@@ -3,6 +3,7 @@
 #define qwt3d_scale_h__2004_06_02_22_02_begin_guarded_code
 
 //#include <qstring.h>
+#include "qwt3d_export.h"
 #include "qwt3d_types.h"
 #include "qwt3d_autoscaler.h"
 #include "qwt3d_valueptr.h"

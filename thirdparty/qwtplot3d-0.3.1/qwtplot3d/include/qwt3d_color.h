@@ -3,6 +3,7 @@
 #define qwt3d_color_h__2009_06_12_13_31_18_begin_guarded_code
 
 //#include <qstring.h>
+#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 #include "qwt3d_types.h"
 #include "qwt3d_valueptr.h"

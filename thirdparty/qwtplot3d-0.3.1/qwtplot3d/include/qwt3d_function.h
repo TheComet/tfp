@@ -2,6 +2,7 @@
 #ifndef qwt3d_function_h__2004_03_05_13_51_begin_guarded_code
 #define qwt3d_function_h__2004_03_05_13_51_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_gridmapping.h"
 
 namespace Qwt3D

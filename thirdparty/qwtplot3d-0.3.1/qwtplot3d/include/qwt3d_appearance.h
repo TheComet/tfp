@@ -2,6 +2,7 @@
 #ifndef qwt3d_appearance_h__2009_06_10_12_11_18_begin_guarded_code
 #define qwt3d_appearance_h__2009_06_10_12_11_18_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_types.h"
 #include "qwt3d_valueptr.h"
 #include "qwt3d_color_std.h"

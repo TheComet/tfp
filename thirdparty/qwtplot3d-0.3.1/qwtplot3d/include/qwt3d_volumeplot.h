@@ -9,6 +9,7 @@
 #ifndef qwt3d_volumeplot_h__2004_03_06_01_52_begin_guarded_code
 #define qwt3d_volumeplot_h__2004_03_06_01_52_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_plot3d.h"
 
 

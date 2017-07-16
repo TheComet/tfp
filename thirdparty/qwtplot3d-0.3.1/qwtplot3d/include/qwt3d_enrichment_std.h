@@ -2,6 +2,7 @@
 #ifndef qwt3d_enrichment_std_h__2009_10_11_14_18_10_begin_guarded_code
 #define qwt3d_enrichment_std_h__2009_10_11_14_18_10_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_enrichment.h"
 
 namespace Qwt3D

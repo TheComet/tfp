@@ -2,6 +2,7 @@
 #ifndef qwt3d_color_std_h__2009_06_12_13_29_12_begin_guarded_code
 #define qwt3d_color_std_h__2009_06_12_13_29_12_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_color.h"
 
 namespace Qwt3D

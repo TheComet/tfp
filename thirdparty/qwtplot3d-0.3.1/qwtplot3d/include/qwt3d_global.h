@@ -9,7 +9,7 @@
 #define QWT3D_PATCH_VERSION 1
 
 //
-// Create Qwt3d DLL if QWT3D_DLL is defined (Windows only)
+// Create Qwt3d DLL if QWT3D_PUBLIC_API is defined (Windows only)
 //
 
 #if defined(Q_OS_WIN)
@@ -24,27 +24,27 @@
   #endif
 
   #if defined(QWT3D_NODLL)
-    #undef QWT3D_MAKEDLL
-    #undef QWT3D_DLL
+    #undef QWT3D_BUILDING
+    #undef QWT3D_PUBLIC_API
     #undef QWT3D_TEMPLATEDLL
   #endif
 
-  #ifdef QWT3D_DLL
-    #if defined(QWT3D_MAKEDLL)     /* create a Qwt3d DLL library */
-      #undef QWT3D_DLL
+  #ifdef QWT3D_PUBLIC_API
+    #if defined(QWT3D_BUILDING)     /* create a Qwt3d DLL library */
+      #undef QWT3D_PUBLIC_API
       #define QWT3D_EXPORT  __declspec(dllexport)
       #define QWT3D_TEMPLATEDLL
     #endif
   #endif
 
-  #if defined(QWT3D_DLL)     /* use a Qwt3d DLL library */
+  #if defined(QWT3D_PUBLIC_API)     /* use a Qwt3d DLL library */
     #define QWT3D_EXPORT  __declspec(dllimport)
     #define QWT3D_TEMPLATEDLL
   #endif
 
 #else // ! Q_OS_WIN
-  #undef QWT3D_MAKEDLL       /* ignore these for other platforms */
-  #undef QWT3D_DLL
+  #undef QWT3D_BUILDING       /* ignore these for other platforms */
+  #undef QWT3D_PUBLIC_API
   #undef QWT3D_TEMPLATEDLL
 #endif
 

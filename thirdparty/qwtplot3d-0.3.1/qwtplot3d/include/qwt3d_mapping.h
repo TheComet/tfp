@@ -3,6 +3,7 @@
 #define qwt3d_mapping_h__2004_03_05_13_51_begin_guarded_code
 
 //#include <qstring.h>
+#include "qwt3d_export.h"
 #include "qwt3d_global.h"
 #include "qwt3d_types.h"
 

@@ -2,6 +2,7 @@
 #ifndef qwt3d_surfaceplot_h__2009_10_11_14_25_06_begin_guarded_code
 #define qwt3d_surfaceplot_h__2009_10_11_14_25_06_begin_guarded_code
 
+#include "qwt3d_export.h"
 #include "qwt3d_plot3d.h"
 
 namespace Qwt3D
