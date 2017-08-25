@@ -26,7 +26,7 @@ public:
         setBackground(QBrush(QColor(190, 190, 190)));
     }
 protected:
-    virtual void paintEvent(QPaintEvent* e) override
+    virtual void paintEvent(QPaintEvent* e) OVERRIDE
     {
         QMdiArea::paintEvent(e);
 

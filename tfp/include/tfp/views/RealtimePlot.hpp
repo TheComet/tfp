@@ -39,9 +39,9 @@ signals:
     void pointSelected(QPointF point);
 
 protected:
-    virtual void changeEvent(QEvent* e) override;
-    virtual bool event(QEvent* event) override;
-    virtual QSize sizeHint() const override;
+    virtual void changeEvent(QEvent* e) OVERRIDE;
+    virtual bool event(QEvent* event) OVERRIDE;
+    virtual QSize sizeHint() const OVERRIDE;
 
 private slots:
     void onPickerActivated(bool activated, const QPointF& point);

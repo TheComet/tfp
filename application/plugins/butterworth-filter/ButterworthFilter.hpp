@@ -21,11 +21,11 @@ public slots:
     void setCutoffFrequency(double wc);
 
 protected:
-    virtual void onSetSystem() override;
-    virtual void onSystemStructureChanged() override {}
-    virtual void onSystemParametersChanged() override {}
-    virtual void replot() override {}
-    virtual void autoScale() override {}
+    virtual void onSetSystem() OVERRIDE;
+    virtual void onSystemStructureChanged() OVERRIDE {}
+    virtual void onSystemParametersChanged() OVERRIDE {}
+    virtual void replot() OVERRIDE {}
+    virtual void autoScale() OVERRIDE {}
 
 private:
     void updateParameters();

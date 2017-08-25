@@ -13,13 +13,13 @@ class BodePlot : public Tool
 public:
     explicit BodePlot(QWidget* parent=NULL);
 
-    virtual void replot() override;
-    virtual void autoScale() override;
+    virtual void replot() OVERRIDE;
+    virtual void autoScale() OVERRIDE;
 
 protected:
-    virtual void onSetSystem() override {}
-    virtual void onSystemStructureChanged() override;
-    virtual void onSystemParametersChanged() override;
+    virtual void onSetSystem() OVERRIDE {}
+    virtual void onSystemStructureChanged() OVERRIDE;
+    virtual void onSystemParametersChanged() OVERRIDE;
 
 protected:
     RealtimePlot* ampPlot_;

@@ -9,9 +9,9 @@ public:
     explicit NodeGraphicsObject(QGraphicsItem* parent=NULL);
 
 protected:
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget=NULL) override;
-    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget=NULL) OVERRIDE;
+    virtual QRectF boundingRect() const OVERRIDE;
 
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) OVERRIDE;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) OVERRIDE;
 };

@@ -24,6 +24,7 @@ function (add_plugin TARGET)
     add_definitions (-DPLUGIN_BUILDING)
 
     add_library (${TARGET} SHARED
+        ${add_plugin_HEADERS}
         ${add_plugin_SOURCES}
         ${SOURCES_MOC}
         ${FORMS_MOC}

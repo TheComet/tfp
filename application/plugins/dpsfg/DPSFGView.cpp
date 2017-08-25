@@ -26,11 +26,12 @@ void DPSFGView::mousePressEvent(QMouseEvent* event)
     if (event->button() == Qt::MiddleButton)
         lastMiddleClickPosition_ = pos;
 
-    if (event->button() == Qt::RightButton)
-        lastRightClickPosition_ = pos;
-
-    if (scene_->mouseGrabberItem() && event->button() == Qt::RightButton)
-        activateConnection(pos);
+	if (event->button() == Qt::RightButton)
+	{
+		lastRightClickPosition_ = pos;
+		if (scene_->mouseGrabberItem() != NULL)
+			activateConnection(pos);
+	}
 }
 
 // ----------------------------------------------------------------------------

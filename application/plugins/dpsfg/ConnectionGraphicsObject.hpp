@@ -11,8 +11,8 @@ public:
     void setEndPoint(const QPointF& p);
 
 protected:
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget=NULL) override;
-    virtual QRectF boundingRect() const override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget=NULL) OVERRIDE;
+    virtual QRectF boundingRect() const OVERRIDE;
 
 private:
     QPainterPath path_;

@@ -3,40 +3,13 @@
 #include "tfp/models/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include "tfp/math/Math.hpp"
-#include "tfp/plugin/Plugin.hpp"
 #include <QVBoxLayout>
 #include <QPainterPath>
 #include <qwt_plot_shapeitem.h>
 #include <qwt_plot_curve.h>
 #include <QtCore/QtGlobal>
 
-#if defined(PLUGIN_BUILDING)
-#  define PLUGIN_API Q_DECL_EXPORT
-#else
-#  define PLUGIN_API Q_DECL_IMPORT
-#endif
-
 using namespace tfp;
-
-extern "C" {
-
-PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
-{
-    return plugin->registerTool<PoleZeroPlot>(
-        Plugin::VISUALISER,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
-        "Pole Zero Plot",
-        "Alex Murray",
-        "Plot the poles and zeros of a transfer function",
-        "alex.murray@gmx.ch"
-    );
-}
-
-PLUGIN_API void stop_plugin(Plugin* plugin)
-{
-}
-
-}
 
 // ----------------------------------------------------------------------------
 PoleZeroPlot::PoleZeroPlot(QWidget* parent) :

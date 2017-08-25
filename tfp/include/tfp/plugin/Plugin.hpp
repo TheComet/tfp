@@ -16,8 +16,8 @@ class DataTree;
 class PluginManager;
 class PluginListener;
 class Tool;
-struct ToolFactory;
-template <class T> struct ToolFactoryImpl;
+class ToolFactory;
+template <class T> class ToolFactoryImpl;
 
 class TFP_PUBLIC_API Plugin : public RefCounted
 {
@@ -82,8 +82,9 @@ private:
     ToolFactories toolFactories_;
 };
 
-struct ToolFactory : public RefCounted
+class ToolFactory : public RefCounted
 {
+public:
     virtual Tool* create() = 0;
     virtual void destroy(Tool* o) = 0;
 
@@ -97,11 +98,19 @@ struct ToolFactory : public RefCounted
 };
 
 template <class T>
-struct ToolFactoryImpl : public ToolFactory
+class ToolFactoryImpl : public ToolFactory
 {
+public:
     ToolFactoryImpl() { typeName = typeid(T).name(); }
-    virtual Tool* create() override { return new T; }
-    virtual void destroy(Tool* o) override { delete o; }
+    virtual Tool* create() OVERRIDE { return new T; }
+    virtual void destroy(Tool* o) OVERRIDE { delete o; }
 };
 
+} // namespace tfp
+
+#if defined(PLUGIN_BUILDING)
+extern "C" {
+	Q_DECL_EXPORT bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree);
+	Q_DECL_EXPORT void stop_plugin(tfp::Plugin* plugin);
 }
+#endif

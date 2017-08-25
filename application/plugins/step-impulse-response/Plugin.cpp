@@ -2,21 +2,13 @@
 #include "StepPlot.hpp"
 #include "tfp/plugin/Plugin.hpp"
 
-#if defined(PLUGIN_BUILDING)
-#  define PLUGIN_API Q_DECL_EXPORT
-#else
-#  define PLUGIN_API Q_DECL_IMPORT
-#endif
-
-using namespace tfp;
-
 extern "C" {
 
-PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
+bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
 {
-    if (plugin->registerTool<ImpulsePlot>(
-        Plugin::VISUALISER,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
+    if (plugin->registerTool<tfp::ImpulsePlot>(
+		tfp::Plugin::VISUALISER,
+		tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
         "Impulse Response",
         "Alex Murray",
         "Calculate the impulse response of a transfer function.",
@@ -24,9 +16,9 @@ PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
 
     ) == false) return false;
 
-    if (plugin->registerTool<StepPlot>(
-        Plugin::VISUALISER,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
+    if (plugin->registerTool<tfp::StepPlot>(
+		tfp::Plugin::VISUALISER,
+		tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
         "Step Response",
         "Alex Murray",
         "Calculate the step response of a transfer function.",
@@ -35,7 +27,7 @@ PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
     return true;
 }
 
-PLUGIN_API void stop_plugin(Plugin* plugin)
+void stop_plugin(tfp::Plugin* plugin)
 {
 }
 

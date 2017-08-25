@@ -15,7 +15,7 @@ public:
     void setYUnit(QString unit);
 
 private:
-    virtual QwtText trackerTextF(const QPointF &pos) const override;
+    virtual QwtText trackerTextF(const QPointF &pos) const OVERRIDE;
 
     QString unitX_;
     QString unitY_;

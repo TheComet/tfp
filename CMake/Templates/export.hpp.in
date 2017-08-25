@@ -87,18 +87,11 @@
      * --------------------------------------------------------------*/
 
 #   if __cplusplus < 201103L
-#       define override
-#       define final
-#   endif
-
-    /* --------------------------------------------------------------
-     * typeof support
-     * --------------------------------------------------------------*/
-
-#   if defined(__GNUC__)
-#       define TYPEOF(x) __typeof__(x)
+#       define OVERRIDE override
+#       define FINAL final
 #   else
-#       undef TYPEOF
+#       define OVERRIDE
+#       define FINAL
 #   endif
 
     /* --------------------------------------------------------------

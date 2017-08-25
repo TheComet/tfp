@@ -1,16 +1,16 @@
-#include "EllipticFilter.hpp"
+#include "PoleZeroPlot.hpp"
 #include "tfp/plugin/Plugin.hpp"
 
 extern "C" {
 
 bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
 {
-    return plugin->registerTool<tfp::EllipticFilter>(
-		tfp::Plugin::GENERATOR,
+    return plugin->registerTool<tfp::PoleZeroPlot>(
+		tfp::Plugin::VISUALISER,
 		tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
-        "Elliptic Filter",
+        "Pole Zero Plot",
         "Alex Murray",
-        "Design an elliptic filter and compute its transfer function",
+        "Plot the poles and zeros of a transfer function",
         "alex.murray@gmx.ch"
     );
 }

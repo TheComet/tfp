@@ -14,10 +14,10 @@ public:
     explicit DPSFGView(DPSFGScene* scene);
 
 protected:
-    virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void drawBackground(QPainter* painter, const QRectF& r) override;
+    virtual void mousePressEvent(QMouseEvent* event) OVERRIDE;
+    virtual void mouseReleaseEvent(QMouseEvent* event) OVERRIDE;
+    virtual void mouseMoveEvent(QMouseEvent* event) OVERRIDE;
+    virtual void drawBackground(QPainter* painter, const QRectF& r) OVERRIDE;
 
 private:
     void spawnNode(const QPointF& pos);

@@ -15,14 +15,14 @@ class TimeDomainResponsePlot : public Tool
 public:
     explicit TimeDomainResponsePlot(QWidget* parent=NULL);
 
-    virtual void replot() override;
-    virtual void autoScale() override;
+    virtual void replot() OVERRIDE;
+    virtual void autoScale() OVERRIDE;
 
 protected:
     virtual TransferFunction<double>::PFEResultData doPartialFractionExpansion() = 0;
-    virtual void onSetSystem() override {}
-    virtual void onSystemParametersChanged() override;
-    virtual void onSystemStructureChanged() override;
+    virtual void onSetSystem() OVERRIDE {}
+    virtual void onSystemParametersChanged() OVERRIDE;
+    virtual void onSystemStructureChanged() OVERRIDE;
 
 private:
     RealtimePlot* plot_;

@@ -7,33 +7,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_scale_engine.h>
 
-#if defined(PLUGIN_BUILDING)
-#  define PLUGIN_API Q_DECL_EXPORT
-#else
-#  define PLUGIN_API Q_DECL_IMPORT
-#endif
-
 using namespace tfp;
-
-extern "C" {
-
-PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
-{
-    return plugin->registerTool<BodePlot>(
-        Plugin::VISUALISER,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
-        "Bode Plot",
-        "Alex Murray",
-        "Visualise the amplitude and phase of a system.",
-        "alex.murray@gmx.ch"
-    );
-}
-
-PLUGIN_API void stop_plugin(Plugin* plugin)
-{
-}
-
-}
 
 // ----------------------------------------------------------------------------
 BodePlot::BodePlot(QWidget* parent) :

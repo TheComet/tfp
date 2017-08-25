@@ -1,38 +1,11 @@
 #include "ComplexPlane3D.hpp"
 #include "tfp/views/RealtimePlot3D.hpp"
 #include "tfp/models/System.hpp"
-#include "tfp/plugin/Plugin.hpp"
 #include "tfp/plugin/Tool.hpp"
 #include <qwt3d_function.h>
 #include <QVBoxLayout>
 
-#if defined(PLUGIN_BUILDING)
-#  define PLUGIN_API Q_DECL_EXPORT
-#else
-#  define PLUGIN_API Q_DECL_IMPORT
-#endif
-
 using namespace tfp;
-
-extern "C" {
-
-PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
-{
-    return plugin->registerTool<ComplexPlane3D>(
-        Plugin::VISUALISER,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
-        "Complex Plane 3D",
-        "Alex Murray",
-        "Plot the poles and zeros of a transfer function in 3D",
-        "alex.murray@gmx.ch"
-    );
-}
-
-PLUGIN_API void stop_plugin(Plugin* plugin)
-{
-}
-
-}
 
 class MagnitudeFunction : public Qwt3D::Function
 {

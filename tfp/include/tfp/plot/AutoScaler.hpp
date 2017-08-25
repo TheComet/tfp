@@ -21,7 +21,7 @@ public:
     void autoScale();
 
 protected:
-    virtual void widgetMouseDoubleClickEvent(QMouseEvent *me) override;
+    virtual void widgetMouseDoubleClickEvent(QMouseEvent *me) OVERRIDE;
 
 private:
     QFlags<Qt::MouseButton> btn_;

@@ -15,13 +15,13 @@ class PoleZeroPlot : public Tool
 public:
     explicit PoleZeroPlot(QWidget* parent=NULL);
 
-    virtual void autoScale() override;
-    virtual void replot() override;
+    virtual void autoScale() OVERRIDE;
+    virtual void replot() OVERRIDE;
 
 protected:
-    virtual void onSetSystem() override {}
-    virtual void onSystemParametersChanged() override;
-    virtual void onSystemStructureChanged() override;
+    virtual void onSetSystem() OVERRIDE {}
+    virtual void onSystemParametersChanged() OVERRIDE;
+    virtual void onSystemStructureChanged() OVERRIDE;
 
 private:
     void onSystemChanged();

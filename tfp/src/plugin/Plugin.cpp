@@ -29,24 +29,24 @@ struct ToolDecorator : public Tool, public PluginListener
             factory_->destroy(wrapped_);
     }
 
-    virtual void onPluginUnloading() override
+    virtual void onPluginUnloading() OVERRIDE
     {
         if (wrapped_ != NULL)
             factory_->destroy(wrapped_);
         wrapped_ = NULL;
     }
 
-    virtual void setSystem(System* system) override
+    virtual void setSystem(System* system) OVERRIDE
     {
         if (wrapped_ != NULL)
             wrapped_->setSystem(system);
     }
 
-    virtual void onSetSystem() override {}
-    virtual void onSystemStructureChanged() override {}
-    virtual void onSystemParametersChanged() override {}
-    virtual void autoScale() override {}
-    virtual void replot() override {}
+    virtual void onSetSystem() OVERRIDE {}
+    virtual void onSystemStructureChanged() OVERRIDE {}
+    virtual void onSystemParametersChanged() OVERRIDE {}
+    virtual void autoScale() OVERRIDE {}
+    virtual void replot() OVERRIDE {}
 
 private:
     Tool* wrapped_;

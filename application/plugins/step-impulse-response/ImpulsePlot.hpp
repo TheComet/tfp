@@ -10,7 +10,7 @@ public:
     explicit ImpulsePlot(QWidget* parent=NULL);
 
 protected:
-    virtual TransferFunction<double>::PFEResultData doPartialFractionExpansion() override;
+    virtual TransferFunction<double>::PFEResultData doPartialFractionExpansion() OVERRIDE;
 };
 
 }

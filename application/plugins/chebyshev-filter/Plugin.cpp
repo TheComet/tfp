@@ -1,21 +1,13 @@
 #include "ChebyshevFilter.hpp"
 #include "tfp/plugin/Plugin.hpp"
 
-#if defined(PLUGIN_BUILDING)
-#  define PLUGIN_API Q_DECL_EXPORT
-#else
-#  define PLUGIN_API Q_DECL_IMPORT
-#endif
-
-using namespace tfp;
-
 extern "C" {
 
-PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
+bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
 {
-    return plugin->registerTool<ChebyshevFilter>(
-        Plugin::GENERATOR,
-        Plugin::LTI_SYSTEM_CONTINUOUS,
+    return plugin->registerTool<tfp::ChebyshevFilter>(
+		tfp::Plugin::GENERATOR,
+		tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
         "Chebyshev Filter",
         "Alex Murray",
         "Generate the transfer function of a Chebyshev filter.",
@@ -23,7 +15,7 @@ PLUGIN_API bool start_plugin(Plugin* plugin, DataTree* dataTree)
     );
 }
 
-PLUGIN_API void stop_plugin(Plugin* plugin)
+void stop_plugin(tfp::Plugin* plugin)
 {
 }
 

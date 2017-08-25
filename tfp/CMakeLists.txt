@@ -146,13 +146,15 @@ if (PLATFORM MATCHES "WINDOWS")
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
         add_custom_target (Qt5CopyBinaries
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindowsd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Cored.dll         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Guid.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5OpenGLd.dll       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5PrintSupportd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Svgd.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Widgetsd.dll      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindowsd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/libGLESv2d.dll       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/libEGLd.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 
             COMMENT "Copying Qt binaries from '${Qt5Core_DIR}/../../bin/' to '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}'"
             VERBATIM
@@ -162,13 +164,15 @@ if (PLATFORM MATCHES "WINDOWS")
     if (CMAKE_BUILD_TYPE MATCHES "Release")
         add_custom_target (Qt5CopyBinaries
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindows.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Core.dll          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Gui.dll           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5OpenGL.dll        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5PrintSupport.dll  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Svg.dll           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/Qt5Widgets.dll       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../plugins/platforms/qwindows.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/platforms
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/libGLESv2.dll        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt5Core_DIR}/../../../bin/libEGL.dll           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 
             COMMENT "Copying Qt binaries from '${Qt5Core_DIR}/../../bin/' to '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}'"
             VERBATIM
