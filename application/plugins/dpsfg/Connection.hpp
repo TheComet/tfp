@@ -4,22 +4,24 @@
 
 namespace tfp {
 
+class Node;
+
 class Connection : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	void setExpression(const QString& expression);
-	const QString& getExpression() const;
-	void setOutgoingNode(Node* node);
-	Node* getOutgoingNode() const;
+    void setExpression(const QString& expression);
+    const QString& getExpression() const;
+    void setTargetNode(Node* node);
+    Node* getTargetNode() const;
 
 signals:
-	void expressionUpdated(Connection*);
+    void expressionUpdated(Connection*);
 
 private:
-	QString  expression_;
-	Node* outgoingNode_;
+    QString  expression_;
+    Node* outgoingNode_;
 };
 
 }

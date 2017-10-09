@@ -112,7 +112,7 @@ void LinearAutoScaler::init(double start, double stop, int ivals)
 \verbatim
 |_______|____________ _ _ _ _  _____|_____________|________________
 
-0     m*10^n                      start         anchor := c*m*10^n	     
+0     m*10^n                      start         anchor := c*m*10^n         
 
 c 'minimal' (anchor-start < m*10^n)
 \endverbatim
@@ -133,7 +133,7 @@ double LinearAutoScaler::anchorvalue(double start, double m, int n)
                                                                                    |
 |______|_______ _ _ _ ____|____|___ _ _ _ _ _ _ _|_______|_______|_ _ _ _ _ _ _____|__|_____
        |                  |                                      |                    |
-0   i := m*10^n         start                                  anchor	              stop
+0   i := m*10^n         start                                  anchor                  stop
 
 c 'minimal' (anchor-start < m*10^n)
 \endverbatim

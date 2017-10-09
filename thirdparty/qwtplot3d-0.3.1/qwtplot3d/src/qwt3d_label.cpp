@@ -239,7 +239,7 @@ const char * Label::fontname()
     else if (font_.bold())
       name = "Helvetica-Bold";
   }
-	return (const char*) name;
+    return (const char*) name;
 }
 
 void Label::draw(double angle)

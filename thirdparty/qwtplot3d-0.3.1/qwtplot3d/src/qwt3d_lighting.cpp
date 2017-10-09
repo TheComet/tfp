@@ -13,23 +13,23 @@ inline GLenum lightEnum(unsigned idx)
 {
   switch(idx) {
   case 0:
-  	return GL_LIGHT0;
+      return GL_LIGHT0;
   case 1:
-  	return GL_LIGHT1;
+      return GL_LIGHT1;
   case 2:
-  	return GL_LIGHT2;
+      return GL_LIGHT2;
   case 3:
-  	return GL_LIGHT3;
+      return GL_LIGHT3;
   case 4:
-  	return GL_LIGHT4;
+      return GL_LIGHT4;
   case 5:
-  	return GL_LIGHT5;
+      return GL_LIGHT5;
   case 6:
-  	return GL_LIGHT6;
+      return GL_LIGHT6;
   case 7:
-  	return GL_LIGHT7;
+      return GL_LIGHT7;
   default:
-  	return GL_LIGHT0;
+      return GL_LIGHT0;
   }
 }
 
@@ -132,15 +132,15 @@ void ExtGLWidget::setLightComponent(GLenum property, double intensity, unsigned 
 
 /**
   Set the rotation angle of the light source. If you look along the respective axis towards ascending values,
-	the rotation is performed in mathematical \e negative sense 
-	\param xVal angle in \e degree to rotate around the X axis
-	\param yVal angle in \e degree to rotate around the Y axis
-	\param zVal angle in \e degree to rotate around the Z axis
+    the rotation is performed in mathematical \e negative sense 
+    \param xVal angle in \e degree to rotate around the X axis
+    \param yVal angle in \e degree to rotate around the Y axis
+    \param zVal angle in \e degree to rotate around the Z axis
   \param light light number
 */
 void ExtGLWidget::setLightRotation( double xVal, double yVal, double zVal, unsigned light )
 {
-	if (light>7)
+    if (light>7)
     return; 
   lights_[light].rot.x = xVal;
   lights_[light].rot.y = yVal;
@@ -149,15 +149,15 @@ void ExtGLWidget::setLightRotation( double xVal, double yVal, double zVal, unsig
 
 /**
   Set the shift in light source (world) coordinates.
-	\param xVal shift along (world) X axis
-	\param yVal shift along (world) Y axis
-	\param zVal shift along (world) Z axis
+    \param xVal shift along (world) X axis
+    \param yVal shift along (world) Y axis
+    \param zVal shift along (world) Z axis
   \param light light number
-	\see setViewportShift()
+    \see setViewportShift()
 */
 void ExtGLWidget::setLightShift( double xVal, double yVal, double zVal, unsigned light )
 {
-	if (light>7)
+    if (light>7)
     return; 
   lights_[light].shift.x = xVal;
   lights_[light].shift.y = yVal;
@@ -166,7 +166,7 @@ void ExtGLWidget::setLightShift( double xVal, double yVal, double zVal, unsigned
 
 void ExtGLWidget::applyLight(unsigned light)
 {
-	if (lights_[light].unlit)
+    if (lights_[light].unlit)
     return;
 
   glEnable(lightEnum(light));
@@ -183,7 +183,7 @@ void ExtGLWidget::applyLight(unsigned light)
 void ExtGLWidget::applyLights()
 {
   glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
+    glPushMatrix();
   for (unsigned i=0; i<8; ++i)
   {
     applyLight(i);

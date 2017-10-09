@@ -110,7 +110,7 @@ public:
 
 #if defined(PLUGIN_BUILDING)
 extern "C" {
-	Q_DECL_EXPORT bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree);
-	Q_DECL_EXPORT void stop_plugin(tfp::Plugin* plugin);
+    Q_DECL_EXPORT bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree);
+    Q_DECL_EXPORT void stop_plugin(tfp::Plugin* plugin);
 }
 #endif

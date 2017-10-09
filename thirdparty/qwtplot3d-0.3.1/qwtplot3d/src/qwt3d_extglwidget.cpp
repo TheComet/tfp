@@ -21,7 +21,7 @@ ExtGLWidget::ExtGLWidget( QWidget * parent, const QGLWidget * shareWidget)
     : QGLWidget( parent, shareWidget)
 {  
     initializedGL_ = false;
-    xRot_ = yRot_ = zRot_ = 0.0;		// default object rotation
+    xRot_ = yRot_ = zRot_ = 0.0;        // default object rotation
 
     xShift_ = yShift_ = zShift_ = xVPShift_ = yVPShift_ = 0.0;
     xScale_ = yScale_ = zScale_ = 1.0;
@@ -214,7 +214,7 @@ void ExtGLWidget::assignMouse(MouseState xrot, MouseState yrot, MouseState zrot,
                               MouseState xscale, MouseState yscale, MouseState zscale,
                               MouseState zoom, MouseState xshift, MouseState yshift)
 {
-    xrot_mstate_   = 	xrot;
+    xrot_mstate_   =     xrot;
     yrot_mstate_   =  yrot;
     zrot_mstate_   =  zrot;
     xscale_mstate_ =  xscale;

@@ -17,11 +17,11 @@ namespace {
 typedef double coordinate_type;
 
 int ccw(coordinate_type **P, int i, int j, int k) {
-    coordinate_type	a = P[i][0] - P[j][0],
+    coordinate_type    a = P[i][0] - P[j][0],
             b = P[i][1] - P[j][1],
             c = P[k][0] - P[j][0],
             d = P[k][1] - P[j][1];
-    return a*d - b*c <= 0;	   /* true if points i, j, k counterclockwise */
+    return a*d - b*c <= 0;       /* true if points i, j, k counterclockwise */
 }
 
 
@@ -54,10 +54,10 @@ int make_chain(coordinate_type** V, int n, int (*cmp)(const void*, const void*))
 }
 
 int _ch2d(coordinate_type **P, int n)  {
-    int u = make_chain(P, n, cmpl);		/* make lower hull */
+    int u = make_chain(P, n, cmpl);        /* make lower hull */
     if (!n) return 0;
     P[n] = P[0];
-    return u+make_chain(P+u, n-u+1, cmph);	/* make upper hull */
+    return u+make_chain(P+u, n-u+1, cmph);    /* make upper hull */
 }
 
 

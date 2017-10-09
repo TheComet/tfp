@@ -54,21 +54,21 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
   //  return;
   //}
 
-  // 	setDeviceLineWidth(meshLineWidth());
+  //     setDeviceLineWidth(meshLineWidth());
   //   GLStateBewarer sb(GL_POLYGON_OFFSET_FILL,true);
-  // 	glPolygonOffset(polygonOffset(),1.0);
-  // 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //	int idx = 0;
-  // 	if (plotStyle() != WIREFRAME)
-  // 	{
-  // 		glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
+  //     glPolygonOffset(polygonOffset(),1.0);
+  //     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //    int idx = 0;
+  //     if (plotStyle() != WIREFRAME)
+  //     {
+  //         glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
   // 
-  // 		bool hl = (plotStyle() == HIDDENLINE);
-  // 		if (hl)
-  // 		{
-  // 			RGBA col = backgroundRGBAColor();
-  // 			glColor4d(col.r, col.g, col.b, col.a);
-  // 		}
+  //         bool hl = (plotStyle() == HIDDENLINE);
+  //         if (hl)
+  //         {
+  //             RGBA col = backgroundRGBAColor();
+  //             glColor4d(col.r, col.g, col.b, col.a);
+  //         }
 
   /*
   RGBA col(0.8,0,0);    
@@ -121,7 +121,7 @@ void GraphPlot::createOpenGlData(const Plotlet& pl)
     b.draw(data.nodes[j]);
   }
 
-  //	}
+  //    }
 }
 
 /*! 
@@ -133,7 +133,7 @@ be replaced by the new data. This includes destruction of possible additional da
 \return Index of new entry in dataset array (append == true), 0 (append == false) or -1 for errors
 */
 int GraphPlot::createDataset(TripleVector const& nodes, EdgeVector const& edges, bool append /*= false*/)
-{	
+{    
 
   int ret = prepareDatasetCreation<GraphData>(append);
   if (ret < 0)
@@ -148,4 +148,4 @@ int GraphPlot::createDataset(TripleVector const& nodes, EdgeVector const& edges,
   createCoordinateSystem();
 
   return ret;
-}	
+}    

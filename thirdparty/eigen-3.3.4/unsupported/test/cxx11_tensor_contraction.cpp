@@ -481,7 +481,7 @@ static void test_tensor_product()
     for (int j = 0; j < result.dimension(1); ++j) {
       for (int k = 0; k < result.dimension(2); ++k) {
         for (int l = 0; l < result.dimension(3); ++l) {
-			VERIFY_IS_APPROX(result(i, j, k, l), mat1(i, j) * mat2(k, l) );
+            VERIFY_IS_APPROX(result(i, j, k, l), mat1(i, j) * mat2(k, l) );
         }
       }
     }

@@ -22,7 +22,7 @@ Qwt3D::Plot3D::Plotlet::Plotlet(Data* d, const Appearance& a)
 */
 Plot3D::Plot3D(QWidget * parent, const QGLWidget * shareWidget)
     : ExtGLWidget(parent, shareWidget),
-	m_fastNormals(false)
+    m_fastNormals(false)
 {  
     plotlets_p.push_back(Plotlet(0));
     renderpixmaprequest_ = false;
@@ -82,8 +82,8 @@ QPixmap Plot3D::renderPixmap(int w/* =0 */, int h/* =0 */, bool useContext/* =fa
 void Plot3D::paintGL()
 {
     // debug mode
-    //	QElapsedTimer tm;
-    //	tm.start();
+    //    QElapsedTimer tm;
+    //    tm.start();
 
 
     glClearColor(bgcolor_.r, bgcolor_.g, bgcolor_.b, bgcolor_.a);
@@ -139,12 +139,12 @@ void Plot3D::paintGL()
 
     glTranslatef(xViewportShift() * 2 * radius , yViewportShift() * 2 * radius , -7 * radius);
 
-	applyLights();
+    applyLights();
 
-	if (lightingEnabled())
+    if (lightingEnabled())
         glEnable(GL_NORMALIZE);
 
-	drawOpenGlData();
+    drawOpenGlData();
 
     coordinates_p.draw();
 
@@ -318,7 +318,7 @@ void Plot3D::setTitleFont(const QString& family, int pointSize, int weight, bool
 */
 void Plot3D::updateData()
 {
-	makeCurrent();
+    makeCurrent();
     GLStateBewarer dt(GL_DEPTH_TEST, true);
     GLStateBewarer ls(GL_LINE_SMOOTH, true);
 
@@ -363,11 +363,11 @@ void Qwt3D::Plot3D::createOpenGlData()
 
 void Qwt3D::Plot3D::drawOpenGlData()
 {
-	for (unsigned i=0; i!= displaylists_p.size(); ++i)
-	{
-		if (i!=LegendObject)
-			glCallList(displaylists_p[i]);
-	}
+    for (unsigned i=0; i!= displaylists_p.size(); ++i)
+    {
+        if (i!=LegendObject)
+            glCallList(displaylists_p[i]);
+    }
 }
 
 /**

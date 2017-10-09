@@ -49,7 +49,7 @@ void MeshPlot::setColorFromVertex(const Plotlet& pl, int node, bool skip)
 
 
 void MeshPlot::data2Floor(const Plotlet& pl)
-{	
+{    
     const MeshData& data = dynamic_cast<const MeshData&>(*pl.data);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -165,7 +165,7 @@ void MeshPlot::createNormals(const Plotlet& pl)
 
         norm = topv-basev;
         norm.normalize();
-        norm	*= diag;
+        norm    *= diag;
 
         arrow.setTop(basev+norm);
         arrow.setColor(color.rgba(basev.x,basev.y,basev.z));
@@ -183,7 +183,7 @@ be replaced by the new data. This includes destruction of possible additional da
 \return Index of new entry in dataset array (append == true), 0 (append == false) or -1 for errors
 */
 int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bool append /*= false*/)
-{	
+{    
     int ret = prepareDatasetCreation<MeshData>(append);
     if (ret < 0)
         return -1;
@@ -226,7 +226,7 @@ int MeshPlot::createDataset(TripleVector const& data, CellVector const& poly, bo
     createCoordinateSystem();
 
     return ret;
-}	
+}    
 
 void MeshPlot::createOpenGlData(const Plotlet& pl)
 {

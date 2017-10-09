@@ -172,7 +172,7 @@ void ColorLegend::draw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     GLStateBewarer(GL_POLYGON_OFFSET_FILL,true);
-    //	glPolygonOffset(0.0, 0.0);
+    //    glPolygonOffset(0.0, 0.0);
 
     glColor4d(0, 0, 0, 1);
     glBegin(GL_LINE_LOOP);

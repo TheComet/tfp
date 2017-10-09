@@ -14,13 +14,13 @@ struct Foo
     // TODO: Is this the correct way to handle this?
     if (Foo::object_count > Foo::object_limit) { std::cout << "\nThrow!\n"; throw Foo::Fail(); }
 #endif
-	  std::cout << '+';
+      std::cout << '+';
     ++Foo::object_count;
   }
 
   ~Foo()
   {
-	  std::cout << '-';
+      std::cout << '-';
     --Foo::object_count;
   }
 
@@ -46,7 +46,7 @@ void test_ctorleak()
     try
     {
 #endif
-    	std::cout <<       "\nMatrixX m(" << rows << ", " << cols << ");\n";
+        std::cout <<       "\nMatrixX m(" << rows << ", " << cols << ");\n";
       MatrixX m(rows, cols);
 #ifdef EIGEN_EXCEPTIONS
       VERIFY(false);  // not reached if exceptions are enabled

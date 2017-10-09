@@ -165,6 +165,8 @@ message (STATUS "------------------------------------------------------------")
 include_directories ("${CMAKE_CURRENT_LIST_DIR}/tfp/include")
 include_directories (${CMAKE_BINARY_DIR})                    # need this because MOC outputs to binary_dir/tfp
 include_directories ("${CMAKE_BINARY_DIR}/tfp/include")      # need this for config.hpp and export.hpp
+include_directories ("tests/googlemock/include")
+include_directories ("tests/googletest/include")
 
 # must be in this order due to linking
 set (EIGEN_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/thirdparty/eigen-3.3.4")
@@ -174,3 +176,4 @@ add_subdirectory ("thirdparty/qwt-6.1.2")
 add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
 add_subdirectory ("tfp")
 add_subdirectory ("application")
+add_subdirectory ("tests")

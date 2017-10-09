@@ -161,11 +161,11 @@ void Dot::drawEnd()
 void Dot::draw(Qwt3D::Triple const& pos)
 {
     if (!IS_NAN(pos.z))
-	{
-		RGBA rgba = plot_p->dataColor()->rgba(pos);
-		glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
-		glVertex3d(pos.x, pos.y, pos.z);
-	}
+    {
+        RGBA rgba = plot_p->dataColor()->rgba(pos);
+        glColor4d(rgba.r,rgba.g,rgba.b,rgba.a);
+        glVertex3d(pos.x, pos.y, pos.z);
+    }
 }
 
 /////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@ void Cone::draw(Qwt3D::Triple const& pos)
 /////////////////////////////////////////////////////////////////
 
 Arrow::Arrow()
-{	
+{    
     hat      = gluNewQuadric();
     disk     = gluNewQuadric();
     base    = gluNewQuadric();
@@ -339,7 +339,7 @@ void Arrow::configure(int segs, double relconelength, double relconerad, double 
 }
 
 void Arrow::draw(Qwt3D::Triple const& pos)
-{	
+{    
     Triple end = top_;
     Triple beg = pos;
     Triple vdiff = end-beg;
@@ -415,7 +415,7 @@ double Arrow::calcRotation(Triple& axis, FreeVector const& vec)
 /////////////////////////////////////////////////////////////////
 
 Stick::Stick()
-{	
+{    
     init(3,1,false);
 }
 
@@ -469,7 +469,7 @@ void Stick::configure(double rad, int segs)
 }
 
 void Stick::draw(Triple const& beg, Triple const& end)
-{	
+{    
     Triple vdiff = end-beg;
     double length = vdiff.length();
     glColor4d(rgba_.r,rgba_.g,rgba_.b,rgba_.a);
@@ -487,12 +487,12 @@ void Stick::draw(Triple const& beg, Triple const& end)
     glRotatef(phi, axis.x, axis.y, axis.z);
 
     gluCylinder(base, radius_, radius_, length, segments_, 1);
-	if (!open_)
-    	gluDisk(bottom, 0, radius_, segments_, 1);
+    if (!open_)
+        gluDisk(bottom, 0, radius_, segments_, 1);
 
     glTranslatef(0, 0, length);
-	if (!open_)
-    	gluDisk(top, 0, radius_, segments_, 1);
+    if (!open_)
+        gluDisk(top, 0, radius_, segments_, 1);
 
     glPopMatrix();
     glMatrixMode(mode);

@@ -47,7 +47,7 @@ void StandardColor::setAlpha(double a)
         elem.a = a;
         colors_[i] = elem;
     }
-}	
+}    
 
 RGBA StandardColor::rgba(double, double, double z) const
 {

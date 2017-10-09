@@ -16,15 +16,15 @@ const char* NativeReader::magicstring = "jk:11051895-17021986";
 
 namespace
 {
-	FILE* open(QString fname)
-	{
-		FILE* file = fopen(QWT3DLOCAL8BIT(fname), "r");
-		if (!file) 
-		{
-			fprintf(stderr, "NativeReader::operator(): cannot open data file \"%s\"\n", QWT3DLOCAL8BIT(fname));
-		}
-		return file;
-	}
+    FILE* open(QString fname)
+    {
+        FILE* file = fopen(QWT3DLOCAL8BIT(fname), "r");
+        if (!file) 
+        {
+            fprintf(stderr, "NativeReader::operator(): cannot open data file \"%s\"\n", QWT3DLOCAL8BIT(fname));
+        }
+        return file;
+    }
 
   int read_char (FILE * fp, bool skipcomments = true)
   {
@@ -33,17 +33,17 @@ namespace
     if ((c = fgetc (fp)) == EOF)
       return (c);
     if (skipcomments)
-		{
-			if (c == '#')
-			{
-				do
-				{
-					if ((c = fgetc (fp)) == EOF)
-						return (c);
-				}
-				while (c != '\n' && c != '\r');
-			}
-		}
+        {
+            if (c == '#')
+            {
+                do
+                {
+                    if ((c = fgetc (fp)) == EOF)
+                        return (c);
+                }
+                while (c != '\n' && c != '\r');
+            }
+        }
     return (c);
   }
 
@@ -86,7 +86,7 @@ namespace
     if (xmesh < 1 || ymesh < 1)
       return false;
     
-		// ... and the limits
+        // ... and the limits
     if ((p = read_field (fp)) == 0)
       return false;
     xmin = atof (p);
@@ -95,7 +95,7 @@ namespace
       return false;
     xmax = atof (p);
     
-		if ((p = read_field (fp)) == 0)
+        if ((p = read_field (fp)) == 0)
       return false;
     ymin = atof (p);
 
@@ -110,48 +110,48 @@ namespace
   }
 
   //! find out what the magic string is and compare
-	bool check_magic(FILE* fp, const char* val)
-	{
+    bool check_magic(FILE* fp, const char* val)
+    {
     char* p;
     if ((p = read_field (fp,false)) == 0)
         return false;
   
     if (strcmp (p, val ) != 0)
-        return false;	
-		return true;
-	}
+        return false;    
+        return true;
+    }
 
-	//! find out what the type is
-	bool check_type(FILE* fp, const char* val)
-	{
+    //! find out what the type is
+    bool check_type(FILE* fp, const char* val)
+    {
     char* p;
     if ((p = read_field (fp)) == 0)
         return false;
   
     if (strcmp (p, val ) != 0)
-        return false;	
-		return true;
-	}
+        return false;    
+        return true;
+    }
 
-	double** allocateData(int columns, int rows)
-	{
- 		double** data         = new double* [columns] ;
+    double** allocateData(int columns, int rows)
+    {
+         double** data         = new double* [columns] ;
  
-		for ( int i = 0; i < columns; ++i) 
-		{
-			data[i]         = new double [rows];
-		}
-		return data;
-	}
+        for ( int i = 0; i < columns; ++i) 
+        {
+            data[i]         = new double [rows];
+        }
+        return data;
+    }
 
-	void deleteData(double**data, int columns)
-	{
-		for ( int i = 0; i < columns; i++) 
-		{
-			delete [] data[i];
-		}
-		delete [] data;
-	}
+    void deleteData(double**data, int columns)
+    {
+        for ( int i = 0; i < columns; i++) 
+        {
+            delete [] data[i];
+        }
+        delete [] data;
+    }
 }
 
 NativeReader::NativeReader()
@@ -160,28 +160,28 @@ NativeReader::NativeReader()
 }
 
 bool NativeReader::collectInfo(FILE*& file, QString const& fname, unsigned& xmesh, unsigned& ymesh, 
-															 double& minx, double& maxx, double& miny, double& maxy)
+                                                             double& minx, double& maxx, double& miny, double& maxy)
 {
-	if (fname.isEmpty())
-		return false;
-	
-	file = open(fname);
-	
-	if (!file)
-		return false;
-	
-	
-	if (
-				(!check_magic(file, magicstring))
-			||(!check_type(file, "MESH"))
-			||(!extract_info(file, xmesh, ymesh, minx, maxx, miny, maxy))
-		 )
-	{
-		fclose(file);
-		return false;
-	}
+    if (fname.isEmpty())
+        return false;
+    
+    file = open(fname);
+    
+    if (!file)
+        return false;
+    
+    
+    if (
+                (!check_magic(file, magicstring))
+            ||(!check_type(file, "MESH"))
+            ||(!extract_info(file, xmesh, ymesh, minx, maxx, miny, maxy))
+         )
+    {
+        fclose(file);
+        return false;
+    }
  
-	return true;
+    return true;
 }
 
 
@@ -191,39 +191,39 @@ be replaced by the new data. This includes destruction of possible additional da
 */
 bool NativeReader::operator()(Plot3D* plot, QString const& fname, bool append /*= false*/)
 {
-	
-	FILE* file;
-	unsigned int xmesh, ymesh;
-	double minx, maxx, miny, maxy;
-	
-	if ( !collectInfo(file, fname, xmesh, ymesh, minx, maxx, miny, maxy) )
-		return false;
-	
-	/* allocate some space for the mesh */
- 	double** data = allocateData(xmesh, ymesh);
+    
+    FILE* file;
+    unsigned int xmesh, ymesh;
+    double minx, maxx, miny, maxy;
+    
+    if ( !collectInfo(file, fname, xmesh, ymesh, minx, maxx, miny, maxy) )
+        return false;
+    
+    /* allocate some space for the mesh */
+     double** data = allocateData(xmesh, ymesh);
 
-	for (unsigned int j = 0; j < ymesh; j++) 
-	{
+    for (unsigned int j = 0; j < ymesh; j++) 
+    {
     for (unsigned int i = 0; i < xmesh; i++) 
-		{
+        {
       if (fscanf(file, "%lf", &data[i][j]) != 1) 
-			{
-				fprintf(stderr, "NativeReader::operator(): error in data file \"%s\"\n", QWT3DLOCAL8BIT(fname));
-				return false;
+            {
+                fprintf(stderr, "NativeReader::operator(): error in data file \"%s\"\n", QWT3DLOCAL8BIT(fname));
+                return false;
       }
 
-			if (data[i][j] > maxz_)
-				data[i][j] = maxz_;
-			else if (data[i][j] < minz_)
-				data[i][j] = minz_;
+            if (data[i][j] > maxz_)
+                data[i][j] = maxz_;
+            else if (data[i][j] < minz_)
+                data[i][j] = minz_;
     }
   }
 
   /* close the file */
   fclose(file);
 
-	((GridPlot*)plot)->createDataset(data, xmesh, ymesh, minx, maxx, miny, maxy, append);
-	deleteData(data,xmesh);
+    ((GridPlot*)plot)->createDataset(data, xmesh, ymesh, minx, maxx, miny, maxy, append);
+    deleteData(data,xmesh);
 
-	return true;
+    return true;
 }
