@@ -2,13 +2,19 @@
 #include "Graph.hpp"
 #include "Node.hpp"
 
-using namespace tfp;
+using namespace dpsfg;
 
 // ----------------------------------------------------------------------------
 void Graph::setForwardPath(Node* in, Node* out)
 {
     input_ = in;
     output_ = out;
+}
+
+// ----------------------------------------------------------------------------
+tfp::TransferFunction<double> Graph::calculateTransferFunction()
+{
+    return tfp::TransferFunction<double>();
 }
 
 // ----------------------------------------------------------------------------
@@ -20,6 +26,7 @@ void Graph::updateTransferFunction()
 // ----------------------------------------------------------------------------
 bool Graph::evaluatePhysicalUnitConsistencies() const
 {
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -69,7 +76,7 @@ QVector<Connection*> Graph::getNodeConnections(const QVector<Node*>& nodes)
     int i = 0;
     while (i < nodes.size())
     {
-        // Accounts for loop connections (first connected with last)
+        // Accounts for when the list of connections forms a loop (first connected with last)
         Node* prev = i == 0 ? nodes[nodes.size() - 1] : nodes[i-1];
         Node* next = nodes[i];
 
@@ -100,6 +107,5 @@ QString Graph::multiplyPathExpressions(const QVector<Connection*>& connections)
         result += (*it)->getExpression();
         result += "*"; // we're multiplying
     }
-    result.erase();
     return result;
 }

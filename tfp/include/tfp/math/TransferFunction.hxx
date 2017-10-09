@@ -28,6 +28,7 @@ public:
     RootPolynomial<T>& denominator();
     const RootPolynomial<T>& numerator() const;
     const RootPolynomial<T>& denominator() const;
+    T factor() const;
 
     std::complex<T> evaluate(const std::complex<T>& value) const;
 

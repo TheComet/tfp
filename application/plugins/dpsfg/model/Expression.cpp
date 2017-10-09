@@ -1,7 +1,7 @@
 #include "Expression.hpp"
 #include <string.h>
 
-using namespace tfp;
+using namespace dpsfg;
 
 static const char* supportedOperations = "+-*/^";
 

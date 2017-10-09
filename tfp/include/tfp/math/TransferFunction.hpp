@@ -61,6 +61,13 @@ const RootPolynomial<T>& TransferFunction<T>::denominator() const
 
 // ----------------------------------------------------------------------------
 template <class T>
+T TransferFunction<T>::factor() const
+{
+    return numerator_.factor() / denominator_.factor();
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
 std::complex<T> TransferFunction<T>::evaluate(const std::complex<T>& value) const
 {
     return numerator_.evaluate(value) / denominator_.evaluate(value);

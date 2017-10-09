@@ -1,4 +1,4 @@
-#include "DPSFG.hpp"
+#include "view/DPSFG.hpp"
 #include "tfp/plugin/Plugin.hpp"
 
 extern "C" {

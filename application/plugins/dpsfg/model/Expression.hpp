@@ -1,11 +1,12 @@
 #pragma once
 
+#include "tfp/util/RefCounted.hpp"
 #include <string>
 #include <vector>
 
-namespace tfp {
+namespace dpsfg {
 
-class Expression
+class Expression : public tfp::RefCounted
 {
     Expression(const Expression& other);
 

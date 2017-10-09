@@ -1,16 +1,20 @@
 #pragma once
 
+#include "tfp/util/RefCounted.hpp"
+#include "tfp/math/TransferFunction.hpp"
 #include <QVector>
 
-namespace tfp {
+namespace dpsfg {
 
 class Node;
 class Connection;
 
-class Graph
+class Graph : public tfp::RefCounted
 {
 public:
     void setForwardPath(Node* in, Node* out);
+    tfp::TransferFunction<double> calculateTransferFunction();
+
     void updateTransferFunction();
     bool evaluatePhysicalUnitConsistencies() const;
 
@@ -28,6 +32,7 @@ private:
     QVector< QVector<Connection*> > loops_;
     QVector< QVector<Connection*> > paths_;
     QString expression_;
+    tfp::TransferFunction<double> transferFunction_;
 };
 
 } // namespace tfp

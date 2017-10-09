@@ -1,5 +1,5 @@
 function (add_plugin TARGET)
-    set (multiValueArgs SOURCES HEADERS TEST_SOURCES FORMS RESOURCES TRANSLATIONS)
+    set (multiValueArgs SOURCES INCLUDE_DIRS HEADERS TEST_SOURCES FORMS RESOURCES TRANSLATIONS)
     cmake_parse_arguments (add_plugin "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if (NOT TARGET)
@@ -22,6 +22,7 @@ function (add_plugin TARGET)
     endif ()
 
     add_definitions (-DPLUGIN_BUILDING)
+    include_directories (${add_plugin_INCLUDE_DIRS})
 
     add_library (${TARGET} SHARED
         ${add_plugin_HEADERS}
@@ -66,16 +67,9 @@ function (add_plugin TARGET)
     target_link_libraries (${TARGET} tfp)
 
     if (add_plugin_TEST_SOURCES)
-        target_link_libraries (test_${TARGET} Qt5::Core)
-        target_link_libraries (test_${TARGET} Qt5::Widgets)
-        target_link_libraries (test_${TARGET} Qt5::Gui)
+        target_link_libraries (test_${TARGET} ${TARGET})
 
         target_link_libraries (test_${TARGET} gmock)
         target_link_libraries (test_${TARGET} gmock_main)
-        target_link_libraries (test_${TARGET} qwtinternal)
-        target_link_libraries (test_${TARGET} qwtplot3d)
-        target_link_libraries (test_${TARGET} kiss_fft)
-        target_link_libraries (test_${TARGET} pugixml)
-        target_link_libraries (test_${TARGET} tfp)
     endif ()
 endfunction ()
