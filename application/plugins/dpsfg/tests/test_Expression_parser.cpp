@@ -19,7 +19,7 @@ TEST(NAME, simple_test)
     EXPECT_THAT(e->right()->value(), StrEq("c"));
     EXPECT_THAT(e->left()->parent(), Eq(e));
     EXPECT_THAT(e->right()->parent(), Eq(e));
-    Expression* f = e->right();
+    Expression* f = e->left();
     ASSERT_THAT(f->left(), NotNull());
     ASSERT_THAT(f->right(), NotNull());
     EXPECT_THAT(f->op(), Eq('*'));

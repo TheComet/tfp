@@ -79,12 +79,8 @@ void Expression::Parser::advanceOverWhitespace()
 // ----------------------------------------------------------------------------
 Expression::Parser::Result Expression::Parser::makeSuccess(Expression* e)
 {
-    Expression* topMost = e;
-    while (topMost->parent_ != NULL)
-        topMost = topMost->parent_;
-
     Parser::Result result;
-    result.expression_ = topMost;
+    result.expression_ = e->root();
     return result;
 }
 
@@ -148,7 +144,7 @@ Expression::Parser::Result Expression::Parser::expectOperator(Expression* e)
     if (isOperatorToken() == false)
         return makeError("Expected operator token, got ");
 
-    e = e->asLHSOfSelf();
+    e = e->root()->makeLHSOfSelf();
     e->operator_ = *token_;
     e = e->newRHS();
     advance();

@@ -53,15 +53,27 @@ public:
 
     static Expression* parse(const char* expression);
 
-    Expression* asLHSOfSelf();
+private:
+    void doRestOfInsert(Expression* inserted);
+public:
+    Expression* makeLHSOfSelf();
+    Expression* makeRHSOfSelf();
+    Expression* newLHS();
     Expression* newRHS();
 
+public:
+
+    Expression* root() {
+        Expression* root = this;
+        while (root->parent_ != NULL)
+            root = root->parent_;
+        return root;
+    }
     Expression* parent() const { return parent_; }
     Expression* left() const { return left_; }
     Expression* right() const { return right_; }
     const char* value() const { return value_.toLatin1().data(); }
     char op() const { return operator_; }
-
 
 private:
     Expression* parent_;

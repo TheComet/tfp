@@ -14,11 +14,8 @@ Expression::Expression() :
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::asLHSOfSelf()
+void Expression::doRestOfInsert(Expression* inserted)
 {
-    Expression* inserted = new Expression;
-    inserted->left_ = this;  // Need to do this here, so refcount of this doesn't drop to 0
-
     inserted->parent_ = parent_;
     if (parent_ != NULL)
     {
@@ -30,9 +27,36 @@ Expression* Expression::asLHSOfSelf()
     }
 
     parent_ = inserted;  // now fix up parent
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::makeLHSOfSelf()
+{
+    Expression* inserted = new Expression;
+    inserted->left_ = this;  // Need to do this here, so refcount of this doesn't drop to 0
+    doRestOfInsert(inserted);
 
     return inserted;
 }
+
+// ----------------------------------------------------------------------------
+Expression* Expression::makeRHSOfSelf()
+{
+    Expression* inserted = new Expression;
+    inserted->right_ = this;  // Need to do this here, so refcount of this doesn't drop to 0
+    doRestOfInsert(inserted);
+
+    return inserted;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::newLHS()
+{
+    left_ = new Expression;
+    left_->parent_ = this;
+    return left_;
+}
+
 
 // ----------------------------------------------------------------------------
 Expression* Expression::newRHS()
