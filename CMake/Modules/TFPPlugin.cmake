@@ -24,6 +24,15 @@ function (add_plugin TARGET)
     add_definitions (-DPLUGIN_BUILDING)
     include_directories (${add_plugin_INCLUDE_DIRS})
 
+    set (test_SOURCES "")
+    if (TFP_BUILD_TESTS AND add_plugin_TEST_SOURCES)
+        message (STATUS "Plugin ${TARGET} has tests")
+        configure_file ("${CMAKE_SOURCE_DIR}/CMake/Templates/PluginTestAPI.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/PluginTestAPI.cpp")
+        configure_file ("${CMAKE_SOURCE_DIR}/CMake/Templates/PluginTestMain.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/PluginTestMain.cpp")
+        set (test_SOURCES ${add_plugin_TEST_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/PluginTestAPI.cpp")
+        add_executable (test_${TARGET} "${CMAKE_CURRENT_BINARY_DIR}/PluginTestMain.cpp")
+    endif ()
+
     add_library (${TARGET} SHARED
         ${add_plugin_HEADERS}
         ${add_plugin_SOURCES}
@@ -31,6 +40,7 @@ function (add_plugin TARGET)
         ${FORMS_MOC}
         ${RESOURCES_GEN}
         ${QM_FILES}
+        ${test_SOURCES}
     )
 
     set_target_properties (${TARGET}
@@ -40,11 +50,6 @@ function (add_plugin TARGET)
             LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
             RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
         PREFIX "")
-
-    if (add_plugin_TEST_SOURCES)
-        message (STATUS "Plugin ${TARGET} has tests")
-        add_executable (test_${TARGET} ${add_plugin_TEST_SOURCES})
-    endif ()
 
     ###############################################################################
     # dependencies
@@ -66,10 +71,8 @@ function (add_plugin TARGET)
     target_link_libraries (${TARGET} pugixml)
     target_link_libraries (${TARGET} tfp)
 
-    if (add_plugin_TEST_SOURCES)
-        target_link_libraries (test_${TARGET} ${TARGET})
-
-        target_link_libraries (test_${TARGET} gmock)
-        target_link_libraries (test_${TARGET} gmock_main)
+    if (TFP_BUILD_TESTS AND add_plugin_TEST_SOURCES)
+        target_link_libraries (${TARGET} gmock)
+        target_link_libraries (test_${TARGET} Qt5::Core)
     endif ()
 endfunction ()

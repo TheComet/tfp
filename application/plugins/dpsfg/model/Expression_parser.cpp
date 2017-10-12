@@ -1,5 +1,6 @@
 #include "model/Expression.hpp"
 #include <cstring>
+#include <cctype>
 
 using namespace dpsfg;
 
@@ -196,13 +197,13 @@ Expression::Parser::Result Expression::Parser::expectNumber(Expression* e)
 // ----------------------------------------------------------------------------
 Expression::Parser::Result Expression::Parser::openScope(Expression* e)
 {
-
+    return makeSuccess(e);
 }
 
 // ----------------------------------------------------------------------------
 Expression::Parser::Result Expression::Parser::closeScope(Expression* e)
 {
-
+    return makeSuccess(e);
 }
 
 // ----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "tfp/config.hpp"
 #include "tfp/util/RefCounted.hpp"
 
 #include <cassert>
@@ -31,7 +32,7 @@ namespace tfp {
 
 /// Shared pointer template class with intrusive reference counting.
 template <class T>
-class TFP_PUBLIC_API Reference
+class Reference
 {
 public:
 

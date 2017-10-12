@@ -83,10 +83,4 @@ private:
     char operator_;
 };
 
-//inline Expression operator+(Expression lhs, const Expression& rhs) { lhs += rhs; return lhs;}
-//inline Expression operator-(Expression lhs, const Expression& rhs) { lhs -= rhs; return lhs;}
-//inline Expression operator*(Expression lhs, const Expression& rhs) { lhs *= rhs; return lhs;}
-//inline Expression operator/(Expression lhs, const Expression& rhs) { lhs /= rhs; return lhs;}
-//inline Expression operator^(Expression lhs, const Expression& rhs) { lhs ^= rhs; return lhs;}
-
 }

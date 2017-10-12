@@ -157,9 +157,13 @@ check_complex_hyperbolic ("asinh" HAVE_ASINH ASINH_SYMBOL)
 check_complex_hyperbolic ("acosh" HAVE_ACOSH ACOSH_SYMBOL)
 check_complex_hyperbolic ("atanh" HAVE_ATANH ATANH_SYMBOL)
 
+option (TFP_BUILD_TESTS "Whether to build unit tests" ON)
+
 message (STATUS "------------------------------------------------------------")
 message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message (STATUS "Platform is ${PLATFORM}")
+message (STATUS "Real type: ${REAL_TYPE}")
+message (STATUS "Build tests: ${TFP_BUILD_TESTS}")
 message (STATUS "------------------------------------------------------------")
 
 include_directories ("${CMAKE_CURRENT_LIST_DIR}/tfp/include")
@@ -176,4 +180,7 @@ add_subdirectory ("thirdparty/qwt-6.1.2")
 add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
 add_subdirectory ("tfp")
 add_subdirectory ("application")
-add_subdirectory ("tests")
+if (TFP_BUILD_TESTS)
+    add_subdirectory ("tests")
+endif ()
+
