@@ -40,7 +40,7 @@ void Node::disconnectFrom(Node* other)
 void Node::disconnectOutgoing(Node* other)
 {
     // Take care of all outgoing connections
-    for (QVector<Connection*>::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
+    for (QVector< tfp::Reference<Connection> >::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
     {
         if ((*it)->getTargetNode() == other)
             it = outgoingConnections_.erase(it);
@@ -50,7 +50,7 @@ void Node::disconnectOutgoing(Node* other)
 }
 
 // ----------------------------------------------------------------------------
-const QVector<Connection*>& Node::getOutgoingConnections() const
+const QVector< tfp::Reference<Connection> >& Node::getOutgoingConnections() const
 {
     return outgoingConnections_;
 }

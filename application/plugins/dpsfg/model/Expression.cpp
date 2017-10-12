@@ -1,56 +1,43 @@
 #include "Expression.hpp"
 #include <string.h>
+#include <cassert>
 
 using namespace dpsfg;
-
-static const char* supportedOperations = "+-*/^";
 
 // ----------------------------------------------------------------------------
 Expression::Expression() :
     parent_(NULL),
     left_(NULL),
     right_(NULL),
-    operation_('\0')
+    operator_('\0')
 {
 }
 
 // ----------------------------------------------------------------------------
-Expression::~Expression()
+Expression* Expression::asLHSOfSelf()
 {
-    if (left_ != NULL)
-        delete left_;
-    if (right_ != NULL)
-        delete right_;
+    Expression* inserted = new Expression;
+    inserted->left_ = this;  // Need to do this here, so refcount of this doesn't drop to 0
+
+    inserted->parent_ = parent_;
+    if (parent_ != NULL)
+    {
+        assert(parent_->left_ == this || parent_->right_ == this);
+        if (parent_->left_ == this)
+            parent_->left_ = inserted;
+        else
+            parent_->right_ = inserted;
+    }
+
+    parent_ = inserted;  // now fix up parent
+
+    return inserted;
 }
 
 // ----------------------------------------------------------------------------
-Expression& Expression::operator=(const char* expression)
+Expression* Expression::newRHS()
 {
-    // Currently, we don't support arbitrary expressions, only assignments of symbol names or numbers
-    if (strpbrk(expression, supportedOperations) != NULL)
-        return *this;
-
-    //children_.clear();
-    symbolName_ = expression;
-    operation_ = '\0';
-
-    return *this;
+    right_ = new Expression;
+    right_->parent_ = this;
+    return right_;
 }
-
-// ----------------------------------------------------------------------------
-//Expression& Expression::combine(Expression* rhs)
-//{
-//    Expression* lhs = new Expression;
-//    lhs->left_       = left_;
-//    lhs->right_      = right_;
-//    lhs->symbolName_ = symbolName_;
-//    lhs->operation_  = operation_;
-//
-//    left_  = lhs;  rhs->parent_ = this;
-//    right_ = rhs;  lhs->parent_ = this;
-//
-//    operation_ = '+';
-//    symbolName_ = "";
-//
-//    return *this;
-//}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tfp/util/RefCounted.hpp"
+#include "tfp/util/Reference.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <QVector>
 
@@ -14,6 +14,7 @@ class Graph : public tfp::RefCounted
 public:
     void setForwardPath(Node* in, Node* out);
     tfp::TransferFunction<double> calculateTransferFunction();
+    void setDefaultValue(const QString& varName, double value);
 
     void updateTransferFunction();
     bool evaluatePhysicalUnitConsistencies() const;
@@ -26,13 +27,13 @@ private:
     QString multiplyPathExpressions(const QVector<Connection*>& connections);
 
 private:
-    Node* input_;
-    Node* output_;
+    tfp::Reference<Node> input_;
+    tfp::Reference<Node> output_;
 
     QVector< QVector<Connection*> > loops_;
     QVector< QVector<Connection*> > paths_;
-    QString expression_;
     tfp::TransferFunction<double> transferFunction_;
+    QString expression_;
 };
 
 } // namespace tfp

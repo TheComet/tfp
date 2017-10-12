@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tfp/util/RefCounted.hpp"
+#include "tfp/util/Reference.hpp"
 #include <QVector>
 
 namespace dpsfg {
@@ -39,7 +39,7 @@ public:
      */
     void disconnectOutgoing(Node* node);
 
-    const QVector<Connection*>& getOutgoingConnections() const;
+    const QVector< tfp::Reference<Connection> >& getOutgoingConnections() const;
 
     QString getName() const;
     void setName(QString name);
@@ -50,7 +50,7 @@ public:
 private:
     QString name_;
     QString physicalUnit_;
-    QVector<Connection*> outgoingConnections_;
+    QVector< tfp::Reference<Connection> > outgoingConnections_;
 };
 
 }

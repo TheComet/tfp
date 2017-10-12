@@ -1,7 +1,8 @@
 #include "gmock/gmock.h"
+#include "../model/Connection.hpp"
+#include "../model/Expression.hpp"
 #include "../model/Graph.hpp"
 #include "../model/Node.hpp"
-#include "../model/Connection.hpp"
 #include "tfp/util/Reference.hpp"
 
 #define NAME dpsfg_Graph
@@ -48,6 +49,4 @@ TEST(NAME, three_node_forward_path)
 
     Graph graph;
     graph.setForwardPath(n1, n3);
-    c1->setExpression("A+B");
-    c2->setExpression("C+D");
 }

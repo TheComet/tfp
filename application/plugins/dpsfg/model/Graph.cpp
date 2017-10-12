@@ -60,8 +60,8 @@ void Graph::findForwardPathsAndLoopsRecursive(Node* current, QVector<Node*> list
 
     list.push_back(current);
 
-    const QVector<Connection*>& connections = current->getOutgoingConnections();
-    for (QVector<Connection*>::const_iterator it = connections.begin(); it != connections.end(); ++it)
+    const QVector< tfp::Reference<Connection> >& connections = current->getOutgoingConnections();
+    for (QVector< tfp::Reference<Connection> >::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
         Node* child = (*it)->getTargetNode();
         findForwardPathsAndLoopsRecursive(child, list);
@@ -80,8 +80,8 @@ QVector<Connection*> Graph::getNodeConnections(const QVector<Node*>& nodes)
         Node* prev = i == 0 ? nodes[nodes.size() - 1] : nodes[i-1];
         Node* next = nodes[i];
 
-        const QVector<Connection*>& connections = prev->getOutgoingConnections();
-        for (QVector<Connection*>::const_iterator it = connections.begin(); it != connections.end(); ++it)
+        const QVector< tfp::Reference<Connection> >& connections = prev->getOutgoingConnections();
+        for (QVector< tfp::Reference<Connection> >::const_iterator it = connections.begin(); it != connections.end(); ++it)
             if ((*it)->getTargetNode() == next)
             {
                 result.push_back(*it);
@@ -104,7 +104,7 @@ QString Graph::multiplyPathExpressions(const QVector<Connection*>& connections)
     QString result;
     for (QVector<Connection*>::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
-        result += (*it)->getExpression();
+        //result += (*it)->getExpression();
         result += "*"; // we're multiplying
     }
     return result;
