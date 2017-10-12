@@ -29,7 +29,7 @@ TEST(NAME, simple_test)
     EXPECT_THAT(f->left()->parent(), Eq(f));
     EXPECT_THAT(f->right()->parent(), Eq(f));
 }
-
+/*
 TEST(NAME, mul_before_add)
 {
     tfp::Reference<Expression> e = Expression::parse("a+b*c");
@@ -108,9 +108,9 @@ TEST(NAME, div_before_sub)
     EXPECT_THAT(e->right()->op(), Eq('/'));
     EXPECT_THAT(e->right()->left()->value(), StrEq("b"));
     EXPECT_THAT(e->right()->right()->value(), StrEq("c"));
-}
+}*/
 
-TEST(NAME, parenthesis_test)
+TEST(NAME, parenthesis_test_1)
 {
     tfp::Reference<Expression> e = Expression::parse("(a+b)*c");
     EXPECT_THAT(e->op(), Eq('*'));
@@ -118,6 +118,18 @@ TEST(NAME, parenthesis_test)
     EXPECT_THAT(e->left()->op(), Eq('+'));
     EXPECT_THAT(e->left()->left()->value(), StrEq("a"));
     EXPECT_THAT(e->left()->right()->value(), StrEq("b"));
+}
+
+TEST(NAME, parenthesis_test_2)
+{
+    tfp::Reference<Expression> e = Expression::parse("a*(b+c)*d");
+    EXPECT_THAT(e->op(), Eq('*'));
+    EXPECT_THAT(e->left()->value(), StrEq("a"));
+    EXPECT_THAT(e->right()->op(), Eq('*'));
+    EXPECT_THAT(e->right()->right()->value(), StrEq("d"));
+    EXPECT_THAT(e->right()->left()->op(), Eq('+'));
+    EXPECT_THAT(e->right()->left()->left()->value(), StrEq("b"));
+    EXPECT_THAT(e->right()->left()->right()->value(), StrEq("c"));
 }
 
 TEST(NAME, more_complicated_test)

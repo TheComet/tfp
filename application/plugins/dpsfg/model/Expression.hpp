@@ -1,52 +1,67 @@
 #pragma once
 
 #include "tfp/util/Reference.hpp"
-#include <QString>
+#include <string>
+#include <unordered_map>
 
 namespace dpsfg {
+
+class SymbolTable
+{
+public:
+    void add(std::string name, double value);
+    void set(std::string name, double value);
+    void remove(std::string name);
+    double evaluate(std::string name);
+
+private:
+    union Symbol
+    {
+        double (*func)(double,double);
+        double value;
+    };
+    std::unordered_map<std::string, Symbol> table_;
+};
 
 class Expression : public tfp::RefCounted
 {
     struct Parser
     {
-        struct Result
+        enum
         {
-            Result() : expression_(NULL) {}
-
-            bool isSuccess() { return expression_ != NULL; }
-
-            QString errorMessage_;
-            int errorColumn_;
-            Expression* expression_;
+            TOK_ERROR,
+            TOK_END,
+            TOK_OPEN,
+            TOK_CLOSE,
+            TOK_NUMBER,
+            TOK_VARIABLE,
+            TOK_INFIX
         };
 
         bool isAtEnd();
-        bool isSymbolToken();
-        bool isNumberToken();
-        bool isOperatorToken();
-        bool isWhitespaceToken();
+        bool isSymbol();
+        bool isNumber();
+        bool isOperator();
+        bool isWhitespace();
         bool isOpenBracket();
         bool isCloseBracket();
 
         void advance();
         void advanceOverWhitespace();
+        void nextToken();
 
-        Result makeSuccess(Expression* e);
-        Result makeError(const char* msg);
-        Result openScope(Expression* e);
-        Result closeScope(Expression* e);
-        Result expectOperand(Expression* e);
-        Result expectOperandOrEnd(Expression* e);
-        Result expectOperatorOrEnd(Expression* e);
-        Result expectOperator(Expression* e);
-        Result expectSymbolName(Expression* e);
-        Result expectNumber(Expression* e);
+        Expression* makeError(const char* msg);
+        Expression* power();
+        Expression* base();
+        Expression* factor();
+        Expression* term();
+        Expression* expr();
 
-        Result parse(const char* str);
+        Expression* parse(const char* str);
 
-        const char* str_;
-        const char* token_;
-        int scope_;
+        const char* start_;
+        const char* next_;
+        SymbolTable symbols_;
     };
 public:
     Expression();
@@ -72,14 +87,14 @@ public:
     Expression* parent() const { return parent_; }
     Expression* left() const { return left_; }
     Expression* right() const { return right_; }
-    const char* value() const { return value_.toLatin1().data(); }
+    const char* value() const { return value_.c_str(); }
     char op() const { return operator_; }
 
 private:
     Expression* parent_;
     tfp::Reference<Expression> left_;
     tfp::Reference<Expression> right_;
-    QString value_;
+    std::string value_;
     char operator_;
 };
 
