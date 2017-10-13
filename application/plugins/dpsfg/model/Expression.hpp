@@ -69,12 +69,7 @@ class Expression : public tfp::RefCounted
         bool isSymbol();
         bool isNumber();
         bool isOperator();
-        bool isWhitespace();
-        bool isOpenBracket();
-        bool isCloseBracket();
 
-        void advance();
-        void advanceOverWhitespace();
         void nextToken();
 
         Expression* makeError(const char* msg);

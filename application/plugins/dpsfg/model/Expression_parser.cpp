@@ -38,43 +38,6 @@ bool Expression::Parser::isOperator()
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isWhitespace()
-{
-    return std::isspace(*next_);
-}
-
-// ----------------------------------------------------------------------------
-bool Expression::Parser::isOpenBracket()
-{
-    return *next_ == '(';
-}
-
-// ----------------------------------------------------------------------------
-bool Expression::Parser::isCloseBracket()
-{
-    return *next_ == ')';
-}
-
-// ----------------------------------------------------------------------------
-void Expression::Parser::advance()
-{
-    if (isAtEnd())
-        return;
-    ++next_;
-}
-
-// ----------------------------------------------------------------------------
-void Expression::Parser::advanceOverWhitespace()
-{
-    while (isAtEnd() == false)
-    {
-        if (isWhitespace() == false)
-            break;
-        ++next_;
-    }
-}
-
-// ----------------------------------------------------------------------------
 void Expression::Parser::nextToken()
 {
     type_ = TOK_NULL;
