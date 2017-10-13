@@ -79,11 +79,11 @@ endif()
 # with one of them.
 
 if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    if (PREVIEWER_TESTS)
+    if (TFP_BUILD_TESTS)
         add_definitions (-fPIC)
     endif ()
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    if (PREVIEWER_TESTS)
+    if (TFP_BUILD_TESTS)
         add_definitions (-fPIC)
     endif ()
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")

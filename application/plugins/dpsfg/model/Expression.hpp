@@ -3,23 +3,49 @@
 #include "tfp/util/Reference.hpp"
 #include <string>
 #include <unordered_map>
+#include <cmath>
 
 namespace dpsfg {
 
-class SymbolTable
+struct Symbol
+{
+    enum Type
+    {
+        INVALID,
+        CONSTANT,
+        VARIABLE,
+        FUNCTION1,
+        FUNCTION2
+    };
+
+    Symbol() : type(INVALID) {}
+
+    double add(double a, double b) { return a + b; }
+    double sub(double a, double b) { return a - b; }
+    double mul(double a, double b) { return a * b; }
+    double div(double a, double b) { return a / b; }
+    double pow(double a, double b) { return std::pow(a, b); }
+    double negate(double a) { return -a; }
+
+    union {
+        double value;
+        char* name;
+        double (Symbol::*eval1)(double);
+        double (Symbol::*eval2)(double,double);
+    };
+    Type type;
+};
+
+class SymbolTable : public tfp::RefCounted
 {
 public:
     void add(std::string name, double value);
     void set(std::string name, double value);
     void remove(std::string name);
-    double evaluate(std::string name);
+    void clear();
+    double valueOf(std::string name, double=0, double=0);
 
 private:
-    union Symbol
-    {
-        double (*func)(double,double);
-        double value;
-    };
     std::unordered_map<std::string, Symbol> table_;
 };
 
@@ -27,14 +53,15 @@ class Expression : public tfp::RefCounted
 {
     struct Parser
     {
-        enum
+        enum Token
         {
+            TOK_NULL,
             TOK_ERROR,
             TOK_END,
             TOK_OPEN,
             TOK_CLOSE,
             TOK_NUMBER,
-            TOK_VARIABLE,
+            TOK_SYMBOL,
             TOK_INFIX
         };
 
@@ -59,22 +86,25 @@ class Expression : public tfp::RefCounted
 
         Expression* parse(const char* str);
 
+        Token type_;
+        double value_;
+        std::string name_;
+        typedef double (Symbol::*OpFunc)(double,double);
+        OpFunc function_;
+
         const char* start_;
         const char* next_;
-        SymbolTable symbols_;
+        tfp::Reference<SymbolTable> symbolTable_;
     };
 public:
     Expression();
 
     static Expression* parse(const char* expression);
 
-private:
-    void doRestOfInsert(Expression* inserted);
-public:
-    Expression* makeLHSOfSelf();
-    Expression* makeRHSOfSelf();
-    Expression* newLHS();
-    Expression* newRHS();
+    static Expression* make(double (Symbol::*func2)(double,double), Expression* lhs, Expression* rhs);
+    static Expression* make(double (Symbol::*func1)(double), Expression* rhs);
+    static Expression* make(double value);
+    static Expression* make(const char* symbolName);
 
 public:
 
@@ -87,15 +117,14 @@ public:
     Expression* parent() const { return parent_; }
     Expression* left() const { return left_; }
     Expression* right() const { return right_; }
-    const char* value() const { return value_.c_str(); }
-    char op() const { return operator_; }
+    const Symbol& symbol() const { return symbol_; }
 
 private:
     Expression* parent_;
+    Symbol symbol_;
     tfp::Reference<Expression> left_;
     tfp::Reference<Expression> right_;
-    std::string value_;
-    char operator_;
+    tfp::Reference<SymbolTable> symbolTable_;
 };
 
 }

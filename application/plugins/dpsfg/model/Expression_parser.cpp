@@ -1,19 +1,20 @@
 #include "model/Expression.hpp"
 #include <cstring>
 #include <cctype>
+#include <cmath>
 
 using namespace dpsfg;
 
 // ----------------------------------------------------------------------------
 bool Expression::Parser::isAtEnd()
 {
-    if (*token_ == '\0')
+    if (*next_ == '\0')
         return true;
     return false;
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isSymbolToken()
+bool Expression::Parser::isSymbol()
 {
     if (isalpha(*next_))
         return true;
@@ -23,13 +24,13 @@ bool Expression::Parser::isSymbolToken()
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isNumberToken()
+bool Expression::Parser::isNumber()
 {
-    return isdigit(*next_);
+    return isdigit(*next_) || *next_ == '.';
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isOperatorToken()
+bool Expression::Parser::isOperator()
 {
     if (strchr("+-*/^", *next_))
         return true;
@@ -37,21 +38,21 @@ bool Expression::Parser::isOperatorToken()
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isWhitespaceToken()
+bool Expression::Parser::isWhitespace()
 {
-    return std::isspace(*token_);
+    return std::isspace(*next_);
 }
 
 // ----------------------------------------------------------------------------
 bool Expression::Parser::isOpenBracket()
 {
-    return *token_ == '(';
+    return *next_ == '(';
 }
 
 // ----------------------------------------------------------------------------
 bool Expression::Parser::isCloseBracket()
 {
-    return *token_ == ')';
+    return *next_ == ')';
 }
 
 // ----------------------------------------------------------------------------
@@ -59,7 +60,7 @@ void Expression::Parser::advance()
 {
     if (isAtEnd())
         return;
-    ++token_;
+    ++next_;
 }
 
 // ----------------------------------------------------------------------------
@@ -67,10 +68,55 @@ void Expression::Parser::advanceOverWhitespace()
 {
     while (isAtEnd() == false)
     {
-        if (isWhitespaceToken() == false)
+        if (isWhitespace() == false)
             break;
-        ++token_;
+        ++next_;
     }
+}
+
+// ----------------------------------------------------------------------------
+void Expression::Parser::nextToken()
+{
+    type_ = TOK_NULL;
+
+    do
+    {
+        if (*next_ == '\0')
+        {
+            type_ = TOK_END;
+            return;
+        }
+
+        if (isNumber())
+        {
+            type_ = TOK_NUMBER;
+            value_ = strtod(next_, (char**)&next_);
+            continue;
+        }
+
+        if (isSymbol())
+        {
+            type_ = TOK_SYMBOL;
+            name_.clear();
+            do
+                name_ += *next_++;
+            while (isSymbol() || isdigit(*next_));
+            continue;
+        }
+
+        switch (*next_++)
+        {
+            case '+': type_ = TOK_INFIX; function_ = &Symbol::add; break;
+            case '-': type_ = TOK_INFIX; function_ = &Symbol::sub; break;
+            case '*': type_ = TOK_INFIX; function_ = &Symbol::mul; break;
+            case '/': type_ = TOK_INFIX; function_ = &Symbol::div; break;
+            case '^': type_ = TOK_INFIX; function_ = &Symbol::pow; break;
+            case '(': type_ = TOK_OPEN; break;
+            case ')': type_ = TOK_CLOSE; break;
+            case ' ': case '\t': case '\n': case '\r': continue;
+            default: type_ = TOK_ERROR; break;
+        }
+    } while (type_ == TOK_NULL);
 }
 
 // ----------------------------------------------------------------------------
@@ -80,111 +126,164 @@ Expression* Expression::Parser::makeError(const char* msg)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectOperand()
+Expression* Expression::make(const char* symbolName)
 {
-    advanceOverWhitespace();
-
-    if (isSymbolToken())
-        return expectSymbolName();
-    if (isNumberToken())
-        return expectNumber();
-    if (isOpenBracket())
-        return openScope();
-
-    return makeError("Expected operand, got ");
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectOperandOrEnd()
-{
-    advanceOverWhitespace();
-    if (isAtEnd() || isCloseBracket())
-        return NULL;
-
-    return expectOperand();
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectOperator(Expression* lhs)
-{
-    advanceOverWhitespace();
-    if (isOperatorToken() == false)
-        return makeError("Expected operator token, got ");
-
-    Expression* op = new Expression;
-    op->operator_ = *token_;
-    advance();
-    op->left_ = lhs;
-    op->right_ = expectOperand();
-
-    return op;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectOperatorOrEnd(Expression* e)
-{
-    advanceOverWhitespace();
-    if (isAtEnd() || isCloseBracket())
-        return NULL;
-
-    return expectOperator(e);
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectSymbolName()
-{
-    advanceOverWhitespace();
-    if (isSymbolToken() == false)
-        return makeError("Expected symbol token, got ");
+    int len = strlen(symbolName);
+    char* name = (char*)malloc((sizeof(char) + 1) * len);
+    strcpy(name, symbolName);
 
     Expression* e = new Expression;
-    do
-    {
-        e->value_ += *token_;
-        advance();
-    } while (isSymbolToken());
-
-    return expectOperatorOrEnd(e);
+    e->symbol_.type = Symbol::VARIABLE;
+    e->symbol_.name = name;
+    return e;
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::expectNumber()
+Expression* Expression::make(double value)
 {
-    advanceOverWhitespace();
-    if (isNumberToken() == false)
-        return makeError("Expected number token, got ");
-
     Expression* e = new Expression;
-    do
+    e->symbol_.type = Symbol::CONSTANT;
+    e->symbol_.value = value;
+    return e;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::make(double (Symbol::*func1)(double), Expression* rhs)
+{
+    Expression* e = new Expression;
+    e->symbol_.type = Symbol::FUNCTION1;
+    e->symbol_.eval1 = func1;
+    e->right_ = rhs;
+    rhs->parent_ = e;
+
+    return e;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::make(double (Symbol::*func2)(double,double), Expression* lhs, Expression* rhs)
+{
+    Expression* e = new Expression;
+    e->symbol_.type = Symbol::FUNCTION2;
+    e->symbol_.eval2 = func2;
+    e->left_ = lhs;
+    e->right_ = rhs;
+    lhs->parent_= e;
+    rhs->parent_ = e;
+
+    return e;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::Parser::base()
+{
+    switch (type_)
     {
-        e->value_ += *token_;
-        advance();
-    } while (isNumberToken());
+        case TOK_NUMBER:
+        {
+            double value = value_;
+            nextToken();
+            return Expression::make(value);
+        }
 
-    return expectOperator(e);
+        case TOK_SYMBOL:
+        {
+            std::string name = name_;
+            nextToken();
+            return Expression::make(name.c_str());
+        }
+
+        case TOK_OPEN:
+        {
+            nextToken();
+            Expression* ret = expr();
+            if (type_ != TOK_CLOSE)
+                type_ = TOK_ERROR;
+            else
+                nextToken();
+            return ret;
+        }
+
+        default:
+            return new Expression;
+    }
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::openScope()
+Expression* Expression::Parser::power()
 {
-    advance();
-    return expectOperand();
+    int sign = 1;
+    while (type_ == TOK_INFIX && (function_ == &Symbol::add || function_ == &Symbol::sub))
+    {
+        if (function_ == &Symbol::sub)
+            sign = -sign;
+        nextToken();
+    }
+
+    if (sign == 1)
+        return base();
+    else
+        return Expression::make(&Symbol::negate, base());
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::closeScope()
+Expression* Expression::Parser::factor()
 {
-    return makeError("oh oh");
+    Expression* ret = power();
+
+    while (type_ == TOK_INFIX && (function_ == &Symbol::pow))
+    {
+        double (Symbol::*f)(double,double) = function_;
+        nextToken();
+        ret = Expression::make(f, ret, power());
+    }
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::Parser::term()
+{
+    Expression* ret = factor();
+
+    while (type_ == TOK_INFIX && (function_ == &Symbol::mul || function_ == &Symbol::div))
+    {
+        double (Symbol::*f)(double,double) = function_;
+        nextToken();
+        ret = Expression::make(f, ret, factor());
+    }
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::Parser::expr()
+{
+    Expression* ret = term();
+
+    while (type_ == TOK_INFIX && (function_ == &Symbol::add || function_ == &Symbol::sub))
+    {
+        double (Symbol::*f)(double,double) = function_;
+        nextToken();
+        ret = Expression::make(f, ret, term());
+    }
+
+    return ret;
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::Parser::parse(const char* str)
 {
-    str_ = str;
-    token_ = str;
-    scope_ = 0;
+    start_ = next_ = str;
+    nextToken();
 
-    return expectOperandOrEnd();
+    Expression* result = expr();
+    if (type_ != TOK_END)
+    {
+        delete result;
+        return NULL;
+    }
+
+    return result;
 }
 
 // ----------------------------------------------------------------------------
