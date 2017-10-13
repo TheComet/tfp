@@ -3,6 +3,21 @@
 #include <cctype>
 #include <cmath>
 
+namespace dpsfg {
+namespace op {
+
+double add(double a, double b) { return a + b; }
+double sub(double a, double b) { return a - b; }
+double mul(double a, double b) { return a * b; }
+double div(double a, double b) { return a / b; }
+double pow(double a, double b) { return std::pow(a, b); }
+double mod(double a, double b) { return std::fmod(a, b); }
+double negate(double a) { return -a; }
+double comma(double a, double b) { return b; }
+
+}
+}
+
 using namespace dpsfg;
 
 // ----------------------------------------------------------------------------
@@ -69,71 +84,19 @@ void Expression::Parser::nextToken()
 
         switch (*next_++)
         {
-            case '+': type_ = TOK_INFIX; function_ = &Symbol::add; break;
-            case '-': type_ = TOK_INFIX; function_ = &Symbol::sub; break;
-            case '*': type_ = TOK_INFIX; function_ = &Symbol::mul; break;
-            case '/': type_ = TOK_INFIX; function_ = &Symbol::div; break;
-            case '^': type_ = TOK_INFIX; function_ = &Symbol::pow; break;
+            case '+': type_ = TOK_INFIX; function_ = op::add; break;
+            case '-': type_ = TOK_INFIX; function_ = op::sub; break;
+            case '*': type_ = TOK_INFIX; function_ = op::mul; break;
+            case '/': type_ = TOK_INFIX; function_ = op::div; break;
+            case '^': type_ = TOK_INFIX; function_ = op::pow; break;
+            case '%': type_ = TOK_INFIX; function_ = op::mod; break;
             case '(': type_ = TOK_OPEN; break;
             case ')': type_ = TOK_CLOSE; break;
+            case ',': type_ = TOK_SEP; break;
             case ' ': case '\t': case '\n': case '\r': continue;
             default: type_ = TOK_ERROR; break;
         }
     } while (type_ == TOK_NULL);
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::Parser::makeError(const char* msg)
-{
-    return NULL;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::make(const char* symbolName)
-{
-    int len = strlen(symbolName);
-    char* name = (char*)malloc((sizeof(char) + 1) * len);
-    strcpy(name, symbolName);
-
-    Expression* e = new Expression;
-    e->symbol_.type = Symbol::VARIABLE;
-    e->symbol_.name = name;
-    return e;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::make(double value)
-{
-    Expression* e = new Expression;
-    e->symbol_.type = Symbol::CONSTANT;
-    e->symbol_.value = value;
-    return e;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::make(double (Symbol::*func1)(double), Expression* rhs)
-{
-    Expression* e = new Expression;
-    e->symbol_.type = Symbol::FUNCTION1;
-    e->symbol_.eval1 = func1;
-    e->right_ = rhs;
-    rhs->parent_ = e;
-
-    return e;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::make(double (Symbol::*func2)(double,double), Expression* lhs, Expression* rhs)
-{
-    Expression* e = new Expression;
-    e->symbol_.type = Symbol::FUNCTION2;
-    e->symbol_.eval2 = func2;
-    e->left_ = lhs;
-    e->right_ = rhs;
-    lhs->parent_= e;
-    rhs->parent_ = e;
-
-    return e;
 }
 
 // ----------------------------------------------------------------------------
@@ -175,9 +138,9 @@ Expression* Expression::Parser::base()
 Expression* Expression::Parser::power()
 {
     int sign = 1;
-    while (type_ == TOK_INFIX && (function_ == &Symbol::add || function_ == &Symbol::sub))
+    while (type_ == TOK_INFIX && (function_ == op::add || function_ == op::sub))
     {
-        if (function_ == &Symbol::sub)
+        if (function_ == op::sub)
             sign = -sign;
         nextToken();
     }
@@ -185,7 +148,7 @@ Expression* Expression::Parser::power()
     if (sign == 1)
         return base();
     else
-        return Expression::make(&Symbol::negate, base());
+        return Expression::make(op::negate, base());
 }
 
 // ----------------------------------------------------------------------------
@@ -193,9 +156,9 @@ Expression* Expression::Parser::factor()
 {
     Expression* ret = power();
 
-    while (type_ == TOK_INFIX && (function_ == &Symbol::pow))
+    while (type_ == TOK_INFIX && (function_ == op::pow))
     {
-        double (Symbol::*f)(double,double) = function_;
+        double (*f)(double,double) = function_;
         nextToken();
         ret = Expression::make(f, ret, power());
     }
@@ -208,9 +171,9 @@ Expression* Expression::Parser::term()
 {
     Expression* ret = factor();
 
-    while (type_ == TOK_INFIX && (function_ == &Symbol::mul || function_ == &Symbol::div))
+    while (type_ == TOK_INFIX && (function_ == op::mul || function_ == op::div || function_ == op::mod))
     {
-        double (Symbol::*f)(double,double) = function_;
+        double (*f)(double,double) = function_;
         nextToken();
         ret = Expression::make(f, ret, factor());
     }
@@ -223,11 +186,25 @@ Expression* Expression::Parser::expr()
 {
     Expression* ret = term();
 
-    while (type_ == TOK_INFIX && (function_ == &Symbol::add || function_ == &Symbol::sub))
+    while (type_ == TOK_INFIX && (function_ == op::add || function_ == op::sub))
     {
-        double (Symbol::*f)(double,double) = function_;
+        double (*f)(double,double) = function_;
         nextToken();
         ret = Expression::make(f, ret, term());
+    }
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::Parser::list()
+{
+    Expression* ret = expr();
+
+    while (type_ == TOK_SEP)
+    {
+        nextToken();
+        ret = Expression::make(op::comma, ret, expr());
     }
 
     return ret;
