@@ -8,6 +8,8 @@ namespace dpsfg {
 
 namespace op {
 
+typedef double (*Op1)(double);
+typedef double (*Op2)(double,double);
 double add(double a, double b);
 double sub(double a, double b);
 double mul(double a, double b);
@@ -78,16 +80,28 @@ public:
 
     static Expression* parse(const char* expression);
 
-    static Expression* make(double (*func2)(double,double), Expression* lhs, Expression* rhs);
-    static Expression* make(double (*func1)(double), Expression* rhs);
+    static Expression* make(const char* variableName);
     static Expression* make(double value);
-    static Expression* make(const char* symbolName);
+    static Expression* make(op::Op1 func, Expression* rhs);
+    static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
+    
+    void set(const char* variableName);
+    void set(double value);
+    void set(op::Op1 func, Expression* rhs);
+    void set(op::Op2 func, Expression* lhs, Expression* rhs);
+    void reset();
 
-private:
-    static void addVariableToTable(VariableTable* vt, const Expression* e);
-public:
     VariableTable* generateVariableTable() const;
     double evaluate(const VariableTable* vt=NULL) const;
+
+    bool isOperation(op::Op1 func); 
+    bool isOperation(op::Op2 func);
+    bool hasRHSOperation(op::Op1 func);
+    bool hasRHSOperation(op::Op2 func);
+    void eliminateDivisionsAndSubtractions();
+    void eliminateNegativeExponents(const char* variable);
+    
+    bool manipulateIntoRationalFunction(const char* variable);
 
     Expression* root() {
         Expression* root = this;
@@ -101,16 +115,17 @@ public:
     Type type() const { return type_; }
     const char* name() const { assert(type_ == VARIABLE); return name_; }
     double value() const { assert(type_ == CONSTANT); return value_; }
-    double (*eval1() const)(double) { assert(type_ == FUNCTION1); return eval1_; }
-    double (*eval2() const)(double,double) { assert(type_ == FUNCTION2); return eval2_; }
+    op::Op1 op1() const { assert(type_ == FUNCTION1); return op1_; }
+    op::Op2 op2() const { assert(type_ == FUNCTION2); return op2_; }
+    
 
 private:
 
     union {
         double value_;
         char* name_;
-        double (*eval1_)(double);
-        double (*eval2_)(double,double);
+        op::Op1 op1_;
+        op::Op2 op2_;
     };
     Expression* parent_;
     tfp::Reference<Expression> left_;

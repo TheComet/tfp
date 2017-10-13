@@ -15,20 +15,14 @@ Expression::Expression() :
 // ----------------------------------------------------------------------------
 Expression::~Expression()
 {
-    if (type_ == VARIABLE)
-        free(name_);
+    reset();
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::make(const char* symbolName)
+Expression* Expression::make(const char* variableName)
 {
-    std::size_t len = strlen(symbolName);
-    char* name = (char*)malloc((sizeof(char) + 1) * len);
-    strcpy(name, symbolName);
-
     Expression* e = new Expression;
-    e->type_ = VARIABLE;
-    e->name_ = name;
+    e->set(variableName);
     return e;
 }
 
@@ -36,39 +30,79 @@ Expression* Expression::make(const char* symbolName)
 Expression* Expression::make(double value)
 {
     Expression* e = new Expression;
-    e->type_ = CONSTANT;
-    e->value_ = value;
+    e->set(value);
     return e;
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::make(double (*func1)(double), Expression* rhs)
+Expression* Expression::make(op::Op1 func, Expression* rhs)
 {
     Expression* e = new Expression;
-    e->type_ = FUNCTION1;
-    e->eval1_ = func1;
-    e->right_ = rhs;
-    rhs->parent_ = e;
-
+    e->set(func, rhs);
     return e;
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::make(double (*func2)(double,double), Expression* lhs, Expression* rhs)
+Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 {
     Expression* e = new Expression;
-    e->type_ = FUNCTION2;
-    e->eval2_ = func2;
-    e->left_ = lhs;
-    e->right_ = rhs;
-    lhs->parent_= e;
-    rhs->parent_ = e;
-
+    e->set(func, lhs, rhs);
     return e;
 }
 
 // ----------------------------------------------------------------------------
-void Expression::addVariableToTable(VariableTable* vt, const Expression* e)
+void Expression::set(const char* variableName)
+{
+    reset();
+
+    type_ = VARIABLE;
+    name_ = (char*)malloc((sizeof(char) + 1) * strlen(variableName));
+    strcpy(name_, variableName);
+}
+
+// ----------------------------------------------------------------------------
+void Expression::set(double value)
+{
+    reset();
+
+    type_ = CONSTANT;
+    value_ = value;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::set(op::Op1 func, Expression* rhs)
+{
+    reset();
+
+    type_ = FUNCTION1;
+    op1_ = func;
+    right_ = rhs;
+    rhs->parent_ = this;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
+{
+    reset();
+
+    type_ = FUNCTION2;
+    op2_ = func;
+    left_ = lhs;
+    right_ = rhs;
+    lhs->parent_ = this;
+    rhs->parent_ = this;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::reset()
+{
+    if (type_ == VARIABLE)
+        free(name_);
+    type_ = INVALID;
+}
+
+// ----------------------------------------------------------------------------
+static void addVariableToTable(VariableTable* vt, const Expression* e)
 {
     if (e == NULL)
         return;
@@ -76,25 +110,23 @@ void Expression::addVariableToTable(VariableTable* vt, const Expression* e)
     addVariableToTable(vt, e->left());
     addVariableToTable(vt, e->right());
 
-    if (e->type() != VARIABLE)
+    if (e->type() != Expression::VARIABLE)
         return;
 
     // If we are the right hand side of an expression that is mul or pow,
     // default value should be 1
     double defaultValue = 0;
     Expression* p = e->parent();
-    if (p != NULL && p->type() == FUNCTION2)
+    if (p != NULL && p->type() == Expression::FUNCTION2)
     {
-        if (p->eval2() == op::mul && e == p->right())
+        if (p->op2() == op::mul && e == p->right())
             defaultValue = 1;
-        else if (p->eval2() == op::pow && e == p->right())
+        else if (p->op2() == op::pow && e == p->right())
             defaultValue = 1;
     }
 
     vt->add(e->name(), defaultValue);
 }
-
-// ----------------------------------------------------------------------------
 VariableTable* Expression::generateVariableTable() const
 {
     VariableTable* vt = new VariableTable;
@@ -109,13 +141,37 @@ double Expression::evaluate(const VariableTable* vt) const
     {
         case CONSTANT:  return value();
         case VARIABLE:  return vt->valueOf(name());
-        case FUNCTION1: return eval1()(
+        case FUNCTION1: return op1()(
             right()->evaluate(vt)
         );
-        case FUNCTION2: return eval2()(
+        case FUNCTION2: return op2()(
             left()->evaluate(vt),
             right()->evaluate(vt)
         );
         default: throw std::runtime_error("Error during evaluating expression: Found node marked with INVALID. Can't evaluate");
     }
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::isOperation(double (*op)(double))
+{
+    return (type() == FUNCTION1 && op1() == op);
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::isOperation(double (*op)(double,double))
+{
+    return (type() == FUNCTION2 && op2() == op);
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::hasRHSOperation(double (*op)(double))
+{
+    return (right() && right()->type() == FUNCTION1 && right()->op1() == op);
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::hasRHSOperation(double (*op)(double,double))
+{
+    return (right() && right()->type() == FUNCTION2 && right()->op2() == op);
 }
