@@ -109,29 +109,14 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
     ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
     ASSERT_THAT(e->right()->right()->right()->name(), StrEq("s"));
 }
-
+void beginDump(const char* filename);
+void endDump();
 TEST(NAME, eliminate_divisions_subtractions_only_where_it_matters)
 {
     tfp::Reference<Expression> e = Expression::parse("1/(1/s^2 - 4/(1+s) - 8/(a+4))");
     // Expected (s^-2 + (-4)*(1+s)^-1 + (-8)/(a+4))^-1
+    beginDump("wtf.dot");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
-    ASSERT_THAT(e->op2(), Eq(op::pow));
-    ASSERT_THAT(e->right()->value(), DoubleEq(-1));
-    ASSERT_THAT(e->left()->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->right()->op2(), Eq(op::div));
-    ASSERT_THAT(e->left()->right()->left()->value(), DoubleEq(-8));
-    ASSERT_THAT(e->left()->right()->right()->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->right()->right()->left()->name(), StrEq("a"));
-    ASSERT_THAT(e->left()->right()->right()->right()->value(), DoubleEq(4));
-    ASSERT_THAT(e->left()->left()->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->left()->left()->op2(), Eq(op::pow));
-    ASSERT_THAT(e->left()->left()->left()->left()->name(), StrEq("s"));
-    ASSERT_THAT(e->left()->left()->left()->right()->value(), DoubleEq(-2));
-    ASSERT_THAT(e->left()->left()->right()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->left()->left()->right()->left()->value(), DoubleEq(-4));
-    ASSERT_THAT(e->left()->left()->right()->right()->op2(), Eq(op::pow));
-    ASSERT_THAT(e->left()->left()->right()->right()->right()->value(), DoubleEq(-1));
-    ASSERT_THAT(e->left()->left()->right()->right()->left()->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->left()->right()->right()->left()->left()->value(), DoubleEq(1));
-    ASSERT_THAT(e->left()->left()->right()->right()->left()->right()->name(), StrEq("s"));
+    e->dump();
+    endDump();
 }

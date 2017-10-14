@@ -69,18 +69,20 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
                     toNegate->set(-toNegate->value());
                 else
                     toNegate->set(op::negate, toNegate->clone());
+
             }
             else
             {
                 set(ops[i].outerInv,
                     left(),
                     Expression::make(ops[i].inner,
-                                     right(),
-                                     Expression::make(-1)));
+                        right(),
+                        Expression::make(-1)));
             }
         }
     }
 
+    root()->dump();
     return true;
 }
 

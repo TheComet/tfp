@@ -85,13 +85,13 @@ public:
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
 
-    Expression* clone() const;
+    Expression* clone();
 
     void set(const char* variableName);
     void set(double value);
     void set(op::Op1 func, Expression* rhs);
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
-    void set(const Expression* other);
+    void set(Expression* other);
     void reset();
 
     VariableTable* generateVariableTable() const;
@@ -110,6 +110,10 @@ public:
     void optimiseConstants();
 
     bool manipulateIntoRationalFunction(const char* variable);
+
+    void dump(const char* filename);
+    void dump(FILE* fp);
+    void dump();
 
     Expression* root() {
         Expression* root = this;

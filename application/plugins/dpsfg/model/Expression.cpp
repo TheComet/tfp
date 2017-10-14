@@ -51,7 +51,7 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::clone() const
+Expression* Expression::clone()
 {
     Expression* e = new Expression;
     e->set(this);
@@ -64,6 +64,8 @@ void Expression::set(const char* variableName)
     reset();
 
     type_ = VARIABLE;
+    left_ = NULL;
+    right_ = NULL;
     name_ = (char*)malloc((sizeof(char) + 1) * strlen(variableName));
     strcpy(name_, variableName);
 }
@@ -74,6 +76,8 @@ void Expression::set(double value)
     reset();
 
     type_ = CONSTANT;
+    left_ = NULL;
+    right_ = NULL;
     value_ = value;
 }
 
@@ -85,6 +89,7 @@ void Expression::set(op::Op1 func, Expression* rhs)
     type_ = FUNCTION1;
     op1_ = func;
     right_ = rhs;
+    left_ = NULL;
     rhs->parent_ = this;
 }
 
@@ -95,6 +100,8 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 
     type_ = FUNCTION2;
     op2_ = func;
+    tfp::Reference<Expression> ptrl(lhs);
+    tfp::Reference<Expression> ptrr(rhs);
     left_ = lhs;
     right_ = rhs;
     lhs->parent_ = this;
@@ -102,7 +109,7 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-void Expression::set(const Expression* other)
+void Expression::set(Expression* other)
 {
     reset();
 
@@ -118,6 +125,10 @@ void Expression::set(const Expression* other)
             break;
         case INVALID: break;
     }
+
+    tfp::Reference<Expression> ptr(other);
+    left_ = other->left_;
+    right_ = other->right_;
 }
 
 // ----------------------------------------------------------------------------
@@ -207,4 +218,76 @@ bool Expression::hasRHSOperation(op::Op2 op) const
 bool Expression::hasVariable(const char* variable) const
 {
     return (type() == VARIABLE && strcmp(name(), variable) == 0);
+}
+
+// ----------------------------------------------------------------------------
+FILE* fp = NULL;
+void beginDump(const char* filename)
+{
+    fp = fopen(filename, "w");
+}
+void endDump()
+{
+    if (fp) fclose(fp);
+    fp = NULL;
+}
+static void writeFunction(FILE* fp, op::Op2 f)
+{
+    if (f == op::add) fprintf(fp, "\"+\"");
+    else if (f == op::sub) fprintf(fp, "\"-\"");
+    else if (f == op::mul) fprintf(fp, "\"*\"");
+    else if (f == op::div) fprintf(fp, "\"/\"");
+    else if (f == op::pow) fprintf(fp, "\"^\"");
+}
+static void writeFunction(FILE* fp, op::Op1 f)
+{
+    if (f == op::negate) fprintf(fp, "neg");
+}
+void writeName(FILE* fp, Expression* e)
+{
+    switch (e->type())
+    {
+        case Expression::CONSTANT  : fprintf(fp, "%f", e->value()); break;
+        case Expression::VARIABLE  : fprintf(fp, "%s", e->name());  break;
+        case Expression::FUNCTION1 : writeFunction(fp, e->op1()); break;
+        case Expression::FUNCTION2 : writeFunction(fp, e->op2()); break;
+        case Expression::INVALID : break;
+    }
+}
+int guid = 0;
+static int dumpRecurse(FILE* fp, Expression* e)
+{
+    int thisId = guid++;
+    fprintf(fp, "    %d [label=", thisId);
+    writeName(fp, e);
+    fprintf(fp, "];\n");
+
+    if (e->right())
+    {
+        fprintf(fp, "    %d -- %d [label=rhs];\n", thisId, dumpRecurse(fp, e->right()));
+    }
+    if (e->left())
+    {
+        fprintf(fp, "    %d -- %d [label=lhs];\n", thisId, dumpRecurse(fp, e->left()));
+    }
+
+    return thisId;
+}
+void Expression::dump(FILE* fp)
+{
+    fprintf(fp, "graph graphname {\n");
+    fprintf(fp, "    %d [color=\"0.0 1.0 1.0\"];\n", guid);
+    dumpRecurse(fp, this);
+    fprintf(fp, "}\n\n");
+}
+void Expression::dump(const char* filename)
+{
+    FILE* fp = fopen(filename, "w");
+    dump(fp);
+    fclose(fp);
+}
+void Expression::dump()
+{
+    if (fp)
+        dump(fp);
 }

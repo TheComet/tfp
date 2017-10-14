@@ -19,6 +19,13 @@ TEST(NAME, simplify_constant_expressions)
     EXPECT_THAT(e->value(), DoubleEq(10.0));
 }
 
+TEST(NAME, simplify_constant_expressions_exponent)
+{
+    tfp::Reference<Expression> e = Expression::parse("2^5");
+    ASSERT_THAT(e->type(), Eq(Expression::CONSTANT));
+    EXPECT_THAT(e->value(), DoubleEq(32.0));
+}
+
 TEST(NAME, simplify_constant_expressions_with_variables)
 {
     tfp::Reference<Expression> e = Expression::make(op::mul,

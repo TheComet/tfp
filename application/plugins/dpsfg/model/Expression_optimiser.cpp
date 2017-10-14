@@ -19,8 +19,6 @@ void Expression::optimise()
         if (isOperation(op::negate) && hasRHSOperation(op::negate))
         {
             set(right()->right());
-            left_ = right()->right()->left_;
-            right_ = right()->right()->right_;
             continue;
         }
     }
@@ -35,8 +33,6 @@ void Expression::optimise()
     if (left()->type() == CONSTANT && right()->type() == CONSTANT)
     {
         set(evaluate());
-        left_ = NULL;
-        right_ = NULL;
         continue;
     }
 
@@ -48,15 +44,11 @@ void Expression::optimise()
         if (left()->type() == CONSTANT && left()->value() == 0.0)
         {
             set(right());
-            left_ = right()->left_;
-            right_ = right()->right_;
             continue;
         }
         else if (right()->type() == CONSTANT && right()->value() == 0.0)
         {
             set(left());
-            right_ = left()->right_;
-            left_ = left()->left_;
             continue;
         }
     }
@@ -69,14 +61,11 @@ void Expression::optimise()
         if (left()->type() == CONSTANT && left()->value() == 0.0)
         {
             set(op::negate, right());
-            left_ = NULL;
             continue;
         }
         else if (right()->type() == CONSTANT && right()->value() == 0.0)
         {
             set(left());
-            right_ = left()->right_;
-            left_ = left()->left_;
             continue;
         }
     }
@@ -91,14 +80,11 @@ void Expression::optimise()
             if (left()->value() == 1.0)
             {
                 set(right());
-                left_ = right()->left_;
-                right_ = right()->right_;
                 continue;
             }
             else if (left()->value() == -1.0)
             {
                 set(op::negate, right());
-                left_ = NULL;
                 continue;
             }
         }
@@ -107,14 +93,11 @@ void Expression::optimise()
             if (right()->value() == 1.0)
             {
                 set(left());
-                right_ = left()->right_;
-                left_ = left()->left_;
                 continue;
             }
             else if (right()->value() == -1.0)
             {
                 set(op::negate, left());
-                left_ = NULL;
                 continue;
             }
         }
@@ -130,14 +113,11 @@ void Expression::optimise()
             if (right()->value() == 1.0)
             {
                 set(left());
-                right_ = left()->right_;
-                left_ = left()->left_;
                 continue;
             }
             else if (right()->value() == -1.0)
             {
                 set(op::negate, left());
-                left_ = NULL;
                 continue;
             }
         }
@@ -151,8 +131,6 @@ void Expression::optimise()
         if (right()->type() == CONSTANT && right()->value() == 1.0)
         {
             set(left());
-            right_ = left()->right_;
-            left_ = left()->left_;
             continue;
         }
     }
