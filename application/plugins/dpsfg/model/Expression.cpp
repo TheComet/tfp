@@ -51,6 +51,14 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
+Expression* Expression::clone() const
+{
+    Expression* e = new Expression;
+    e->set(this);
+    return e;
+}
+
+// ----------------------------------------------------------------------------
 void Expression::set(const char* variableName)
 {
     reset();
@@ -91,6 +99,25 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
     right_ = rhs;
     lhs->parent_ = this;
     rhs->parent_ = this;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::set(const Expression* other)
+{
+    reset();
+
+    type_ = other->type_;
+    switch (type_)
+    {
+        case CONSTANT  : value_ = other->value_; break;
+        case FUNCTION1 : op1_ = other->op1_; break;
+        case FUNCTION2 : op2_ = other->op2_; break;
+        case VARIABLE  :
+            name_ = (char*)malloc((strlen(other->name_) + 1) * sizeof(char));
+            strcpy(name_, other->name_);
+            break;
+        case INVALID: break;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -153,25 +180,31 @@ double Expression::evaluate(const VariableTable* vt) const
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::isOperation(double (*op)(double))
+bool Expression::isOperation(op::Op1 op) const
 {
     return (type() == FUNCTION1 && op1() == op);
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::isOperation(double (*op)(double,double))
+bool Expression::isOperation(op::Op2 op) const
 {
     return (type() == FUNCTION2 && op2() == op);
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::hasRHSOperation(double (*op)(double))
+bool Expression::hasRHSOperation(op::Op1 op) const
 {
     return (right() && right()->type() == FUNCTION1 && right()->op1() == op);
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::hasRHSOperation(double (*op)(double,double))
+bool Expression::hasRHSOperation(op::Op2 op) const
 {
     return (right() && right()->type() == FUNCTION2 && right()->op2() == op);
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::hasVariable(const char* variable) const
+{
+    return (type() == VARIABLE && strcmp(name(), variable) == 0);
 }

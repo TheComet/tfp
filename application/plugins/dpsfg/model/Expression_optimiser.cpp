@@ -1,0 +1,162 @@
+#include "model/Expression.hpp"
+
+using namespace dpsfg;
+
+// ----------------------------------------------------------------------------
+void Expression::optimise()
+{
+    if (left())  left()->optimise();
+    if (right()) right()->optimise();
+
+    while (true)
+    {
+
+    /*
+     * Eliminates double negates.
+     */
+    if (type() == FUNCTION1)
+    {
+        if (isOperation(op::negate) && hasRHSOperation(op::negate))
+        {
+            set(right()->right());
+            left_ = right()->right()->left_;
+            right_ = right()->right()->right_;
+            continue;
+        }
+    }
+
+    // Anything beyond this point must have two operands.
+    if (type() != FUNCTION2)
+        return;
+
+    /*
+     * Evaluate any constant expressions.
+     */
+    if (left()->type() == CONSTANT && right()->type() == CONSTANT)
+    {
+        set(evaluate());
+        left_ = NULL;
+        right_ = NULL;
+        continue;
+    }
+
+    /*
+     * Eliminates addition with 0
+     */
+    if (isOperation(op::add))
+    {
+        if (left()->type() == CONSTANT && left()->value() == 0.0)
+        {
+            set(right());
+            left_ = right()->left_;
+            right_ = right()->right_;
+            continue;
+        }
+        else if (right()->type() == CONSTANT && right()->value() == 0.0)
+        {
+            set(left());
+            right_ = left()->right_;
+            left_ = left()->left_;
+            continue;
+        }
+    }
+
+    /*
+     * Eliminates subtraction by 0 and turns subtraction from 0 into a negate.
+     */
+    else if (isOperation(op::sub))
+    {
+        if (left()->type() == CONSTANT && left()->value() == 0.0)
+        {
+            set(op::negate, right());
+            left_ = NULL;
+            continue;
+        }
+        else if (right()->type() == CONSTANT && right()->value() == 0.0)
+        {
+            set(left());
+            right_ = left()->right_;
+            left_ = left()->left_;
+            continue;
+        }
+    }
+
+    /*
+     * Eliminates multiplication by 1
+     */
+    else if (isOperation(op::mul))
+    {
+        if (left()->type() == CONSTANT)
+        {
+            if (left()->value() == 1.0)
+            {
+                set(right());
+                left_ = right()->left_;
+                right_ = right()->right_;
+                continue;
+            }
+            else if (left()->value() == -1.0)
+            {
+                set(op::negate, right());
+                left_ = NULL;
+                continue;
+            }
+        }
+        else if (right()->type() == CONSTANT)
+        {
+            if (right()->value() == 1.0)
+            {
+                set(left());
+                right_ = left()->right_;
+                left_ = left()->left_;
+                continue;
+            }
+            else if (right()->value() == -1.0)
+            {
+                set(op::negate, left());
+                left_ = NULL;
+                continue;
+            }
+        }
+    }
+
+    /*
+     * Eliminates division by 1
+     */
+    else if (isOperation(op::div))
+    {
+        if (right()->type() == CONSTANT)
+        {
+            if (right()->value() == 1.0)
+            {
+                set(left());
+                right_ = left()->right_;
+                left_ = left()->left_;
+                continue;
+            }
+            else if (right()->value() == -1.0)
+            {
+                set(op::negate, left());
+                left_ = NULL;
+                continue;
+            }
+        }
+    }
+
+    /*
+     * Eliminates raising to the power of 1
+     */
+    else if (isOperation(op::pow))
+    {
+        if (right()->type() == CONSTANT && right()->value() == 1.0)
+        {
+            set(left());
+            right_ = left()->right_;
+            left_ = left()->left_;
+            continue;
+        }
+    }
+
+    break;
+    }
+}

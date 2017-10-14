@@ -11,6 +11,7 @@ add_plugin (dpsfg
         "${CMAKE_CURRENT_LIST_DIR}/model/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/model/Expression_parser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/model/Expression_manipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/model/Expression_optimiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/model/Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/model/Node.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/model/VariableTable.cpp"
@@ -23,6 +24,7 @@ add_plugin (dpsfg
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_manipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp"
 )

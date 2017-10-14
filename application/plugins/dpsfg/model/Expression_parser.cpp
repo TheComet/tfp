@@ -230,5 +230,10 @@ Expression* Expression::Parser::parse(const char* str)
 Expression* Expression::parse(const char* str)
 {
     Parser parser;
-    return parser.parse(str);
+    Expression* e = parser.parse(str);
+    if (e == NULL)
+        return NULL;
+
+    e->optimise();
+    return e;
 }

@@ -84,23 +84,31 @@ public:
     static Expression* make(double value);
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
-    
+
+    Expression* clone() const;
+
     void set(const char* variableName);
     void set(double value);
     void set(op::Op1 func, Expression* rhs);
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
+    void set(const Expression* other);
     void reset();
 
     VariableTable* generateVariableTable() const;
     double evaluate(const VariableTable* vt=NULL) const;
 
-    bool isOperation(op::Op1 func); 
-    bool isOperation(op::Op2 func);
-    bool hasRHSOperation(op::Op1 func);
-    bool hasRHSOperation(op::Op2 func);
-    void eliminateDivisionsAndSubtractions();
-    void eliminateNegativeExponents(const char* variable);
-    
+    bool isOperation(op::Op1 func) const;
+    bool isOperation(op::Op2 func) const;
+    bool hasRHSOperation(op::Op1 func) const;
+    bool hasRHSOperation(op::Op2 func) const;
+    bool hasVariable(const char* variable) const;
+    void reorderProducts(const char* variable);
+    bool eliminateDivisionsAndSubtractions(const char* variable);
+    bool eliminateNegativeExponents(const char* variable);
+    void optimise();
+    void optimiseOperations();
+    void optimiseConstants();
+
     bool manipulateIntoRationalFunction(const char* variable);
 
     Expression* root() {
@@ -117,7 +125,6 @@ public:
     double value() const { assert(type_ == CONSTANT); return value_; }
     op::Op1 op1() const { assert(type_ == FUNCTION1); return op1_; }
     op::Op2 op2() const { assert(type_ == FUNCTION2); return op2_; }
-    
 
 private:
 
