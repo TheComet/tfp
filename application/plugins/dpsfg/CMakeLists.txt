@@ -27,4 +27,5 @@ add_plugin (dpsfg
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp"
 )

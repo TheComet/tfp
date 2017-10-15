@@ -111,12 +111,47 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
 }
 void beginDump(const char* filename);
 void endDump();
-TEST(NAME, eliminate_divisions_subtractions_only_where_it_matters)
+TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
     tfp::Reference<Expression> e = Expression::parse("1/(1/s^2 - 4/(1+s) - 8/(a+4))");
-    // Expected (s^-2 + (-4)*(1+s)^-1 + (-8)/(a+4))^-1
+    /*
+     * Solved on paper:
+     *                 (a+4)s^2 + (a+4)s^3
+     *  G(s) = ---------------------------------
+     *         (a+4) + (a+4)s + (8-4a)s^2 + 8s^3
+     *
+     * b0 = 0
+     * b1 = 0
+     * b2 = a+4
+     * b3 = a+4
+     * a0 = a+4
+     * a1 = a+4
+     * a2 = 8-4a
+     * a3 = 8
+     *
+     */
     beginDump("wtf.dot");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     e->dump();
     endDump();
+
+    Expression::TransferFunctionCoefficients tfe = e->calculateTransferFunctionCoefficients("s");
+    ASSERT_THAT(tfe.numeratorCoefficients_.size(), Eq(4u));
+    ASSERT_THAT(tfe.denominatorCoefficients_.size(), Eq(4u));
+    Expression* b0 = tfe.numeratorCoefficients_[0];
+    Expression* b1 = tfe.numeratorCoefficients_[1];
+    Expression* b2 = tfe.numeratorCoefficients_[2];
+    Expression* b3 = tfe.numeratorCoefficients_[3];
+    Expression* a0 = tfe.denominatorCoefficients_[0];
+    Expression* a1 = tfe.denominatorCoefficients_[1];
+    Expression* a2 = tfe.denominatorCoefficients_[2];
+    Expression* a3 = tfe.denominatorCoefficients_[3];
+    EXPECT_THAT(b0->value(), DoubleEq(0));
+    EXPECT_THAT(b1->value(), DoubleEq(0));
+    EXPECT_THAT(b2->op2(), Eq(op::add));
+    EXPECT_THAT(b3->op2(), Eq(op::add));
+    EXPECT_THAT(a0->op2(), Eq(op::add));
+    EXPECT_THAT(a1->op2(), Eq(op::add));
+    EXPECT_THAT(a2->op2(), Eq(op::sub));
+    EXPECT_THAT(a3->value(), DoubleEq(8));
 }

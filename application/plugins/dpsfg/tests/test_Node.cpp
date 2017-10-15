@@ -16,9 +16,9 @@ TEST(NAME, node_connect_to_another_node)
 
     ASSERT_THAT(c, NotNull());
     EXPECT_THAT(c->getTargetNode(), Eq(n2));
-    ASSERT_THAT(n1->getOutgoingConnections().size(), Eq(1));
+    ASSERT_THAT(n1->getOutgoingConnections().size(), Eq(1u));
     EXPECT_THAT(n1->getOutgoingConnections()[0], Eq(c));
-    EXPECT_THAT(n2->getOutgoingConnections().size(), Eq(0));
+    EXPECT_THAT(n2->getOutgoingConnections().size(), Eq(0u));
 }
 
 TEST(NAME, node_connect_from_another_node)
@@ -29,9 +29,9 @@ TEST(NAME, node_connect_from_another_node)
 
     ASSERT_THAT(c, NotNull());
     EXPECT_THAT(c->getTargetNode(), Eq(n2));
-    ASSERT_THAT(n1->getOutgoingConnections().size(), Eq(1));
+    ASSERT_THAT(n1->getOutgoingConnections().size(), Eq(1u));
     EXPECT_THAT(n1->getOutgoingConnections()[0], Eq(c));
-    EXPECT_THAT(n2->getOutgoingConnections().size(), Eq(0));
+    EXPECT_THAT(n2->getOutgoingConnections().size(), Eq(0u));
 }
 
 TEST(NAME, node_connect_to_self)
@@ -41,7 +41,7 @@ TEST(NAME, node_connect_to_self)
 
     ASSERT_THAT(c, NotNull());
     EXPECT_THAT(c->getTargetNode(), Eq(n));
-    ASSERT_THAT(n->getOutgoingConnections().size(), Eq(1));
+    ASSERT_THAT(n->getOutgoingConnections().size(), Eq(1u));
     EXPECT_THAT(n->getOutgoingConnections()[0], Eq(c));
 
     n->disconnectFrom(n);  // avoid memory leaks

@@ -18,94 +18,90 @@ tfp::TransferFunction<double> Graph::calculateTransferFunction()
 }
 
 // ----------------------------------------------------------------------------
-void Graph::updateTransferFunction()
-{
-    findForwardPathsAndLoops();
-}
-
-// ----------------------------------------------------------------------------
 bool Graph::evaluatePhysicalUnitConsistencies() const
 {
     return false;
 }
 
 // ----------------------------------------------------------------------------
-void Graph::findForwardPathsAndLoops()
+void Graph::findForwardPathsAndLoops(PathList* paths, PathList* loops)
 {
-    paths_.clear();
-    loops_.clear();
-
-    findForwardPathsAndLoopsRecursive(input_, QVector<Node*>());
+    findForwardPathsAndLoopsRecursive(paths, loops, input_, NodeList());
 }
 
 // ----------------------------------------------------------------------------
-void Graph::findForwardPathsAndLoopsRecursive(Node* current, QVector<Node*> list)
+void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
+                                              Node* current, NodeList list)
 {
     // Reaching the end means we've found a forward path
     if (current == output_)
     {
         list.push_back(current); // need last node
-        paths_.push_back(getNodeConnections(list));
+        Path path;
+        nodeListToPath(&path, list);
+        paths->push_back(path);
         return;
     }
 
     // Reaching a node we've already passed means we've found a loop
-    for (QVector<Node*>::iterator it = list.begin(); it != list.end(); ++it)
+    for (NodeList::iterator it = list.begin(); it != list.end(); ++it)
         if (current == *it)
         {
             list.erase(list.begin(), it); // all nodes preceeding the one we hit aren't part of the loop
-            loops_.push_back(getNodeConnections(list));
+            Path path;
+            nodeListToPath(&path, list);
+            loops->push_back(path);
             return;
         }
 
     list.push_back(current);
 
-    const QVector< tfp::Reference<Connection> >& connections = current->getOutgoingConnections();
-    for (QVector< tfp::Reference<Connection> >::const_iterator it = connections.begin(); it != connections.end(); ++it)
+    const Node::ConnectionList& connections = current->getOutgoingConnections();
+    for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
         Node* child = (*it)->getTargetNode();
-        findForwardPathsAndLoopsRecursive(child, list);
+        findForwardPathsAndLoopsRecursive(paths, loops, child, list);
     }
 }
 
 // ----------------------------------------------------------------------------
-QVector<Connection*> Graph::getNodeConnections(const QVector<Node*>& nodes)
+void Graph::nodeListToPath(Path* path, const NodeList& nodes)
 {
-    QVector<Connection*> result;
-
-    int i = 0;
+    std::size_t i = 0;
     while (i < nodes.size())
     {
         // Accounts for when the list of connections forms a loop (first connected with last)
         Node* prev = i == 0 ? nodes[nodes.size() - 1] : nodes[i-1];
         Node* next = nodes[i];
 
-        const QVector< tfp::Reference<Connection> >& connections = prev->getOutgoingConnections();
-        for (QVector< tfp::Reference<Connection> >::const_iterator it = connections.begin(); it != connections.end(); ++it)
+        const Node::ConnectionList& connections = prev->getOutgoingConnections();
+        for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
             if ((*it)->getTargetNode() == next)
             {
-                result.push_back(*it);
+                path->push_back(*it);
                 break;
             }
     }
-
-    return result;
 }
 
 // ----------------------------------------------------------------------------
-void Graph::doMasonsGainFormula()
+Expression* Graph::mason()
 {
-
+    return Expression::make(1.0);
 }
 
 // ----------------------------------------------------------------------------
-QString Graph::multiplyPathExpressions(const QVector<Connection*>& connections)
+Expression* Graph::calculatePathExpression(const Path& path)
 {
-    QString result;
-    for (QVector<Connection*>::const_iterator it = connections.begin(); it != connections.end(); ++it)
+    // Multiply all path expressions together
+    Expression* e = NULL;
+    for (Path::const_iterator connection = path.begin(); connection != path.end(); ++connection)
     {
-        //result += (*it)->getExpression();
-        result += "*"; // we're multiplying
+        if (e == NULL)
+            e = (*connection)->getExpression();
+        else
+            e = Expression::make(op::mul, (*connection)->getExpression(), e);
     }
-    return result;
+
+    return e;
 }

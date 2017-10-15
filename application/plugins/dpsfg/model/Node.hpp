@@ -1,7 +1,8 @@
 #pragma once
 
 #include "tfp/util/Reference.hpp"
-#include <QVector>
+#include <string>
+#include <vector>
 
 namespace dpsfg {
 
@@ -10,8 +11,9 @@ class Connection;
 class Node : public tfp::RefCounted
 {
 public:
+    typedef std::vector< tfp::Reference<Connection> > ConnectionList;
     Node();
-    Node(const QString& name);
+    Node(const std::string& name);
 
     /*!
      * Creates a new connection between this node and another node. The connection
@@ -39,18 +41,18 @@ public:
      */
     void disconnectOutgoing(Node* node);
 
-    const QVector< tfp::Reference<Connection> >& getOutgoingConnections() const;
+    const ConnectionList& getOutgoingConnections() const;
 
-    QString getName() const;
-    void setName(QString name);
+    std::string getName() const;
+    void setName(std::string name);
 
-    QString getPhysicalUnit() const;
-    void setPhysicalUnit(QString unit);
+    std::string getPhysicalUnit() const;
+    void setPhysicalUnit(std::string unit);
 
 private:
-    QString name_;
-    QString physicalUnit_;
-    QVector< tfp::Reference<Connection> > outgoingConnections_;
+    std::string name_;
+    std::string physicalUnit_;
+    ConnectionList outgoingConnections_;
 };
 
 }

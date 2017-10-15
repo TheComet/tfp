@@ -1,4 +1,7 @@
 #include "model/Expression.hpp"
+#include "model/VariableTable.hpp"
+#include "tfp/math/CoefficientPolynomial.hpp"
+#include "tfp/math/TransferFunction.hpp"
 #include <cstring>
 
 using namespace dpsfg;
@@ -90,4 +93,32 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
 bool Expression::manipulateIntoRationalFunction(const char* variable)
 {
     return false;
+}
+
+// ----------------------------------------------------------------------------
+Expression::TransferFunctionCoefficients Expression::calculateTransferFunctionCoefficients(const char* variable)
+{
+    return TransferFunctionCoefficients();
+}
+
+// ----------------------------------------------------------------------------
+tfp::TransferFunction<double> Expression::calculateTransferFunction(const TransferFunctionCoefficients& tfe,
+                                                                  const VariableTable* vt)
+{
+    tfp::CoefficientPolynomial<double> numerator(tfe.numeratorCoefficients_.size());
+    tfp::CoefficientPolynomial<double> denominator(tfe.denominatorCoefficients_.size());
+
+    for (std::size_t i = 0; i != tfe.numeratorCoefficients_.size(); ++i)
+    {
+        double value = tfe.numeratorCoefficients_[i]->evaluate(vt);
+        numerator.setCoefficient(i, value);
+    }
+
+    for (std::size_t i = 0; i != tfe.denominatorCoefficients_.size(); ++i)
+    {
+        double value = tfe.denominatorCoefficients_[i]->evaluate(vt);
+        numerator.setCoefficient(i, value);
+    }
+
+    return tfp::TransferFunction<double>(numerator, denominator);
 }

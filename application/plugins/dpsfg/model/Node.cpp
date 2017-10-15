@@ -9,7 +9,7 @@ Node::Node()
 }
 
 // ----------------------------------------------------------------------------
-Node::Node(const QString& name) :
+Node::Node(const std::string& name) :
     name_(name)
 {
 }
@@ -40,7 +40,7 @@ void Node::disconnectFrom(Node* other)
 void Node::disconnectOutgoing(Node* other)
 {
     // Take care of all outgoing connections
-    for (QVector< tfp::Reference<Connection> >::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
+    for (std::vector< tfp::Reference<Connection> >::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
     {
         if ((*it)->getTargetNode() == other)
             it = outgoingConnections_.erase(it);
@@ -50,31 +50,31 @@ void Node::disconnectOutgoing(Node* other)
 }
 
 // ----------------------------------------------------------------------------
-const QVector< tfp::Reference<Connection> >& Node::getOutgoingConnections() const
+const std::vector< tfp::Reference<Connection> >& Node::getOutgoingConnections() const
 {
     return outgoingConnections_;
 }
 
 // ----------------------------------------------------------------------------
-QString Node::getName() const
+std::string Node::getName() const
 {
     return name_;
 }
 
 // ----------------------------------------------------------------------------
-void Node::setName(QString name)
+void Node::setName(std::string name)
 {
     name_ = name;
 }
 
 // ----------------------------------------------------------------------------
-QString Node::getPhysicalUnit() const
+std::string Node::getPhysicalUnit() const
 {
     return physicalUnit_;
 }
 
 // ----------------------------------------------------------------------------
-void Node::setPhysicalUnit(QString unit)
+void Node::setPhysicalUnit(std::string unit)
 {
     physicalUnit_ = unit;
 }

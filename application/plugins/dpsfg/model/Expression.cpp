@@ -173,18 +173,16 @@ VariableTable* Expression::generateVariableTable() const
 }
 
 // ----------------------------------------------------------------------------
-double Expression::evaluate(const VariableTable* vt) const
+double Expression::evaluate(const VariableTable* vt, std::set<std::string>* visited) const
 {
     switch (type())
     {
         case CONSTANT:  return value();
-        case VARIABLE:  return vt->valueOf(name());
-        case FUNCTION1: return op1()(
-            right()->evaluate(vt)
-        );
+        case VARIABLE:  return vt->valueOf(name(), visited);
+        case FUNCTION1: return op1()(right()->evaluate(vt, visited));
         case FUNCTION2: return op2()(
-            left()->evaluate(vt),
-            right()->evaluate(vt)
+            left()->evaluate(vt, visited),
+            right()->evaluate(vt, visited)
         );
         default: throw std::runtime_error("Error during evaluating expression: Found node marked with INVALID. Can't evaluate");
     }
