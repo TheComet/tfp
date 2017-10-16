@@ -19,5 +19,5 @@ LTI systems based on transfer functions. Features being worked on are:
 
 And here's what it looks like.
 
-![](apptest.gifv)
+[(See animation here)](https://i.imgur.com/c5Inpbb.gifv)
 
