@@ -131,6 +131,74 @@ TEST(NAME, find_single_loop)
     EXPECT_THAT(loops[0][1], Eq(c3));
 }
 
+TEST(NAME, determinant_with_no_loops)
+{
+    tfp::Reference<Node> n1 = new Node;
+    tfp::Reference<Node> n2 = new Node;
+    n1->connectTo(n2)->setExpression(Expression::make("a"));
+
+    Graph graph;
+    Graph::PathList paths;
+    Graph::PathList loops;
+    graph.setForwardPath(n1, n2);
+    graph.findForwardPathsAndLoops(&paths, &loops);
+    Expression* e = graph.calculateGraphDeterminant(loops);
+
+    EXPECT_THAT(e->type(), Eq(Expression::CONSTANT));
+    EXPECT_THAT(e->value(), DoubleEq(1));
+}
+
+TEST(NAME, determinant_with_one_loop)
+{
+    tfp::Reference<Node> n1 = new Node;
+    tfp::Reference<Node> n2 = new Node;
+    n1->connectTo(n2)->setExpression(Expression::make("a"));
+    n2->connectTo(n1)->setExpression(Expression::make("b"));
+
+    Graph graph;
+    Graph::PathList paths;
+    Graph::PathList loops;
+    graph.setForwardPath(n1, n2);
+    graph.findForwardPathsAndLoops(&paths, &loops);
+    Expression* e = graph.calculateGraphDeterminant(loops);
+
+    EXPECT_THAT(e->op2(), Eq(op::sub));
+    EXPECT_THAT(e->left()->value(), DoubleEq(1.0));
+    EXPECT_THAT(e->right()->op2(), Eq(op::mul));
+    EXPECT_THAT(e->right()->left()->name(), StrEq("b"));
+    EXPECT_THAT(e->right()->right()->name(), StrEq("a"));
+}
+
+TEST(NAME, determinant_with_two_touching_loops)
+{
+    tfp::Reference<Node> n1 = new Node;
+    tfp::Reference<Node> n2 = new Node;
+    tfp::Reference<Node> n3 = new Node;
+    n1->connectTo(n2)->setExpression(Expression::make("a"));
+    n2->connectTo(n3)->setExpression(Expression::make("b"));
+    n3->connectTo(n2)->setExpression(Expression::make("c"));
+    n2->connectTo(n1)->setExpression(Expression::make("d"));
+
+    // L1: b*c
+    // L2: a*d
+
+    Graph graph;
+    Graph::PathList paths;
+    Graph::PathList loops;
+    graph.setForwardPath(n1, n2);
+    graph.findForwardPathsAndLoops(&paths, &loops);
+    Expression* e = graph.calculateGraphDeterminant(loops);
+
+    // Easier to just insert numbers and evaluate
+    // Determinant should be: 1 - b*c - a*d
+    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 7.0);
+    vt->set("b", 13.0);
+    vt->set("c", 17.0);
+    vt->set("d", 19.0);
+    EXPECT_THAT(e->evaluate(vt), DoubleEq(-87));
+}
+
 TEST(NAME, not_really_a_test_yet)
 {
     tfp::Reference<Node> V1 = new Node;

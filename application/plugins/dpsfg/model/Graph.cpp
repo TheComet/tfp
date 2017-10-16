@@ -176,6 +176,7 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
          */
         op::Op2 combineOperation = k % 2 ? op::sub : op::add;
 
+        bool loopsAreTouching;
         do
         {
             /*
@@ -185,7 +186,7 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
              */
             for (std::size_t i = 0; i != k; ++i)
                 subPermutation[i] = permutation[i];
-            bool loopsAreTouching = false;
+            loopsAreTouching = false;
             do
             {
                 if (touchingLoops[subPermutation[0]][subPermutation[1]-subPermutation[0]-1])
@@ -211,6 +212,10 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
             e = Expression::make(combineOperation, e, loopExp);
 
         } while (next_combination(permutation.begin(), permutation.begin() + k, permutation.end()));
+
+        // If no loops were touching through all sub-permutations, we are done
+        if (loopsAreTouching)
+            break;
     }
 
     return e;
