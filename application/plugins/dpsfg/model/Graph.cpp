@@ -33,16 +33,6 @@ void Graph::findForwardPathsAndLoops(PathList* paths, PathList* loops)
 void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
                                               Node* current, NodeList list)
 {
-    // Reaching the end means we've found a forward path
-    if (current == output_)
-    {
-        list.push_back(current); // need last node
-        Path path;
-        nodeListToPath(&path, list);
-        paths->push_back(path);
-        return;
-    }
-
     // Reaching a node we've already passed means we've found a loop
     for (NodeList::iterator it = list.begin(); it != list.end(); ++it)
         if (current == *it)
@@ -54,7 +44,16 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
             return;
         }
 
+    // Do this before checking for path goal, as it belongs to the path
     list.push_back(current);
+
+    // Reaching the end means we've found a forward path
+    if (current == output_)
+    {
+        Path path;
+        nodeListToPath(&path, list);
+        paths->push_back(path);
+    }
 
     const Node::ConnectionList& connections = current->getOutgoingConnections();
     for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
@@ -67,14 +66,13 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
 // ----------------------------------------------------------------------------
 void Graph::nodeListToPath(Path* path, const NodeList& nodes)
 {
-    std::size_t i = 0;
-    while (i < nodes.size())
+    for (std::size_t i = 0; i < nodes.size(); ++i)
     {
         // Accounts for when the list of connections forms a loop (first connected with last)
-        Node* prev = i == 0 ? nodes[nodes.size() - 1] : nodes[i-1];
-        Node* next = nodes[i];
+        Node* curr = nodes[i];
+        Node* next = i == nodes.size() - 1 ? nodes[0] : nodes[i+1];
 
-        const Node::ConnectionList& connections = prev->getOutgoingConnections();
+        const Node::ConnectionList& connections = curr->getOutgoingConnections();
         for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
             if ((*it)->getTargetNode() == next)
             {
@@ -87,6 +85,9 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes)
 // ----------------------------------------------------------------------------
 Expression* Graph::mason()
 {
+    PathList paths;
+    PathList loops;
+    findForwardPathsAndLoops(&paths, &loops);
     return Expression::make(1.0);
 }
 

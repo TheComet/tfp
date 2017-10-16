@@ -24,7 +24,6 @@ public:
 
     bool evaluatePhysicalUnitConsistencies() const;
 
-private:
     void findForwardPathsAndLoops(PathList* paths, PathList* loops);
     void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
                                            Node* current, NodeList list);
