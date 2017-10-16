@@ -19,16 +19,18 @@ public:
     void setForwardPath(Node* in, Node* out);
     VariableTable* variables();
 
-    Expression* mason();
-    tfp::TransferFunction<double> calculateTransferFunction();
+    Expression* mason() const;
+    tfp::TransferFunction<double> calculateTransferFunction() const;
 
     bool evaluatePhysicalUnitConsistencies() const;
 
-    void findForwardPathsAndLoops(PathList* paths, PathList* loops);
+    void findForwardPathsAndLoops(PathList* paths, PathList* loops) const;
     void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
-                                           Node* current, NodeList list);
-    void nodeListToPath(Path* path, const NodeList& nodes);
-    Expression* calculatePathExpression(const Path& path);
+                                           Node* current, NodeList list) const;
+    void nodeListToPath(Path* path, const NodeList& nodes) const;
+    Expression* calculatePathExpression(const Path& path) const;
+    Expression* calculateGraphDeterminant(const PathList& loops) const;
+    bool pathsAreTouching(const Path& a, const Path& b) const;
 
 private:
     tfp::Reference<Node> input_;
