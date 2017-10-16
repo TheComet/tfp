@@ -77,7 +77,11 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
         for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
             if ((*it)->getTargetNode() == next)
             {
-                path->push_back(*it);
+                PathSegment segment;
+                segment.connection_ = *it;
+                segment.in_ = curr;
+                segment.out_ = next;
+                path->push_back(segment);
                 break;
             }
     }
@@ -90,40 +94,27 @@ Expression* Graph::mason() const
     PathList loops;
     findForwardPathsAndLoops(&paths, &loops);
 
-    Expression* graphDeterminant = calculateGraphDeterminant(loops);
+    Expression* graphDeterminant = calculateDeterminant(loops);
+    Expression* forwardGain = calculateCofactorsAndPathGains(paths, loops);
 
-    std::vector< std::vector<bool> > touchingPaths(paths.size());
-    for (std::size_t inner = 0; inner != paths.size(); ++inner)
-    {
-        std::vector<bool> touching(loops.size());
-        for (std::size_t outer = 0; outer != loops.size(); ++outer)
-        {
-            touching.push_back(pathsAreTouching(paths[inner], loops[outer]));
-        }
-        touchingPaths.push_back(touching);
-    }
-
-    return Expression::make(1.0);
+    return Expression::make(op::div, forwardGain, graphDeterminant);
 }
 
 // ----------------------------------------------------------------------------
-Expression* Graph::calculatePathExpression(const Path& path) const
+Expression* Graph::calculateConnectionGain(const Path& path) const
 {
     // Multiply all path expressions together
-    Expression* e = NULL;
-    for (Path::const_iterator connection = path.begin(); connection != path.end(); ++connection)
+    Expression* e = path[0].connection_->getExpression();
+    for (std::size_t i = 1; i < path.size(); ++i)
     {
-        if (e == NULL)
-            e = (*connection)->getExpression();
-        else
-            e = Expression::make(op::mul, (*connection)->getExpression(), e);
+        e = Expression::make(op::mul, e, path[i].connection_->getExpression());
     }
 
     return e;
 }
 
 // ----------------------------------------------------------------------------
-Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
+Expression* Graph::calculateDeterminant(const PathList& loops) const
 {
     // Nothing to do if there are no loops
     if (loops.size() == 0)
@@ -131,11 +122,11 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
 
     /*
      * Multiply all gain factors in each loop now, because these expressions
-     * could potentially be used thousands of times.
+     * could potentially be used hundreds of times.
      */
     std::vector< tfp::Reference<Expression> > loopExpressions(loops.size());
     for (std::size_t i = 0; i != loops.size(); ++i)
-        loopExpressions[i] = calculatePathExpression(loops[i]);
+        loopExpressions[i] = calculateConnectionGain(loops[i]);
 
     /*
      * For k=0 and k=1 the expressions are trivial and can be computed manually
@@ -154,29 +145,28 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
      * other, because pathsAreTouching() is fairly expensive compared to a
      * two lookups in two vectors.
      */
-    std::vector< std::vector<bool> > touchingLoops(loops.size());
+    std::vector< std::vector<bool> > touchingLoops(loops.size() - 1);
     for (std::size_t i = 0; i != loops.size(); ++i)
         for (std::size_t j = i+1; j < loops.size(); ++j)
             touchingLoops[i].push_back(pathsAreTouching(loops[i], loops[j]));
 
     std::vector<int> permutation(loops.size());
     std::vector<int> subPermutation(loops.size());
-    std::size_t k = 1;  // We begin at k=2
-    while (true)
+    for (std::size_t k = 2; k != loops.size() + 1; ++k)
     {
         // reset permutation for new value of k
-        k++;
         for (std::size_t i = 0; i != loops.size(); ++i)
             permutation[i] = i;
-        subPermutation.resize(k);
 
         /*
          * Graph determinant alternates between addition and subtraction of
-         * non-touching loops.
+         * non-touching loop combinations.
          */
         op::Op2 combineOperation = k % 2 ? op::sub : op::add;
 
+        subPermutation.resize(k);
         bool loopsAreTouching;
+        bool expressionWasModified = false;
         do
         {
             /*
@@ -204,18 +194,49 @@ Expression* Graph::calculateGraphDeterminant(const PathList& loops) const
                 continue;
 
             // Multiply all non-touching loop gains
-            Expression* loopExp = loopExpressions[permutation[0]];
+            Expression* loopGain = loopExpressions[permutation[0]];
             for (std::size_t i = 1; i < k; ++i)
-                loopExp = Expression::make(op::mul, loopExp, loopExpressions[permutation[i]]);
+                loopGain = Expression::make(op::mul, loopGain, loopExpressions[permutation[i]]);
 
             // Finally, add (or subtract) to/from the final expression
-            e = Expression::make(combineOperation, e, loopExp);
+            e = Expression::make(combineOperation, e, loopGain);
+            expressionWasModified = true;
 
         } while (next_combination(permutation.begin(), permutation.begin() + k, permutation.end()));
 
-        // If no loops were touching through all sub-permutations, we are done
-        if (loopsAreTouching)
+        if (expressionWasModified == false)
             break;
+    }
+
+    return e;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Graph::calculateCofactorsAndPathGains(const PathList& paths, const PathList& loops) const
+{
+    if (paths.size() == 0)
+        return Expression::make(0.0);
+
+    Expression* e = NULL;
+    for (PathList::const_iterator path = paths.begin(); path != paths.end(); ++path)
+    {
+        PathList nonTouchingLoops;
+        for (PathList::const_iterator loop = loops.begin(); loop != loops.end(); ++loop)
+        {
+            if (pathsAreTouching(*path, *loop) == false)
+                nonTouchingLoops.push_back(*loop);
+        }
+
+        Expression* pathGain = calculateConnectionGain(*path);
+        if (nonTouchingLoops.size() > 0)
+        {
+            pathGain = Expression::make(op::mul, pathGain, calculateDeterminant(nonTouchingLoops));
+        }
+
+        if (e == NULL)
+            e = pathGain;
+        else
+            e = Expression::make(op::add, e, pathGain);
     }
 
     return e;
@@ -226,7 +247,21 @@ bool Graph::pathsAreTouching(const Path& a, const Path& b) const
 {
     for (Path::const_iterator ita = a.begin(); ita != a.end(); ++ita)
         for (Path::const_iterator itb = b.begin(); itb != b.end(); ++itb)
-            if (*ita == *itb)
+            if (ita->out_ == itb->out_ || ita->in_ == itb->in_)
                 return true;
     return false;
+}
+
+// ----------------------------------------------------------------------------
+void Graph::dump(const char* fileName) const
+{
+    FILE* fp = fopen(fileName, "w");
+    dump(fp);
+    fclose(fp);
+}
+
+// ----------------------------------------------------------------------------
+void Graph::dump(FILE* fp) const
+{
+
 }

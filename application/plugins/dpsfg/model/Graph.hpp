@@ -12,9 +12,16 @@ class Connection;
 class Graph : public tfp::RefCounted
 {
 public:
-    typedef std::vector< tfp::Reference<Connection> > Path;
-    typedef std::vector<Node*> NodeList;
+    struct PathSegment
+    {
+        Node* in_;
+        Node* out_;
+        Connection* connection_;
+    };
+
+    typedef std::vector<PathSegment> Path;
     typedef std::vector<Path> PathList;
+    typedef std::vector<Node*> NodeList;
 
     void setForwardPath(Node* in, Node* out);
     VariableTable* variables();
@@ -28,9 +35,13 @@ public:
     void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
                                            Node* current, NodeList list) const;
     void nodeListToPath(Path* path, const NodeList& nodes) const;
-    Expression* calculatePathExpression(const Path& path) const;
-    Expression* calculateGraphDeterminant(const PathList& loops) const;
+    Expression* calculateConnectionGain(const Path& path) const;
+    Expression* calculateDeterminant(const PathList& loops) const;
+    Expression* calculateCofactorsAndPathGains(const PathList& loops, const PathList& paths) const;
     bool pathsAreTouching(const Path& a, const Path& b) const;
+
+    void dump(const char* fileName) const;
+    void dump(FILE* fileName) const;
 
 private:
     tfp::Reference<Node> input_;

@@ -66,6 +66,8 @@ RootPolynomial<T> CoefficientPolynomial<T>::roots() const
 {
     // Companion matrix is a square m x m matrix, where m = polynomial order
     int size = coefficients_.rows() - 1;
+    if (size < 0)
+        return RootPolynomial<T>();
 
     // Each coefficient is divided by this factor to make it a monic polynomial
     T factor = coefficients_(0);

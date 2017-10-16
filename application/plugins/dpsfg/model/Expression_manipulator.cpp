@@ -102,8 +102,9 @@ Expression::TransferFunctionCoefficients Expression::calculateTransferFunctionCo
 }
 
 // ----------------------------------------------------------------------------
-tfp::TransferFunction<double> Expression::calculateTransferFunction(const TransferFunctionCoefficients& tfe,
-                                                                  const VariableTable* vt)
+tfp::TransferFunction<double>
+Expression::calculateTransferFunction(const TransferFunctionCoefficients& tfe,
+                                      const VariableTable* vt)
 {
     tfp::CoefficientPolynomial<double> numerator(tfe.numeratorCoefficients_.size());
     tfp::CoefficientPolynomial<double> denominator(tfe.denominatorCoefficients_.size());
