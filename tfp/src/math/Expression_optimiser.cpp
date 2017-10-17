@@ -1,6 +1,6 @@
-#include "model/Expression.hpp"
+#include "tfp/math/Expression.hpp"
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 void Expression::optimise()

@@ -105,22 +105,7 @@ MainWindow::~MainWindow()
 // ----------------------------------------------------------------------------
 void MainWindow::loadPlugins()
 {
-    QDir pluginsDir("plugins");
-    QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
-
-    QStringList validExtensions;
-    validExtensions += ".dll";
-    validExtensions += ".so";
-    validExtensions += ".dylib";
-    validExtensions += ".dynlib";
-
-    for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
-        for (QStringList::const_iterator ext = validExtensions.begin(); ext != validExtensions.end(); ++ext)
-            if (it->endsWith(*ext, Qt::CaseInsensitive))
-            {
-                pluginManager_->loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
-                break;
-            }
+    pluginManager_->loadAllPlugins();
 
     std::cout << "Available tools:" << std::endl;
     QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();

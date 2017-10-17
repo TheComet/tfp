@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "../model/Expression.hpp"
+#include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME dpsfg_Expression_manipulator
+#define NAME Expression_manipulator
 
 using namespace testing;
-using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, reorder_product)
 {

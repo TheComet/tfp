@@ -1,15 +1,16 @@
 #pragma once
 
+#include "tfp/config.hpp"
 #include "tfp/util/Reference.hpp"
 #include <vector>
 #include <unordered_map>
 #include <set>
 
-namespace dpsfg {
+namespace tfp {
 
 class Expression;
 
-class VariableTable : public tfp::RefCounted
+class TFP_PUBLIC_API VariableTable : public tfp::RefCounted
 {
 public:
     typedef std::vector< std::pair<std::string, double> > ValueVariables;

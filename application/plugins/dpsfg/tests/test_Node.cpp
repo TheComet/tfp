@@ -3,7 +3,7 @@
 #include "model/Graph.hpp"
 #include "model/Node.hpp"
 #include "tfp/util/Reference.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/VariableTable.hpp"
 
 #define NAME dpsfg_Node
 

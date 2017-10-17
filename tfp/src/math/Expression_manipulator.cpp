@@ -1,10 +1,10 @@
-#include "model/Expression.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
 #include "tfp/math/CoefficientPolynomial.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include <cstring>
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 static bool variableIsChildOf(Expression* e, const char* variable)

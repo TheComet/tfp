@@ -2,6 +2,7 @@
 #include "tfp/plugin/Plugin.hpp"
 #include "tfp/views/DataTree.hpp"
 #include <QLibrary>
+#include <QDir>
 
 namespace tfp {
 
@@ -14,7 +15,7 @@ PluginManager::PluginManager(DataTree* dataTree) :
 // ----------------------------------------------------------------------------
 bool PluginManager::loadPlugin(const QString& name)
 {
-    Reference<Plugin> plugin(new Plugin);
+    Reference<Plugin> plugin(new Plugin(name));
     plugin->library_->setFileName(name);
     if (plugin->library_->load() == false)
     {
@@ -37,11 +38,39 @@ bool PluginManager::loadPlugin(const QString& name)
         std::cout << "Failed to load plugin: " << "start_plugin() returned an error" << std::endl;
         return false;
     }
+    if ((plugin->run_tests = (Plugin::run_tests_func)plugin->library_->resolve("run_tests")) == NULL)
+    {
+        std::cout << "Plugin " << name.toStdString() << "has no unit tests :/" << std::endl;
+    }
 
     std::cout << "Loaded plugin " << name.toStdString() << std::endl;
     plugins_.push_back(plugin);
 
     return true;
+}
+
+// ----------------------------------------------------------------------------
+bool PluginManager::loadAllPlugins()
+{
+    QDir pluginsDir("plugins");
+    QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
+
+    QStringList validExtensions;
+    validExtensions += ".dll";
+    validExtensions += ".so";
+    validExtensions += ".dylib";
+    validExtensions += ".dynlib";
+
+    bool success = true;
+    for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
+        for (QStringList::const_iterator ext = validExtensions.begin(); ext != validExtensions.end(); ++ext)
+            if (it->endsWith(*ext, Qt::CaseInsensitive))
+            {
+                success &= loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
+                break;
+            }
+
+    return success;
 }
 
 // ----------------------------------------------------------------------------
@@ -61,6 +90,16 @@ Tool* PluginManager::createTool(const QString& name)
         if ((ret = (*it)->createTool(name)) != NULL)
             break;
     return ret;
+}
+
+// ----------------------------------------------------------------------------
+QVector<QString> PluginManager::runPluginTests(int argc, char** argv) const
+{
+    QVector<QString> failedPlugins;
+    for (Plugins::const_iterator it = plugins_.begin(); it != plugins_.end(); ++it)
+        if ((*it)->runTests(argc, argv) != 0)
+            failedPlugins.push_back((*it)->getName());
+    return failedPlugins;
 }
 
 }

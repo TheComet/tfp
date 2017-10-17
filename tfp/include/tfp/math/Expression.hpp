@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tfp/config.hpp"
 #include "tfp/util/Reference.hpp"
 #include "tfp/math/TransferFunction.hxx"
 #include <string>
@@ -7,26 +8,26 @@
 #include <vector>
 #include <set>
 
-namespace dpsfg {
+namespace tfp {
 
 namespace op {
 
 typedef double (*Op1)(double);
 typedef double (*Op2)(double,double);
-double add(double a, double b);
-double sub(double a, double b);
-double mul(double a, double b);
-double div(double a, double b);
-double pow(double a, double b);
-double mod(double a, double b);
-double negate(double a);
-double comma(double a, double b);
+TFP_PUBLIC_API double add(double a, double b);
+TFP_PUBLIC_API double sub(double a, double b);
+TFP_PUBLIC_API double mul(double a, double b);
+TFP_PUBLIC_API double div(double a, double b);
+TFP_PUBLIC_API double pow(double a, double b);
+TFP_PUBLIC_API double mod(double a, double b);
+TFP_PUBLIC_API double negate(double a);
+TFP_PUBLIC_API double comma(double a, double b);
 
 }
 
 class VariableTable;
 
-class Expression : public tfp::RefCounted
+class TFP_PUBLIC_API Expression : public tfp::RefCounted
 {
     struct Parser
     {

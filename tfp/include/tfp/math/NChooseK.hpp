@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace dpsfg {
+namespace tfp {
 
 /*
  * Taken from here:

@@ -55,10 +55,11 @@ private:
 };
 
 // ----------------------------------------------------------------------------
-Plugin::Plugin() :
+Plugin::Plugin(QString name) :
     start(NULL),
     stop(NULL),
-    library_(new QLibrary)
+    library_(new QLibrary),
+    name_(name)
 {
 }
 
@@ -84,7 +85,12 @@ Plugin::~Plugin()
     std::cout << "Unloading plugin " << library_->fileName().toStdString() << std::endl;
     library_->unload();
     delete library_;
+}
 
+// ----------------------------------------------------------------------------
+const QString& Plugin::getName() const
+{
+    return name_;
 }
 
 // ----------------------------------------------------------------------------
@@ -122,6 +128,14 @@ Tool* Plugin::createTool(const QString& name)
     if (it == toolFactories_.end())
         return NULL;
     return new ToolDecorator(it.value(), this);
+}
+
+// ----------------------------------------------------------------------------
+int Plugin::runTests(int argc, char** argv)
+{
+    if (run_tests == NULL)
+        return 0;
+    return run_tests(argc, argv);
 }
 
 }

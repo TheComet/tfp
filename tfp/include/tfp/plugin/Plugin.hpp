@@ -39,8 +39,10 @@ public:
         SUB_CATEGORY_COUNT
     };
 
-    Plugin();
+    Plugin(QString name);
     ~Plugin();
+
+    const QString& getName() const;
 
     template <class T>
     bool registerTool(Category category,
@@ -54,8 +56,9 @@ public:
     }
 
     QVector<ToolFactory*> getToolsList() const;
-
     Tool* createTool(const QString& name);
+
+    int runTests(int argc, char** argv);
 
     ListenerDispatcher<PluginListener> dispatcher;
 
@@ -74,12 +77,15 @@ private:
 private:
     typedef bool (*start_plugin_func)(Plugin*, DataTree*);
     typedef void (*stop_plugin_func)(Plugin*);
+    typedef int (*run_tests_func)(int,char**);
     typedef QMap< QString, Reference<ToolFactory> > ToolFactories;
 
     start_plugin_func start;
-    stop_plugin_func stop;
-    QLibrary* library_;
-    ToolFactories toolFactories_;
+    stop_plugin_func  stop;
+    run_tests_func    run_tests;
+    QLibrary*         library_;
+    QString           name_;
+    ToolFactories     toolFactories_;
 };
 
 class ToolFactory : public RefCounted

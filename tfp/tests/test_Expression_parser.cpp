@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "../model/Expression.hpp"
+#include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME dpsfg_Expression_parser
+#define NAME Expression_parser
 
 using namespace testing;
-using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, simple_test)
 {

@@ -1,22 +1,23 @@
 #include "gmock/gmock.h"
 #include "model/Connection.hpp"
-#include "model/Expression.hpp"
 #include "model/Graph.hpp"
 #include "model/Node.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
+#include "tfp/math/VariableTable.hpp"
 
 #define NAME dpsfg_Graph
 
 using namespace testing;
 using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, single_node_forward_path_returns_identity_TF)
 {
     Graph graph;
     Node* n = graph.createNode("n");
     graph.setForwardPath(n, n);
-    tfp::TransferFunction<double> tf = graph.calculateTransferFunction();
+    TransferFunction<double> tf = graph.calculateTransferFunction();
 
     EXPECT_THAT(tf.numerator().size(), Eq(0));
     EXPECT_THAT(tf.denominator().size(), Eq(0));
@@ -33,7 +34,7 @@ TEST(NAME, default_connections_are_identity_TF)
     n2->connectTo(n3);
     graph.setForwardPath(n1, n3);
 
-    tfp::TransferFunction<double> tf = graph.calculateTransferFunction();
+    TransferFunction<double> tf = graph.calculateTransferFunction();
     EXPECT_THAT(tf.numerator().size(), Eq(0));
     EXPECT_THAT(tf.denominator().size(), Eq(0));
     EXPECT_THAT(tf.factor(), Eq(1));
@@ -141,7 +142,7 @@ TEST(NAME, determinant_with_no_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
+    Reference<Expression> e = graph.calculateDeterminant(loops);
 
     EXPECT_THAT(e->type(), Eq(Expression::CONSTANT));
     EXPECT_THAT(e->value(), DoubleEq(1));
@@ -159,7 +160,7 @@ TEST(NAME, determinant_with_one_loop)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
+    Reference<Expression> e = graph.calculateDeterminant(loops);
 
     EXPECT_THAT(e->op2(), Eq(op::sub));
     EXPECT_THAT(e->left()->value(), DoubleEq(1.0));
@@ -186,11 +187,11 @@ TEST(NAME, determinant_with_two_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
+    Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
-    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    Reference<VariableTable> vt = e->generateVariableTable();
     e->dump("determinant_with_two_touching_loops.dot");
     vt->set("a", 7.0);
     vt->set("b", 13.0);
@@ -222,11 +223,11 @@ TEST(NAME, determinant_with_two_non_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
+    Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
-    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    Reference<VariableTable> vt = e->generateVariableTable();
     e->dump("determinant_with_two_non_touching_loops.dot");
     vt->set("L11", 13.0);
     vt->set("L12", 17.0);
@@ -255,11 +256,11 @@ TEST(NAME, determinant_with_three_non_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n3);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
+    Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
-    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    Reference<VariableTable> vt = e->generateVariableTable();
     e->dump("determinant_with_three_non_touching_loops.dot");
     vt->set("L1", 7.0);
     vt->set("L2", 13.0);
@@ -304,11 +305,11 @@ TEST(NAME, mason_complicated_test)
     n3->connectTo(n2)->setExpression(Expression::make("h"));
 
     graph.setForwardPath(n1, n5);
-    tfp::Reference<Expression> e = graph.mason();
+    Reference<Expression> e = graph.mason();
     graph.dump("mason_complicated_test_graph.dot");
     e->dump("mason_complicated_test.dot");
 
-    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    Reference<VariableTable> vt = e->generateVariableTable();
     vt->set("a", 3);
     vt->set("b", 5);
     vt->set("c", 7);
@@ -319,33 +320,4 @@ TEST(NAME, mason_complicated_test)
     vt->set("h", 23);
     vt->set("i", 27);
     EXPECT_THAT(e->evaluate(vt), DoubleEq(46109.0 / -55328.0));
-}
-
-TEST(NAME, not_really_a_test_yet)
-{
-    Graph graph;
-    Node* V1 = graph.createNode("V1");
-    Node* I2 = graph.createNode("I2");
-    Node* V2 = graph.createNode("V2");
-    Node* V3 = graph.createNode("V3");
-    V1->connectTo(I2)->setExpression(Expression::make("G1"));
-    I2->connectTo(V2)->setExpression(Expression::parse("G1+G2+s*C"));
-    V2->connectTo(V3)->setExpression(Expression::parse("-A"));
-    V3->connectTo(I2)->setExpression(Expression::parse("G2+s*C"));
-
-    graph.setForwardPath(V1, V3);
-    tfp::Reference<Expression> graphExpression = graph.mason();
-    tfp::Reference<VariableTable> variables = graphExpression->generateVariableTable();
-    variables->set("G1", "1/R1");
-    variables->set("G2", "1/R2");
-    variables->set("R1", 1e3);
-    variables->set("R2", 1e3);
-    variables->set("C", 1e-6);
-    variables->set("A", "inf");
-    graphExpression->dump("LP-1st-order.dot");
-    Expression::TransferFunctionCoefficients tfc = graphExpression->calculateTransferFunctionCoefficients("s");
-
-    tfp::TransferFunction<double> tf = graphExpression->calculateTransferFunction(tfc, variables);
-    double freq[100], amp[100], phase[100];
-    tf.frequencyResponse(freq, amp, phase, 1e2, 1e4, 100);
 }

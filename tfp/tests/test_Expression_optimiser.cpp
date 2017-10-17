@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "model/Expression.hpp"
+#include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME dpsfg_Expression_optimiser
+#define NAME Expression_optimiser
 
 using namespace testing;
-using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, simplify_constant_expressions)
 {

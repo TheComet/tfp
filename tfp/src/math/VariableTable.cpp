@@ -1,7 +1,7 @@
-#include "model/VariableTable.hpp"
-#include "model/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 void VariableTable::add(std::string name, double value)

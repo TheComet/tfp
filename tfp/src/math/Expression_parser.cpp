@@ -1,9 +1,9 @@
-#include "model/Expression.hpp"
+#include "tfp/math/Expression.hpp"
 #include <cstring>
 #include <cctype>
 #include <cmath>
 
-namespace dpsfg {
+namespace tfp {
 namespace op {
 
 double add(double a, double b) { return a + b; }
@@ -18,7 +18,7 @@ double comma(double a, double b) { return b; }
 }
 }
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 bool Expression::Parser::isAtEnd()

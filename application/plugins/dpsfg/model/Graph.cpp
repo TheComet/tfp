@@ -1,10 +1,11 @@
 #include "model/Connection.hpp"
 #include "model/Graph.hpp"
 #include "model/Node.hpp"
-#include "model/NChooseK.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/NChooseK.hpp"
+#include "tfp/math/VariableTable.hpp"
 
 using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 Graph::Graph() :

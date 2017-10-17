@@ -1,9 +1,9 @@
-#include "model/Expression.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
 #include <string.h>
 #include <cassert>
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 Expression::Expression() :

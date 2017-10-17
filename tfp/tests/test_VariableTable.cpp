@@ -1,12 +1,12 @@
 #include "gmock/gmock.h"
-#include "model/Expression.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME dpsfg_VariableTable
+#define NAME VariableTable
 
 using namespace testing;
-using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, add_and_get_constant_value)
 {

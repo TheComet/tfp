@@ -17,10 +17,12 @@ public:
     PluginManager(DataTree* dataTree);
 
     bool loadPlugin(const QString& fileName);
+    bool loadAllPlugins();
 
     QVector<ToolFactory*> getToolsList() const;
-
     Tool* createTool(const QString& name);
+    
+    QVector<QString> runPluginTests(int argc, char** argv) const;
 
 private:
     typedef QVector< Reference<Plugin> > Plugins;

@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "model/Expression.hpp"
-#include "model/VariableTable.hpp"
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
 
-#define NAME dpsfg_Expression
+#define NAME Expression
 
 using namespace testing;
-using namespace dpsfg;
+using namespace tfp;
 
 TEST(NAME, generate_variable_table)
 {

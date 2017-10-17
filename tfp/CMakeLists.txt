@@ -41,7 +41,12 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
 
 set (tfp_SOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_parser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_manipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_optimiser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
@@ -73,6 +78,20 @@ set (tfp_RESOURCES
 set (tfp_TRANSLATION_FILES
         "")
 
+set (tfp_test_SOURCES "")
+if (TFP_BUILD_TESTS)
+    set (tfp_test_SOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_manipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp")
+    add_executable (test_all
+        "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_application.cpp")
+    target_link_libraries (test_all tfp)
+endif ()
+
 find_package (Qt5
     COMPONENTS Core Widgets Gui OpenGL REQUIRED)
 
@@ -85,6 +104,7 @@ include_directories ("include")
 
 add_library (tfp ${BUILD_TYPE}
     ${tfp_SOURCES}
+    ${tfp_test_SOURCES}
     ${tfp_SOURCES_MOC}
     ${tfp_FORMS_MOC}
     ${tfp_RESOURCES_GEN}
@@ -114,6 +134,10 @@ target_link_libraries (tfp ${QWT_LIBRARIES})
 target_link_libraries (tfp ${QWTPLOT3D_LIBRARIES})
 target_link_libraries (tfp ${KISS_FFT_LIBRARIES})
 target_link_libraries (tfp ${PUGIXML_LIBRARIES})
+
+if (TFP_BUILD_TESTS)
+    target_link_libraries (tfp gmock)
+endif ()
 
 ###############################################################################
 # Compile translation files
