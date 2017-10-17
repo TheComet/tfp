@@ -11,7 +11,7 @@ namespace dpsfg {
 
 class Node;
 
-class Connection : public tfp::RefCounted
+class Connection
 {
 public:
     void setExpression(Expression* expression) { expression_ = expression; }
@@ -20,8 +20,8 @@ public:
     Node* getTargetNode() const { return outgoingNode_; }
 
 private:
-    tfp::Reference<Expression>  expression_;
-    tfp::Reference<Node>        outgoingNode_;
+    Node*                      outgoingNode_;
+    tfp::Reference<Expression> expression_;
 };
 
 }

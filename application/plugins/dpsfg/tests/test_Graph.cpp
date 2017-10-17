@@ -13,8 +13,8 @@ using namespace dpsfg;
 
 TEST(NAME, single_node_forward_path_returns_identity_TF)
 {
-    tfp::Reference<Node> n = new Node;
     Graph graph;
+    Node* n = graph.createNode("n");
     graph.setForwardPath(n, n);
     tfp::TransferFunction<double> tf = graph.calculateTransferFunction();
 
@@ -25,13 +25,12 @@ TEST(NAME, single_node_forward_path_returns_identity_TF)
 
 TEST(NAME, default_connections_are_identity_TF)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
     n1->connectTo(n2);
     n2->connectTo(n3);
-
-    Graph graph;
     graph.setForwardPath(n1, n3);
 
     tfp::TransferFunction<double> tf = graph.calculateTransferFunction();
@@ -42,13 +41,13 @@ TEST(NAME, default_connections_are_identity_TF)
 
 TEST(NAME, find_single_forward_path)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
-    tfp::Reference<Connection> c1 = n1->connectTo(n2);
-    tfp::Reference<Connection> c2 = n2->connectTo(n3);
-
     Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
+    Connection* c1 = n1->connectTo(n2);
+    Connection* c2 = n2->connectTo(n3);
+
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n3);
@@ -62,20 +61,21 @@ TEST(NAME, find_single_forward_path)
 
 TEST(NAME, find_multiple_forward_paths)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
-    tfp::Reference<Node> n4 = new Node;
-    tfp::Reference<Node> n5 = new Node;
-    tfp::Reference<Node> n6 = new Node;
-    tfp::Reference<Node> n7 = new Node;
-    tfp::Reference<Connection> c1 = n1->connectTo(n2);
-    tfp::Reference<Connection> c2 = n2->connectTo(n3);
-    tfp::Reference<Connection> c3 = n3->connectTo(n4);
-    tfp::Reference<Connection> c4 = n4->connectTo(n5);
-    tfp::Reference<Connection> c5 = n2->connectTo(n6);
-    tfp::Reference<Connection> c6 = n6->connectTo(n7);
-    tfp::Reference<Connection> c7 = n7->connectTo(n5);
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
+    Node* n4 = graph.createNode("n4");
+    Node* n5 = graph.createNode("n5");
+    Node* n6 = graph.createNode("n6");
+    Node* n7 = graph.createNode("n7");
+    Connection* c1 = n1->connectTo(n2);
+    Connection* c2 = n2->connectTo(n3);
+    Connection* c3 = n3->connectTo(n4);
+    Connection* c4 = n4->connectTo(n5);
+    Connection* c5 = n2->connectTo(n6);
+    Connection* c6 = n6->connectTo(n7);
+    Connection* c7 = n7->connectTo(n5);
 
     /*
      *            --> n6 --> n7 --
@@ -84,7 +84,6 @@ TEST(NAME, find_multiple_forward_paths)
      *
      */
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n5);
@@ -107,14 +106,14 @@ TEST(NAME, find_multiple_forward_paths)
 
 TEST(NAME, find_single_loop)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
-    tfp::Reference<Connection> c1 = n1->connectTo(n2);
-    tfp::Reference<Connection> c2 = n2->connectTo(n3);
-    tfp::Reference<Connection> c3 = n3->connectTo(n2);
-
     Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
+    Connection* c1 = n1->connectTo(n2);
+    Connection* c2 = n2->connectTo(n3);
+    Connection* c3 = n3->connectTo(n2);
+
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n3);
@@ -133,11 +132,11 @@ TEST(NAME, find_single_loop)
 
 TEST(NAME, determinant_with_no_loops)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
     n1->connectTo(n2)->setExpression(Expression::make("a"));
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
@@ -150,12 +149,12 @@ TEST(NAME, determinant_with_no_loops)
 
 TEST(NAME, determinant_with_one_loop)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
     n1->connectTo(n2)->setExpression(Expression::make("a"));
     n2->connectTo(n1)->setExpression(Expression::make("b"));
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
@@ -171,9 +170,10 @@ TEST(NAME, determinant_with_one_loop)
 
 TEST(NAME, determinant_with_two_touching_loops)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
     n1->connectTo(n2)->setExpression(Expression::make("a"));
     n2->connectTo(n3)->setExpression(Expression::make("b"));
     n3->connectTo(n2)->setExpression(Expression::make("c"));
@@ -182,7 +182,6 @@ TEST(NAME, determinant_with_two_touching_loops)
     // L1: b*c
     // L2: a*d
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
@@ -202,10 +201,11 @@ TEST(NAME, determinant_with_two_touching_loops)
 
 TEST(NAME, determinant_with_two_non_touching_loops)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
-    tfp::Reference<Node> n4 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
+    Node* n4 = graph.createNode("n4");
     n1->connectTo(n2)->setExpression(Expression::make("P1"));
     n2->connectTo(n3)->setExpression(Expression::make("L11"));
     n3->connectTo(n2)->setExpression(Expression::make("L12"));
@@ -218,7 +218,6 @@ TEST(NAME, determinant_with_two_non_touching_loops)
      * 1 - L11*L12 - L21*L22 + L11*L12*L21*L22
      */
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
@@ -238,9 +237,10 @@ TEST(NAME, determinant_with_two_non_touching_loops)
 
 TEST(NAME, determinant_with_three_non_touching_loops)
 {
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
     n1->connectTo(n2)->setExpression(Expression::make("P11"));
     n2->connectTo(n3)->setExpression(Expression::make("P12"));
     n1->connectTo(n1)->setExpression(Expression::make("L1"));
@@ -251,7 +251,6 @@ TEST(NAME, determinant_with_three_non_touching_loops)
      * 1 - L1 - L2 - L3 + L1*L2 + L1*L3 + L2*L3 - L1*L2*L3
      */
 
-    Graph graph;
     Graph::PathList paths;
     Graph::PathList loops;
     graph.setForwardPath(n1, n3);
@@ -286,11 +285,12 @@ TEST(NAME, mason_complicated_test)
      * ----------------------------------------------------------
      * 1 - f - g - bh - i + fg + fhb + fi + gi + bhi - fgi - fhbi
      */
-    tfp::Reference<Node> n1 = new Node;
-    tfp::Reference<Node> n2 = new Node;
-    tfp::Reference<Node> n3 = new Node;
-    tfp::Reference<Node> n4 = new Node;
-    tfp::Reference<Node> n5 = new Node;
+    Graph graph;
+    Node* n1 = graph.createNode("n1");
+    Node* n2 = graph.createNode("n2");
+    Node* n3 = graph.createNode("n3");
+    Node* n4 = graph.createNode("n4");
+    Node* n5 = graph.createNode("n5");
     // paths
     n1->connectTo(n2)->setExpression(Expression::make("a"));
     n2->connectTo(n3)->setExpression(Expression::make("b"));
@@ -303,7 +303,6 @@ TEST(NAME, mason_complicated_test)
     n4->connectTo(n4)->setExpression(Expression::make("i"));
     n3->connectTo(n2)->setExpression(Expression::make("h"));
 
-    Graph graph;
     graph.setForwardPath(n1, n5);
     Expression* e = graph.mason();
     graph.dump("mason_complicated_test_graph.dot");
@@ -324,16 +323,16 @@ TEST(NAME, mason_complicated_test)
 
 TEST(NAME, not_really_a_test_yet)
 {
-    tfp::Reference<Node> V1 = new Node;
-    tfp::Reference<Node> I2 = new Node;
-    tfp::Reference<Node> V2 = new Node;
-    tfp::Reference<Node> V3 = new Node;
+    Graph graph;
+    Node* V1 = graph.createNode("V1");
+    Node* I2 = graph.createNode("I2");
+    Node* V2 = graph.createNode("V2");
+    Node* V3 = graph.createNode("V3");
     V1->connectTo(I2)->setExpression(Expression::make("G1"));
     I2->connectTo(V2)->setExpression(Expression::parse("G1+G2+s*C"));
     V2->connectTo(V3)->setExpression(Expression::parse("-A"));
     V3->connectTo(I2)->setExpression(Expression::parse("G2+s*C"));
 
-    Graph graph;
     graph.setForwardPath(V1, V3);
     tfp::Reference<Expression> graphExpression = graph.mason();
     tfp::Reference<VariableTable> variables = graphExpression->generateVariableTable();
@@ -343,6 +342,7 @@ TEST(NAME, not_really_a_test_yet)
     variables->set("R2", 1e3);
     variables->set("C", 1e-6);
     variables->set("A", "inf");
+    graphExpression->dump("LP-1st-order.dot");
     Expression::TransferFunctionCoefficients tfc = graphExpression->calculateTransferFunctionCoefficients("s");
 
     tfp::TransferFunction<double> tf = graphExpression->calculateTransferFunction(tfc, variables);

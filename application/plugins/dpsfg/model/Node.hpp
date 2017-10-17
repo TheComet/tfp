@@ -3,15 +3,16 @@
 #include "tfp/util/Reference.hpp"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace dpsfg {
 
 class Connection;
 
-class Node : public tfp::RefCounted
+class Node
 {
 public:
-    typedef std::vector< tfp::Reference<Connection> > ConnectionList;
+    typedef std::vector< std::unique_ptr<Connection> > ConnectionList;
     Node();
     Node(const std::string& name);
 

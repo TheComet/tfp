@@ -17,10 +17,9 @@ Node::Node(const std::string& name) :
 // ----------------------------------------------------------------------------
 Connection* Node::connectTo(Node* other)
 {
-    Connection* c = new Connection;
-    c->setTargetNode(other);
-    outgoingConnections_.push_back(c);
-    return c;
+    outgoingConnections_.emplace_back(new Connection);
+    outgoingConnections_.back()->setTargetNode(other);
+    return outgoingConnections_.back().get();
 }
 
 // ----------------------------------------------------------------------------
@@ -40,7 +39,7 @@ void Node::disconnectFrom(Node* other)
 void Node::disconnectOutgoing(Node* other)
 {
     // Take care of all outgoing connections
-    for (std::vector< tfp::Reference<Connection> >::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
+    for (ConnectionList::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
     {
         if ((*it)->getTargetNode() == other)
             it = outgoingConnections_.erase(it);
@@ -50,7 +49,7 @@ void Node::disconnectOutgoing(Node* other)
 }
 
 // ----------------------------------------------------------------------------
-const std::vector< tfp::Reference<Connection> >& Node::getOutgoingConnections() const
+const Node::ConnectionList& Node::getOutgoingConnections() const
 {
     return outgoingConnections_;
 }

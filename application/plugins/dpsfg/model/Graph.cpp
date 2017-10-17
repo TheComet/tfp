@@ -2,8 +2,35 @@
 #include "model/Graph.hpp"
 #include "model/Node.hpp"
 #include "model/NChooseK.hpp"
+#include "model/VariableTable.hpp"
 
 using namespace dpsfg;
+
+// ----------------------------------------------------------------------------
+Graph::Graph() :
+    input_(NULL),
+    output_(NULL)
+{
+}
+
+// ----------------------------------------------------------------------------
+Node* Graph::createNode(const char* name)
+{
+    std::pair< std::unordered_map< std::string, std::unique_ptr<Node> >::iterator, bool> ins
+        = nodes_.emplace(name, std::unique_ptr<Node>(new Node));
+    if (ins.second)
+        return ins.first->second.get();
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Node* Graph::findNode(const char* name)
+{
+    std::unordered_map< std::string, std::unique_ptr<Node> >::iterator it = nodes_.find(name);
+    if (it != nodes_.end())
+        return it->second.get();
+    return NULL;
+}
 
 // ----------------------------------------------------------------------------
 void Graph::setForwardPath(Node* in, Node* out)
@@ -78,7 +105,7 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
             if ((*it)->getTargetNode() == next)
             {
                 PathSegment segment;
-                segment.connection_ = *it;
+                segment.connection_ = it->get();
                 segment.in_ = curr;
                 segment.out_ = next;
                 path->push_back(segment);

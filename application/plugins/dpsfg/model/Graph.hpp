@@ -2,7 +2,8 @@
 
 #include "tfp/util/Reference.hpp"
 #include "tfp/math/TransferFunction.hpp"
-#include <QVector>
+#include <unordered_map>
+#include <memory>
 
 namespace dpsfg {
 
@@ -22,6 +23,11 @@ public:
     typedef std::vector<PathSegment> Path;
     typedef std::vector<Path> PathList;
     typedef std::vector<Node*> NodeList;
+
+    Graph();
+
+    Node* createNode(const char* name);
+    Node* findNode(const char* name);
 
     void setForwardPath(Node* in, Node* out);
     VariableTable* variables();
@@ -44,8 +50,9 @@ public:
     void dump(FILE* fileName) const;
 
 private:
-    tfp::Reference<Node> input_;
-    tfp::Reference<Node> output_;
+    Node* input_;
+    Node* output_;
+    std::unordered_map< std::string, std::unique_ptr<Node> > nodes_;
     tfp::Reference<VariableTable> variables_;
 };
 
