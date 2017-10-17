@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 #include "tfp/config.hpp"
 #include "tfp/plugin/PluginManager.hpp"
+#include "tfp/plugin/Plugin.hpp"
 #include "tfp/views/DataTree.hpp"
 #include <QApplication>
 
@@ -16,6 +17,7 @@ TFP_PUBLIC_API int run_tests(int argc, char** argv)
     // no need for calling testing::InitGoogleTest() separately.
     testing::InitGoogleMock(&argc, argv);
     int thisResult = RUN_ALL_TESTS();
+    CLEAR_ALL_TESTS();
 
     QApplication app(argc, argv);
     PluginManager* pm = new PluginManager(new DataTree);

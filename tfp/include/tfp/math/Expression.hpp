@@ -147,6 +147,7 @@ public:
     bool eliminateDivisionsAndSubtractions(const char* variable);
     bool eliminateNegativeExponents(const char* variable);
     Expression* findOrAddLatestDivision();
+    bool heaveSums(const char* variable);
     bool manipulateIntoRationalFunction(const char* variable);
 
     /*!

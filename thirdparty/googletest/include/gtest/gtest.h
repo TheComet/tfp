@@ -1163,6 +1163,8 @@ class GTEST_API_ UnitTest {
   // INTERNAL IMPLEMENTATION - DO NOT USE IN A USER PROGRAM.
   int Run() GTEST_MUST_USE_RESULT_;
 
+  void ClearAllTests();
+
   // Returns the working directory when the first TEST() or TEST_F()
   // was executed.  The UnitTest object owns the string.
   const char* original_working_dir() const;
@@ -2231,6 +2233,10 @@ int RUN_ALL_TESTS() GTEST_MUST_USE_RESULT_;
 
 inline int RUN_ALL_TESTS() {
   return ::testing::UnitTest::GetInstance()->Run();
+}
+
+inline void CLEAR_ALL_TESTS() {
+  return ::testing::UnitTest::GetInstance()->ClearAllTests();
 }
 
 #endif  // GTEST_INCLUDE_GTEST_GTEST_H_

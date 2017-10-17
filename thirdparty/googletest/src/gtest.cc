@@ -4260,6 +4260,10 @@ int UnitTest::Run() {
       "auxiliary test code (environments or event listeners)") ? 0 : 1;
 }
 
+void UnitTest::ClearAllTests() {
+  impl()->ClearAllTests();
+}
+
 // Returns the working directory when the first TEST() or TEST_F() was
 // executed.
 const char* UnitTest::original_working_dir() const {

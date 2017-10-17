@@ -703,6 +703,20 @@ class GTEST_API_ UnitTestImpl {
     ForEach(test_cases_, TestCase::ClearTestCaseResult);
   }
 
+  void ClearAllTests() {
+    // Deletes every TestCase.
+    ForEach(test_cases_, internal::Delete<TestCase>);
+
+    // Deletes every Environment.
+    ForEach(environments_, internal::Delete<Environment>);
+
+    test_cases_.clear();
+    environments_.clear();
+
+    delete os_stack_trace_getter_;
+    os_stack_trace_getter_ = NULL;
+  }
+
   // Clears the results of ad-hoc test assertions.
   void ClearAdHocTestResult() {
     ad_hoc_test_result_.Clear();
