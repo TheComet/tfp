@@ -51,10 +51,21 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::clone()
+Expression* Expression::make(Expression* other)
 {
     Expression* e = new Expression;
-    e->set(this);
+    e->set(other);
+    return e;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::clone()
+{
+    Expression* e = Expression::make(this);
+    e->parent_ = NULL;
+    
+    if (left())  e->left_  = left()->clone();
+    if (right()) e->right_ = right()->clone();
     return e;
 }
 
@@ -137,6 +148,50 @@ void Expression::reset()
     if (type_ == VARIABLE)
         free(name_);
     type_ = INVALID;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::find(const char* variableName)
+{
+    if (type() == VARIABLE && strcmp(name(), variableName) == 0)
+        return this;
+    
+    if (left())  return left()->find(variableName);
+    if (right()) return right()->find(variableName);
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::find(double value)
+{
+    if (type() == CONSTANT && this->value() == value)
+        return this;
+    
+    if (left())  return left()->find(value);
+    if (right()) return right()->find(value);
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::find(op::Op1 func)
+{
+    if (type() == FUNCTION1 && op1() == func)
+        return this;
+    
+    if (left())  return left()->find(func);
+    if (right()) return right()->find(func);
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::find(op::Op2 func)
+{
+    if (type() == FUNCTION2 && op2() == func)
+        return this;
+    
+    if (left())  return left()->find(func);
+    if (right()) return right()->find(func);
+    return NULL;
 }
 
 // ----------------------------------------------------------------------------

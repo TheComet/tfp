@@ -7,20 +7,20 @@
 using namespace testing;
 using namespace tfp;
 
-TEST(NAME, reorder_product)
+TEST(NAME, enforce_product_order)
 {
-    tfp::Reference<Expression> e = Expression::parse("a*b");
-    e->reorderProducts("a");
+    Reference<Expression> e = Expression::parse("a*b");
+    e->enforceProductLHS("a");
     EXPECT_THAT(e->left()->name(), StrEq("a"));
     EXPECT_THAT(e->right()->name(), StrEq("b"));
-    e->reorderProducts("b");
+    e->enforceProductLHS("b");
     EXPECT_THAT(e->left()->name(), StrEq("b"));
     EXPECT_THAT(e->right()->name(), StrEq("a"));
 }
 
 TEST(NAME, eliminate_divisions)
 {
-    tfp::Reference<Expression> e = Expression::parse("a/s");
+    Reference<Expression> e = Expression::parse("a/s");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -31,7 +31,7 @@ TEST(NAME, eliminate_divisions)
 
 TEST(NAME, eliminate_divisions_with_constant_exponent)
 {
-    tfp::Reference<Expression> e = Expression::parse("a/s^2");
+    Reference<Expression> e = Expression::parse("a/s^2");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -42,7 +42,7 @@ TEST(NAME, eliminate_divisions_with_constant_exponent)
 
 TEST(NAME, eliminate_divisions_with_variable_exponent)
 {
-    tfp::Reference<Expression> e = Expression::parse("a/s^x");
+    Reference<Expression> e = Expression::parse("a/s^x");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -54,7 +54,7 @@ TEST(NAME, eliminate_divisions_with_variable_exponent)
 
 TEST(NAME, eliminate_subtractions)
 {
-    tfp::Reference<Expression> e = Expression::parse("a-s");
+    Reference<Expression> e = Expression::parse("a-s");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -65,7 +65,7 @@ TEST(NAME, eliminate_subtractions)
 
 TEST(NAME, eliminate_subtractions_with_constant_post_factor)
 {
-    tfp::Reference<Expression> e = Expression::parse("a-s*2");
+    Reference<Expression> e = Expression::parse("a-s*2");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -76,7 +76,7 @@ TEST(NAME, eliminate_subtractions_with_constant_post_factor)
 
 TEST(NAME, eliminate_subtractions_with_variable_post_factor)
 {
-    tfp::Reference<Expression> e = Expression::parse("a-s*x");
+    Reference<Expression> e = Expression::parse("a-s*x");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -88,7 +88,7 @@ TEST(NAME, eliminate_subtractions_with_variable_post_factor)
 
 TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
 {
-    tfp::Reference<Expression> e = Expression::parse("a-2*s");
+    Reference<Expression> e = Expression::parse("a-2*s");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -100,7 +100,7 @@ TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
 
 TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
 {
-    tfp::Reference<Expression> e = Expression::parse("a-x*s");
+    Reference<Expression> e = Expression::parse("a-x*s");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -109,11 +109,72 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
     ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
     ASSERT_THAT(e->right()->right()->right()->name(), StrEq("s"));
 }
+
+TEST(NAME, enforce_constant_exponent_on_missing_exponent)
+{
+    Reference<Expression> e = Expression::parse("1/(s+4)");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(1.0));
+}
+
+TEST(NAME, enforce_constant_exponent_on_existing_constant_exponent)
+{
+    Reference<Expression> e = Expression::parse("1/(s^3+4)");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(3.0));
+}
+
+TEST(NAME, enforce_constant_exponent_only_on_trees_that_have_variable)
+{
+    Reference<Expression> e = Expression::parse("(a+b)^c");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+
+    e = Expression::parse("(a+s)^c");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    ASSERT_THAT(e->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    
+    e = Expression::parse("(a+s)^2");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+}
+
+TEST(NAME, enforce_constant_exponent_on_variable_exponent_fails)
+{
+    Reference<Expression> e = Expression::parse("1/(s^a+4)");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+}
+
+TEST(NAME, enforce_constant_exponent_on_expression_exponent_fails)
+{
+    Reference<Expression> e = Expression::parse("1/(s^(a+1)+4)");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+}
+
+TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
+{
+    Reference<Expression> e = Expression::parse("1/(s^(4+1)+4)");
+    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(5.0));
+}
+
 void beginDump(const char* filename);
 void endDump();
 TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
-    tfp::Reference<Expression> e = Expression::parse("1/(1/s^2 - 4/(1+s) - 8/(a+4))");
+    Reference<Expression> e = Expression::parse("1/(1/s^2 - 4/(1+s) - 8/(a+4))");
     /*
      * Solved on paper:
      *                 (a+4)s^2 + (a+4)s^3

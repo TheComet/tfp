@@ -96,7 +96,9 @@ public:
     static Expression* make(double value);
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
+    static Expression* make(Expression* other);
 
+    // deep copy, except parent is NULL
     Expression* clone();
 
     void set(const char* variableName);
@@ -105,6 +107,11 @@ public:
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
     void set(Expression* other);
     void reset();
+    
+    Expression* find(const char* variableName);
+    Expression* find(double value);
+    Expression* find(op::Op1 func);
+    Expression* find(op::Op2 func);
 
     VariableTable* generateVariableTable() const;
     double evaluate(const VariableTable* vt=NULL, std::set<std::string>* visited=NULL) const;
@@ -135,9 +142,11 @@ public:
     op::Op2 op2() const { assert(type_ == FUNCTION2); return op2_; }
 
     // Expression_manipulation.cpp
-    void reorderProducts(const char* variable);
+    void enforceProductLHS(const char* variable);
+    bool enforceConstantExponent(const char* variable);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     bool eliminateNegativeExponents(const char* variable);
+    Expression* findOrAddLatestDivision();
     bool manipulateIntoRationalFunction(const char* variable);
 
     /*!

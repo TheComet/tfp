@@ -7,29 +7,47 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-static bool variableIsChildOf(Expression* e, const char* variable)
+void Expression::enforceProductLHS(const char* variable)
 {
-    if (e->type() == Expression::VARIABLE && strcmp(e->name(), variable) == 0) return true;
-    if (e->left()  && variableIsChildOf(e->left(),  variable)) return true;
-    if (e->right() && variableIsChildOf(e->right(), variable)) return true;
-    return false;
-}
-
-// ----------------------------------------------------------------------------
-void Expression::reorderProducts(const char* variable)
-{
+    if (left())  left()->enforceProductLHS(variable);
+    if (right()) right()->enforceProductLHS(variable);
     if (isOperation(op::mul))
     {
-        if (right() && right()->type() == VARIABLE && strcmp(right()->name(), variable) == 0)
+        if (right() && right()->hasVariable(variable))
         {
             tfp::Reference<Expression> tmp = right_;
             right_ = left_;
             left_ = tmp;
         }
     }
+}
 
-    if (left())  left()->reorderProducts(variable);
-    if (right()) right()->reorderProducts(variable);
+// ----------------------------------------------------------------------------
+bool Expression::enforceConstantExponent(const char* variable)
+{
+    /*
+     * Performs the following transformations:
+     *    s    --> s^1
+     * If s is raised to a non-constant (e.g. s^a or (s+2)^a) abort and return false.
+     */
+    bool success = true;
+    if (left())  success &= left()->enforceConstantExponent(variable);
+    if (right()) success &= right()->enforceConstantExponent(variable);
+    if (hasVariable(variable) == false)
+        return success;
+    
+    // Travel up the tree in search of op::pow...
+    for (Expression* e = parent(); e != NULL; e = e->parent())
+        if (e->isOperation(op::pow))
+            if (e->right()->type() != CONSTANT)  // RHS has to be constant
+                return false;
+    
+    // If immediate parent is already pow (and has a constant RHS), we're done.
+    if (parent()->isOperation(op::pow) == true)
+        return true;
+    
+    set (op::pow, Expression::make(this), Expression::make(1.0));
+    return success;
 }
 
 // ----------------------------------------------------------------------------
@@ -62,26 +80,26 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
 
     for (int i = 0; i != 2; ++i)
     {
-        if (isOperation(ops[i].outer))
+        if (isOperation(ops[i].outer) == false)
+            continue;
+        
+        if (hasRHSOperation(ops[i].inner))
         {
-            if (hasRHSOperation(ops[i].inner))
-            {
-                Expression* toNegate = right()->right();
-                set(ops[i].outerInv, left(), right());
-                if (toNegate->type() == CONSTANT)
-                    toNegate->set(-toNegate->value());
-                else
-                    toNegate->set(op::negate, toNegate->clone());
-
-            }
+            Expression* toNegate = right()->right();
+            set(ops[i].outerInv, left(), right());
+            if (toNegate->type() == CONSTANT)
+                toNegate->set(-toNegate->value());
             else
-            {
-                set(ops[i].outerInv,
-                    left(),
-                    Expression::make(ops[i].inner,
-                        right(),
-                        Expression::make(-1)));
-            }
+                toNegate->set(op::negate, Expression::make(toNegate));
+
+        }
+        else
+        {
+            set(ops[i].outerInv,
+                left(),
+                Expression::make(ops[i].inner,
+                    right(),
+                    Expression::make(-1)));
         }
     }
 
@@ -90,14 +108,59 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
 }
 
 // ----------------------------------------------------------------------------
+bool Expression::heaveSums(const char* variable)
+{
+    /*
+     * Only manipulate branches that are an ancestor of an expression with the
+     * specified variable.
+     */
+    bool weMatter = false;
+    if (left())  weMatter |= left()->heaveSums(variable);
+    if (right()) weMatter |= right()->heaveSums(variable);
+    if (weMatter == false && hasVariable(variable) == false)
+        return false;
+    
+    if (isOperation(op::add) == false)
+        return weMatter;
+}
+
+// ----------------------------------------------------------------------------
 bool Expression::manipulateIntoRationalFunction(const char* variable)
 {
-    return false;
+    /*
+     * Create the "split" operator, i.e. this is the expression that splits the
+     * numerator from the denominator. By default, use the last division
+     * operator we can find in the tree. If none exists, create a div operator
+     * that has no effect.
+     */
+    Expression* split = find(op::div);
+    if (split == NULL)
+        split = Expression::make(op::div, split, Expression::make(1.0));
+
+    /*
+     * Eliminate divisions and subtractions on both sides of the split, so we
+     * can start shuffling terms back and forth between the numerator and
+     * denominator without having to deal with lots of edge cases.
+     */
+    split->left()->eliminateDivisionsAndSubtractions(variable);
+    split->right()->eliminateDivisionsAndSubtractions(variable);
+    
+    /*
+     * All op::pow operations with our variable on the LHS are guaranteed
+     * to have a constant RHS. If not, error out.
+     */
+    if (enforceConstantExponent(variable) == false)
+        return false;
+        //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
+    
+    
 }
 
 // ----------------------------------------------------------------------------
 Expression::TransferFunctionCoefficients Expression::calculateTransferFunctionCoefficients(const char* variable)
 {
+    
+    
     return TransferFunctionCoefficients();
 }
 

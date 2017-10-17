@@ -9,8 +9,8 @@ using namespace tfp;
 
 TEST(NAME, generate_variable_table)
 {
-    tfp::Reference<Expression> e = Expression::parse("a+b^c*d");
-    tfp::Reference<VariableTable> vt = e->generateVariableTable();
+    Reference<Expression> e = Expression::parse("a+b^c*d");
+    Reference<VariableTable> vt = e->generateVariableTable();
     EXPECT_THAT(vt->valueOf("a"), DoubleEq(0));
     EXPECT_THAT(vt->valueOf("b"), DoubleEq(0));
     EXPECT_THAT(vt->valueOf("c"), DoubleEq(1));
@@ -19,14 +19,14 @@ TEST(NAME, generate_variable_table)
 
 TEST(NAME, evaluate_constant_expression)
 {
-    tfp::Reference<Expression> e = Expression::parse("(2+3*4)^2 + 4");
+    Reference<Expression> e = Expression::parse("(2+3*4)^2 + 4");
     EXPECT_THAT(e->evaluate(), DoubleEq(200));
 }
 
 TEST(NAME, evaluate_with_variables)
 {
-    tfp::Reference<Expression> e = Expression::parse("(a+3*c)^d + e");
-    tfp::Reference<VariableTable> vt = new VariableTable;
+    Reference<Expression> e = Expression::parse("(a+3*c)^d + e");
+    Reference<VariableTable> vt = new VariableTable;
     vt->add("a", 2);
     vt->add("c", 4);
     vt->add("d", 2);
@@ -36,6 +36,20 @@ TEST(NAME, evaluate_with_variables)
 
 TEST(NAME, evaluate_with_missing_variable_fails)
 {
-    tfp::Reference<Expression> e = Expression::parse("a");
+    Reference<Expression> e = Expression::parse("a");
     EXPECT_DEATH(e->evaluate(), ".*");
+}
+
+TEST(NAME, clone_actually_deep_copies)
+{
+    Reference<Expression> e1 = Expression::parse("a+b+c");
+    Reference<Expression> e2 = e1->clone();
+    ASSERT_THAT(e1->op2(), Eq(e2->op2()));
+    ASSERT_THAT(e1->right(), Ne(e2->right()));
+    ASSERT_THAT(e1->right()->name(), StrEq(e2->right()->name()));
+    ASSERT_THAT(e1->left(), Ne(e2->left()));
+    ASSERT_THAT(e1->left()->op2(), Eq(e2->left()->op2()));
+    ASSERT_THAT(e1->left()->left(), Ne(e2->left()->left()));
+    ASSERT_THAT(e1->left()->left()->name(), StrEq(e2->left()->left()->name()));
+    ASSERT_THAT(e1->left()->right()->name(), StrEq(e2->left()->right()->name()));
 }
