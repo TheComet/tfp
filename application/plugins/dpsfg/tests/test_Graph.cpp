@@ -141,7 +141,7 @@ TEST(NAME, determinant_with_no_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    Expression* e = graph.calculateDeterminant(loops);
+    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
 
     EXPECT_THAT(e->type(), Eq(Expression::CONSTANT));
     EXPECT_THAT(e->value(), DoubleEq(1));
@@ -159,7 +159,7 @@ TEST(NAME, determinant_with_one_loop)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    Expression* e = graph.calculateDeterminant(loops);
+    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
 
     EXPECT_THAT(e->op2(), Eq(op::sub));
     EXPECT_THAT(e->left()->value(), DoubleEq(1.0));
@@ -186,7 +186,7 @@ TEST(NAME, determinant_with_two_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    Expression* e = graph.calculateDeterminant(loops);
+    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
@@ -222,7 +222,7 @@ TEST(NAME, determinant_with_two_non_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n2);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    Expression* e = graph.calculateDeterminant(loops);
+    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
@@ -255,7 +255,7 @@ TEST(NAME, determinant_with_three_non_touching_loops)
     Graph::PathList loops;
     graph.setForwardPath(n1, n3);
     graph.findForwardPathsAndLoops(&paths, &loops);
-    Expression* e = graph.calculateDeterminant(loops);
+    tfp::Reference<Expression> e = graph.calculateDeterminant(loops);
 
     // Easier to just insert numbers and evaluate
     // Determinant should be: 1 - b*c - a*d
@@ -304,7 +304,7 @@ TEST(NAME, mason_complicated_test)
     n3->connectTo(n2)->setExpression(Expression::make("h"));
 
     graph.setForwardPath(n1, n5);
-    Expression* e = graph.mason();
+    tfp::Reference<Expression> e = graph.mason();
     graph.dump("mason_complicated_test_graph.dot");
     e->dump("mason_complicated_test.dot");
 
