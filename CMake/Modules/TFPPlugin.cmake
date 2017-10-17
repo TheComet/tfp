@@ -55,7 +55,7 @@ function (add_plugin TARGET)
     # dependencies
     ###############################################################################
 
-    add_dependencies (tfp-application ${TARGET})
+    add_dependencies (tfp_application ${TARGET})
 
     target_link_libraries (${TARGET} Qt5::Core)
     target_link_libraries (${TARGET} Qt5::Widgets)

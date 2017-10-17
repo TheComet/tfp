@@ -16,13 +16,13 @@ add_definitions (-D_USE_MATH_DEFINES)
 # source files and library definition
 ###############################################################################
 
-add_executable (tfp-application
+add_executable (tfp_application
     "src/main.cpp"
 )
 
 # generates the correct project files for visual studio, setting thee correct
 # debug working directory and other stuff
-create_vcproj_userfile (tfp-application)
+create_vcproj_userfile (tfp_application)
 
 ###############################################################################
 # dependencies
@@ -35,7 +35,7 @@ include_directories (${QWTPLOT3D_INCLUDE_DIRS})
 include_directories (${EIGEN_INCLUDE_DIRS})
 include_directories (${PUGIXML_INCLUDE_DIRS})
 
-target_link_libraries (tfp-application tfp)
+target_link_libraries (tfp_application tfp)
 
 ###############################################################################
 # plugins

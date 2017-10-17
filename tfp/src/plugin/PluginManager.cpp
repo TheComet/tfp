@@ -40,7 +40,7 @@ bool PluginManager::loadPlugin(const QString& name)
     }
     if ((plugin->run_tests = (Plugin::run_tests_func)plugin->library_->resolve("run_tests")) == NULL)
     {
-        std::cout << "Plugin " << name.toStdString() << "has no unit tests :/" << std::endl;
+        std::cout << "Plugin " << name.toStdString() << " has no unit tests :/" << std::endl;
     }
 
     std::cout << "Loaded plugin " << name.toStdString() << std::endl;

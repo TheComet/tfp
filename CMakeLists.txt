@@ -119,35 +119,35 @@ set (TEMPLATE_EXPORT_H "${CMAKE_SOURCE_DIR}/CMake/Templates/export.hpp.in")
 
 # complex hyperbolic functions
 function (check_complex_hyperbolic SYMBOL RESULT_HAVE RESULT_SYMBOL)
-	set (INCLUDES "#include <cmath>\n#include <complex>")
-	
-	# First, try to see if it is under std::
-    check_cxx_source_compiles ("
-		${INCLUDES}\n
-		int main() {
-			std::complex<double> c(1, 4);
-			std::complex<double> res = std::${SYMBOL}(c);
-		}" ${SYMBOL}_RESULT)
+    set (INCLUDES "#include <cmath>\n#include <complex>")
 
-	if (${SYMBOL}_RESULT)
-		set (${RESULT_SYMBOL} "std::${SYMBOL}" PARENT_SCOPE)
-		set (${RESULT_HAVE} 1 PARENT_SCOPE) 
-	else ()
-		# kay, maybe it's global
-		check_cxx_source_compiles ("
-		${INCLUDES}
-		int main() {
-			std::complex<double> c(1, 4);
-			std::complex<double> res = ${SYMBOL}(c);
-		}" ${SYMBOL}_RESULT)
-		if (${SYMBOL}_RESULT)
-			set (${RESULT_SYMBOL} "${SYMBOL}" PARENT_SCOPE)
-			set (${RESULT_HAVE} 1 PARENT_SCOPE)
-		else ()
-			set (${RESULT_SYMBOL} "tfp::${SYMBOL}" PARENT_SCOPE)
-			set (${RESULT_HAVE} 0 PARENT_SCOPE)
-		endif ()
-	endif ()
+    # First, try to see if it is under std::
+    check_cxx_source_compiles ("
+        ${INCLUDES}\n
+        int main() {
+            std::complex<double> c(1, 4);
+            std::complex<double> res = std::${SYMBOL}(c);
+        }" ${SYMBOL}_RESULT)
+
+    if (${SYMBOL}_RESULT)
+        set (${RESULT_SYMBOL} "std::${SYMBOL}" PARENT_SCOPE)
+        set (${RESULT_HAVE} 1 PARENT_SCOPE)
+    else ()
+        # kay, maybe it's global
+        check_cxx_source_compiles ("
+        ${INCLUDES}
+        int main() {
+            std::complex<double> c(1, 4);
+            std::complex<double> res = ${SYMBOL}(c);
+        }" ${SYMBOL}_RESULT)
+        if (${SYMBOL}_RESULT)
+            set (${RESULT_SYMBOL} "${SYMBOL}" PARENT_SCOPE)
+            set (${RESULT_HAVE} 1 PARENT_SCOPE)
+        else ()
+            set (${RESULT_SYMBOL} "tfp::${SYMBOL}" PARENT_SCOPE)
+            set (${RESULT_HAVE} 0 PARENT_SCOPE)
+        endif ()
+    endif ()
 endfunction ()
 
 check_complex_hyperbolic ("sinh" HAVE_SINH SINH_SYMBOL)
@@ -169,8 +169,11 @@ message (STATUS "------------------------------------------------------------")
 include_directories ("${CMAKE_CURRENT_LIST_DIR}/tfp/include")
 include_directories (${CMAKE_BINARY_DIR})                    # need this because MOC outputs to binary_dir/tfp
 include_directories ("${CMAKE_BINARY_DIR}/tfp/include")      # need this for config.hpp and export.hpp
-include_directories ("tests/googlemock/include")
-include_directories ("tests/googletest/include")
+
+if (TFP_BUILD_TESTS)
+    include_directories ("${CMAKE_SOURCE_DIR}/thirdparty/googlemock/include")
+    include_directories ("${CMAKE_SOURCE_DIR}/thirdparty/googletest/include")
+endif ()
 
 # must be in this order due to linking
 set (EIGEN_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/thirdparty/eigen-3.3.4")
@@ -181,6 +184,6 @@ add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
 add_subdirectory ("tfp")
 add_subdirectory ("application")
 if (TFP_BUILD_TESTS)
-    add_subdirectory ("tests")
+    add_subdirectory ("thirdparty/googlemock")
 endif ()
 
