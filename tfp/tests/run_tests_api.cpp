@@ -16,6 +16,16 @@ TFP_PUBLIC_API int run_tests(int argc, char** argv)
     // also responsible for initializing Google Test.  Therefore there's
     // no need for calling testing::InitGoogleTest() separately.
     testing::InitGoogleMock(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+
+TFP_PUBLIC_API int run_tests_all(int argc, char** argv)
+{
+    std::cout << "Running tests from run_tests() in tfp library\n";
+    // Since Google Mock depends on Google Test, InitGoogleMock() is
+    // also responsible for initializing Google Test.  Therefore there's
+    // no need for calling testing::InitGoogleTest() separately.
+    testing::InitGoogleMock(&argc, argv);
     int thisResult = RUN_ALL_TESTS();
     CLEAR_ALL_TESTS();
 
