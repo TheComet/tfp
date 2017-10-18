@@ -2,7 +2,11 @@ Transfer Function Plotter
 =========================
 
 An  application  for  designing, manipulating and visualising the behaviour of
-LTI systems based on transfer functions. Features being worked on are:
+LTI systems based on transfer functions.
+
+Transfer functions are commonly used by engineers to describe systems in control theory, or to describe filters, or even to describe the small-signal behaviour of micro electronics.
+
+Features being worked on are:
 
   - Manipulation:
     + Driving-Point Signal Flow Graph (DPSFG) drawing tool.
