@@ -274,6 +274,13 @@ bool Expression::hasVariable(const char* variable) const
 }
 
 // ----------------------------------------------------------------------------
+Expression* Expression::getOtherOperand() const
+{
+    assert(type() == FUNCTION2);
+    return parent()->left() == this ? parent()->right() : parent()->left();
+}
+
+// ----------------------------------------------------------------------------
 FILE* fp = NULL;
 void beginDump(const char* filename)
 {

@@ -1,5 +1,6 @@
 #include "gmock/gmock.h"
 #include "tfp/math/Expression.hpp"
+#include "tfp/math/VariableTable.hpp"
 #include "tfp/util/Reference.hpp"
 
 #define NAME Expression_manipulator
@@ -168,6 +169,116 @@ TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(5.0));
+}
+
+TEST(NAME, factor_exponent_4)
+{
+    Reference<Expression> e = Expression::parse("a^4");
+    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    e->dump("factor_constant_integer_exponent.dot");
+    ASSERT_THAT(e->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+}
+
+TEST(NAME, factor_exponent_1)
+{
+    Reference<Expression> e = Expression::parse("a^1");
+    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->type(), Eq(Expression::VARIABLE));
+    ASSERT_THAT(e->name(), StrEq("a"));
+}
+
+TEST(NAME, factor_exponent_0)
+{
+    Reference<Expression> e = Expression::parse("a^0");
+    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->type(), Eq(Expression::CONSTANT));
+    ASSERT_THAT(e->value(), DoubleEq(1.0));
+}
+
+TEST(NAME, factor_exponent_negative)
+{
+    Reference<Expression> e = Expression::parse("a^-1");
+    EXPECT_THROW(e->eliminateConstantExponents("a"), std::runtime_error);
+}
+
+TEST(NAME, expand_scalar_into_sum)
+{
+    Reference<Expression> e = Expression::parse("a*(b+c)");
+    ASSERT_THAT(e->expandProducts("b"), Eq(true));
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->right()->name(), StrEq("b"));
+    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->right()->name(), StrEq("c"));
+}
+
+TEST(NAME, expand_expression_into_sum)
+{
+    Reference<Expression> e = Expression::parse("(a+b)*(c+d)");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("b", 7.0);
+    vt->set("c", 13.0);
+    vt->set("d", 17.0);
+    double beforeResult = e->evaluate(vt);
+
+    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    e->dump("expand_expression_into_sum.dot");
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::add));
+
+    // Make sure subtrees were actually duplicated
+    ASSERT_THAT(e->left()->left(), Ne(e->right()->left()));
+    EXPECT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
+}
+
+TEST(NAME, expand_binomial_product)
+{
+    Reference<Expression> e = Expression::parse("(a+b)*(a+c)");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("b", 7.0);
+    vt->set("c", 13.0);
+    double beforeResult = e->evaluate(vt);
+
+    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    e->dump("expand_binomial_product.dot");
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
+}
+
+TEST(NAME, expand_binomial_exponent)
+{
+    Reference<Expression> e = Expression::parse("(a+b)^2");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("b", 7.0);
+    double beforeResult = e->evaluate(vt);
+
+    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    e->dump("expand_binomial_exponent.dot");
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
 }
 
 void beginDump(const char* filename);

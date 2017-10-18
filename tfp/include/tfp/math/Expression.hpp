@@ -121,6 +121,7 @@ public:
     bool hasRHSOperation(op::Op1 func) const;
     bool hasRHSOperation(op::Op2 func) const;
     bool hasVariable(const char* variable) const;
+    Expression* getOtherOperand() const;
 
     void dump(const char* filename);
     void dump(FILE* fp);
@@ -144,10 +145,12 @@ public:
     // Expression_manipulation.cpp
     void enforceProductLHS(const char* variable);
     bool enforceConstantExponent(const char* variable);
+    bool eliminateConstantExponents(const char* variable);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     bool eliminateNegativeExponents(const char* variable);
     Expression* findOrAddLatestDivision();
-    bool heaveSums(const char* variable);
+    bool expandProducts(const char* variable);
+    bool hoistProducts(const char* variable);
     bool manipulateIntoRationalFunction(const char* variable);
 
     /*!
