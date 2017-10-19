@@ -544,7 +544,7 @@ class MatcherCastImpl {
 
   static Matcher<T> CastImpl(const M& polymorphic_matcher_or_value,
                              BooleanConstant<true>) {
-    // M is implicitly convertible to Matcher<T>, which means that either
+    // M is implicitly converitble to Matcher<T>, which means that either
     // M is a polymorhpic matcher or Matcher<T> has an implicit constructor
     // from M.  In both cases using the implicit conversion will produce a
     // matcher.

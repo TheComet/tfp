@@ -103,6 +103,8 @@ void Expression::set(op::Op1 func, Expression* rhs)
     right_ = rhs;
     left_ = NULL;
     rhs->parent_ = this;
+    if (rhs->left()) rhs->left()->parent_ = rhs;
+    if (rhs->right()) rhs->right()->parent_ = rhs;
 }
 
 // ----------------------------------------------------------------------------
@@ -118,6 +120,10 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
     right_ = rhs;
     lhs->parent_ = this;
     rhs->parent_ = this;
+    if (lhs->left()) lhs->left()->parent_ = lhs;
+    if (lhs->right()) lhs->right()->parent_ = lhs;
+    if (rhs->left()) rhs->left()->parent_ = rhs;
+    if (rhs->right()) rhs->right()->parent_ = rhs;
 }
 
 // ----------------------------------------------------------------------------
@@ -247,6 +253,22 @@ double Expression::evaluate(const VariableTable* vt, std::set<std::string>* visi
 }
 
 // ----------------------------------------------------------------------------
+bool Expression::isSameAs(Expression* other) const
+{
+    if (type() != other->type())
+        return false;
+
+    switch (type())
+    {
+        case CONSTANT  : return value() == other->value();
+        case VARIABLE  : return strcmp(name(), other->name()) == 0;
+        case FUNCTION1 : return op1() == other->op1();
+        case FUNCTION2 : return op2() == other->op2();
+        default        : return false;
+    }
+}
+
+// ----------------------------------------------------------------------------
 bool Expression::isOperation(op::Op1 op) const
 {
     return (type() == FUNCTION1 && op1() == op);
@@ -281,6 +303,26 @@ Expression* Expression::getOtherOperand() const
 {
     assert(type() == FUNCTION2);
     return parent()->left() == this ? parent()->right() : parent()->left();
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::recursivelyCall(bool (Expression::*optfunc)())
+{
+    bool mutated = false;
+    if (left())  mutated |= left()->recursivelyCall(optfunc);
+    if (right()) mutated |= right()->recursivelyCall(optfunc);
+    mutated |= (this->*optfunc)();
+    return mutated;
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable)
+{
+    bool mutated = false;
+    if (left())  mutated |= left()->recursivelyCall(optfunc, variable);
+    if (right()) mutated |= right()->recursivelyCall(optfunc, variable);
+    mutated |= (this->*optfunc)(variable);
+    return mutated;
 }
 
 // ----------------------------------------------------------------------------

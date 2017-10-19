@@ -35,7 +35,7 @@ bool Expression::enforceConstantExponent(const char* variable)
     if (right()) success &= right()->enforceConstantExponent(variable);
     if (hasVariable(variable) == false)
         return success;
-    
+
     // Travel up the tree in search of op::pow...
     for (Expression* e = parent(); e != NULL; e = e->parent())
         if (e->isOperation(op::pow))
@@ -103,6 +103,29 @@ bool Expression::expandConstantExponentsIntoProducts(const char* variable)
     set(e);
 
     return true;
+}
+
+// ----------------------------------------------------------------------------
+bool Expression::factorNegativeExponents(const char* variable)
+{
+    /*
+     * Only manipulate branches that are an ancestor of an expression with the
+     * specified variable.
+     */
+    bool weMatter = false;
+    if (left())  weMatter |= left()->eliminateDivisionsAndSubtractions(variable);
+    if (right()) weMatter |= right()->eliminateDivisionsAndSubtractions(variable);
+    if (weMatter == false && hasVariable(variable) == false)
+        return false;
+
+    /*
+     * Does the following manipulations:
+     *    x + ys^-c (c=const)   ->   s^-c(xs^c + y)
+     *    x + ys^-c1 + zs^-c2 (c1=const,c2=const)  ->  s^-c(xs^c + ys^(c-c1) + zs^(c-c2)) (such that c-c1 >= 0 and c-c2 >= 0)
+     */
+    if (isOperation(op::pow) == false)
+        return true;
+
 }
 
 // ----------------------------------------------------------------------------
@@ -174,6 +197,10 @@ bool Expression::eliminateNegativeExponents(const char* variable)
     if (weMatter == false && hasVariable(variable) == false)
         return false;
 
+    /*
+     * Does the following manipulations:
+     */
+
     if (parent() == NULL)
         return true;
 
@@ -183,16 +210,16 @@ bool Expression::eliminateNegativeExponents(const char* variable)
     return true;
 }
 
-// ------------------------------------------------------------------------mul----
-bool Expression::expandProducts(const char* variable)
+// ----------------------------------------------------------------------------
+bool Expression::expand(const char* variable)
 {
     /*
      * Only manipulate branches that are an ancestor of an expression with the
      * specified variable.
      */
     bool weMatter = false;
-    if (left())  weMatter |= left()->expandProducts(variable);
-    if (right()) weMatter |= right()->expandProducts(variable);
+    if (left())  weMatter |= left()->expand(variable);
+    if (right()) weMatter |= right()->expand(variable);
     if (weMatter == false && hasVariable(variable) == false)
         return false;
 
@@ -217,8 +244,13 @@ bool Expression::expandProducts(const char* variable)
         parent()->set(op::add, this, Expression::make(op::mul, factorInOther, right()));
         set(op::mul, factorInThis, left());
 
-        factorInThis->expandProducts(variable);
-        factorInOther->expandProducts(variable);
+        factorInThis->expand(variable);
+        factorInOther->expand(variable);
+    }
+
+    if (parent()->isOperation(op::pow))
+    {
+        parent()->expandConstantExponentsIntoProducts(variable);
     }
 
     return true;
@@ -237,16 +269,17 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
     Expression* split = find(op::div);
     if (split == NULL)
         split = Expression::make(op::div, split, Expression::make(1.0));
+    root()->dump("wtf.dot", true);
 
     /*
      * Eliminate divisions and subtractions on both sides of the split, so we
      * can start shuffling terms back and forth between the numerator and
      * denominator without having to deal with lots of edge cases.
      */
-    root()->dump("wtf.dot", true);
     split->left()->eliminateDivisionsAndSubtractions(variable);
     split->right()->eliminateDivisionsAndSubtractions(variable);
-    
+    root()->dump("wtf.dot", true);
+
     /*
      * All op::pow operations with our variable on the LHS need to have a
      * constant RHS. If not, error out, because such an expression cannot be
@@ -255,15 +288,13 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
     /*if (enforceConstantExponent(variable) == false)
         return false;*/
         //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
-
-    root()->dump("wtf.dot", true);
     expandConstantExponentsIntoProducts(variable);
+    root()->dump("wtf.dot", true);
 
+    split->left()->expand(variable);
+    split->right()->expand(variable);
     root()->dump("wtf.dot", true);
-    split->left()->expandProducts(variable);
-    split->right()->expandProducts(variable);
-    root()->dump("wtf.dot", true);
-    
+
     return false;
 }
 

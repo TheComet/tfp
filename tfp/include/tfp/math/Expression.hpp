@@ -115,7 +115,15 @@ public:
 
     VariableTable* generateVariableTable() const;
     double evaluate(const VariableTable* vt=NULL, std::set<std::string>* visited=NULL) const;
+    
+    bool recursivelyCall(bool (Expression::*optfunc)());
+    bool recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable);
 
+    /*!
+     * Returns true if the types match and (depending on type) symbol names, value, or
+     * operations match. Invalid expressions return false.
+     */
+    bool isSameAs(Expression* other) const;
     bool isOperation(op::Op1 func) const;
     bool isOperation(op::Op2 func) const;
     bool hasRHSOperation(op::Op1 func) const;
@@ -146,10 +154,11 @@ public:
     void enforceProductLHS(const char* variable);
     bool enforceConstantExponent(const char* variable);
     bool expandConstantExponentsIntoProducts(const char* variable);
+    bool factorNegativeExponents(const char* variable);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     bool eliminateNegativeExponents(const char* variable);
     Expression* findOrAddLatestDivision();
-    bool expandProducts(const char* variable);
+    bool expand(const char* variable);
     bool manipulateIntoRationalFunction(const char* variable);
 
     /*!
@@ -193,6 +202,16 @@ public:
 
     // Expression_optimisation.cpp
     void optimise();
+    bool optimiseMultipleNegates();
+    bool optimiseConstantExpressions();
+    bool optimiseUselessAdditions();
+    bool optimiseUselessSubtractions();
+    bool optimiseUselessProducts();
+    bool optimiseUselessDivisions();
+    bool optimiseUselessExponents();
+    bool collapseChainOfOperations();
+    bool optimiseExponentiate();
+    bool optimiseAdditionsIntoProducts();
     bool checkParentConsistencies() const;
 
 private:

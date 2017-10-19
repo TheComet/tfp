@@ -264,7 +264,7 @@ TEST(NAME, expand_constant_exponents_negative_4)
 TEST(NAME, expand_scalar_into_sum)
 {
     Reference<Expression> e = Expression::parse("a*(b+c)");
-    ASSERT_THAT(e->expandProducts("b"), Eq(true));
+    ASSERT_THAT(e->expand("b"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->name(), StrEq("a"));
@@ -286,7 +286,7 @@ TEST(NAME, expand_expression_into_sum)
     vt->set("d", 17.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    ASSERT_THAT(e->expand("a"), Eq(true));
     e->dump("expand_expression_into_sum.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
@@ -309,7 +309,7 @@ TEST(NAME, expand_binomial_product)
     vt->set("c", 13.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    ASSERT_THAT(e->expand("a"), Eq(true));
     e->dump("expand_binomial_product.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
@@ -332,7 +332,7 @@ TEST(NAME, expand_binomial_exponent)
     double beforeResult = e->evaluate(vt);
 
     ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
-    ASSERT_THAT(e->expandProducts("a"), Eq(true));
+    ASSERT_THAT(e->expand("a"), Eq(true));
     e->dump("expand_binomial_exponent.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
