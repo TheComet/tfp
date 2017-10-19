@@ -51,17 +51,17 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::make(Expression* other)
+Expression* Expression::shallowClone()
 {
     Expression* e = new Expression;
-    e->set(other);
+    e->set(this);
     return e;
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::clone()
 {
-    Expression* e = Expression::make(this);
+    Expression* e = shallowClone();
     
     if (left())  e->left_  = left()->clone();
     if (right()) e->right_ = right()->clone();

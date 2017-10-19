@@ -46,7 +46,7 @@ bool Expression::enforceConstantExponent(const char* variable)
     if (parent()->isOperation(op::pow) == true)
         return true;
     
-    set (op::pow, Expression::make(this), Expression::make(1.0));
+    set (op::pow, shallowClone(), Expression::make(1.0));
     return success;
 }
 
@@ -145,7 +145,7 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
             if (toNegate->type() == CONSTANT)
                 toNegate->set(-toNegate->value());
             else
-                toNegate->set(op::mul, Expression::make(toNegate), Expression::make(-1.0));
+                toNegate->set(op::mul, toNegate->shallowClone(), Expression::make(-1.0));
 
         }
         else

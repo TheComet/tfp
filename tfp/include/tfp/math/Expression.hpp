@@ -96,8 +96,8 @@ public:
     static Expression* make(double value);
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
-    static Expression* make(Expression* other);
 
+    Expression* shallowClone();
     // deep copy, except parent is NULL
     Expression* clone();
 
