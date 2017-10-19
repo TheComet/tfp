@@ -62,7 +62,6 @@ Expression* Expression::make(Expression* other)
 Expression* Expression::clone()
 {
     Expression* e = Expression::make(this);
-    e->parent_ = NULL;
     
     if (left())  e->left_  = left()->clone();
     if (right()) e->right_ = right()->clone();
@@ -140,6 +139,8 @@ void Expression::set(Expression* other)
     tfp::Reference<Expression> ptr(other);
     left_ = other->left_;
     right_ = other->right_;
+    if (left_) left_->parent_ = this;
+    if (right_) right_->parent_ = this;
 }
 
 // ----------------------------------------------------------------------------

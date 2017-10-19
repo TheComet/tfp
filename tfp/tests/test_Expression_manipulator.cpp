@@ -28,6 +28,11 @@ TEST(NAME, eliminate_divisions)
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->left()->parent(), Eq(e));
+    ASSERT_THAT(e->right()->parent(), Eq(e));
+    ASSERT_THAT(e->right()->left()->parent(), Eq(e->right()));
+    ASSERT_THAT(e->right()->right()->parent(), Eq(e->right()));
 }
 
 TEST(NAME, eliminate_divisions_with_constant_exponent)
@@ -181,8 +186,15 @@ TEST(NAME, expand_constant_exponents_4)
     ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     e->dump("expand_constant_exponents_4.dot");
     ASSERT_THAT(e->op2(), Eq(op::mul));
-    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+
+    ASSERT_THAT(e->right()->parent(), Eq(e));
+    ASSERT_THAT(e->left()->parent(), Eq(e));
+    ASSERT_THAT(e->left()->right()->parent(), Eq(e->left()));
+    ASSERT_THAT(e->left()->left()->parent(), Eq(e->left()));
+    ASSERT_THAT(e->left()->left()->right()->parent(), Eq(e->left()->left()));
+    ASSERT_THAT(e->left()->left()->left()->parent(), Eq(e->left()->left()));
 }
 
 TEST(NAME, expand_constant_exponents_1)
@@ -218,8 +230,8 @@ TEST(NAME, expand_constant_exponents_negative_4)
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->value(), DoubleEq(-1));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->left()->right()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->left()->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->left()->op2(), Eq(op::mul));
 }
 
 TEST(NAME, expand_scalar_into_sum)
@@ -304,7 +316,8 @@ void beginDump(const char* filename);
 void endDump();
 TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
-    Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
+    //Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
+    Reference<Expression> e = Expression::parse("1/(4/(1+s)^2)");
     /*
      * Solved on paper:
      *                      s^3 + 2s^4 + s^5
@@ -327,7 +340,6 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      * a5 = -8/(a+4)
      */
     Expression::TransferFunctionCoefficients tfe = e->calculateTransferFunctionCoefficients("s");
-    //e->dump("wtf.dot", true);
 
     ASSERT_THAT(tfe.numeratorCoefficients_.size(), Eq(4u));
     ASSERT_THAT(tfe.denominatorCoefficients_.size(), Eq(4u));

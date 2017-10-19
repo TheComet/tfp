@@ -88,17 +88,19 @@ bool Expression::expandConstantExponentsIntoProducts(const char* variable)
     }
 
     Expression* toFactor = left();
-    set(op::mul, toFactor->clone(), toFactor);
+    Expression* e = Expression::make(op::mul, toFactor->clone(), toFactor);
     int expandTimes = exponent < 0 ? -exponent : exponent;
     for (int i = 2; i != expandTimes; ++i)
     {
-        set(op::mul, toFactor->clone(), Expression::make(this));
+        e = Expression::make(op::mul, e, toFactor->clone());
     }
 
     if (exponent < 0)
     {
-        set(op::pow, Expression::make(this), Expression::make(-1.0));
+        e = Expression::make(op::pow, e, Expression::make(-1.0));
     }
+
+    set(e);
 
     return true;
 }
@@ -231,6 +233,7 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
      * operator we can find in the tree. If none exists, create a div operator
      * that has no effect.
      */
+    root()->dump("wtf.dot");
     Expression* split = find(op::div);
     if (split == NULL)
         split = Expression::make(op::div, split, Expression::make(1.0));
@@ -240,6 +243,7 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
      * can start shuffling terms back and forth between the numerator and
      * denominator without having to deal with lots of edge cases.
      */
+    root()->dump("wtf.dot", true);
     split->left()->eliminateDivisionsAndSubtractions(variable);
     split->right()->eliminateDivisionsAndSubtractions(variable);
     
@@ -248,14 +252,17 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
      * constant RHS. If not, error out, because such an expression cannot be
      * reduced to a rational function.
      */
-    if (enforceConstantExponent(variable) == false)
-        return false;
+    /*if (enforceConstantExponent(variable) == false)
+        return false;*/
         //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
 
-    //eliminateConstantExponents(variable);
+    root()->dump("wtf.dot", true);
+    expandConstantExponentsIntoProducts(variable);
 
+    root()->dump("wtf.dot", true);
     split->left()->expandProducts(variable);
     split->right()->expandProducts(variable);
+    root()->dump("wtf.dot", true);
     
     return false;
 }
