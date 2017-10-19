@@ -51,21 +51,22 @@ bool Expression::enforceConstantExponent(const char* variable)
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::eliminateConstantExponents(const char* variable)
+bool Expression::expandConstantExponentsIntoProducts(const char* variable)
 {
     /*
      * Only manipulate branches that are an ancestor of an expression with the
      * specified variable.
      */
     bool weMatter = false;
-    if (left())  weMatter |= left()->eliminateConstantExponents(variable);
-    if (right()) weMatter |= right()->eliminateConstantExponents(variable);
+    if (left())  weMatter |= left()->expandConstantExponentsIntoProducts(variable);
+    if (right()) weMatter |= right()->expandConstantExponentsIntoProducts(variable);
     if (weMatter == false && hasVariable(variable) == false)
         return false;
 
     /*
      * Performs the following transformations:
-     *   s^c (c=const)  --> s*s*s*...
+     *   s^c  (c=const)  --> s*s*s*...
+     *   s^-c (c=const)  --> (s*s*s*...)^-1
      */
     if (isOperation(op::pow) == false)
         return true;
@@ -74,8 +75,6 @@ bool Expression::eliminateConstantExponents(const char* variable)
         throw std::runtime_error("Expression is raised to a non-integer value, can't expand!");
 
     int exponent = (int)right()->value();
-    if (exponent < 0)
-        throw std::runtime_error("Negative exponent was not expected in factorExponents()");
 
     if (exponent == 0)
     {
@@ -83,17 +82,22 @@ bool Expression::eliminateConstantExponents(const char* variable)
         return true;
     }
 
-    if (exponent == 1)
+    if (exponent == 1 || exponent == -1)
     {
-        set(left());
         return true;
     }
 
     Expression* toFactor = left();
     set(op::mul, toFactor->clone(), toFactor);
-    for (int i = 2; i != exponent; ++i)
+    int expandTimes = exponent < 0 ? -exponent : exponent;
+    for (int i = 2; i != expandTimes; ++i)
     {
         set(op::mul, toFactor->clone(), Expression::make(this));
+    }
+
+    if (exponent < 0)
+    {
+        set(op::pow, Expression::make(this), Expression::make(-1.0));
     }
 
     return true;
@@ -139,7 +143,7 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
             if (toNegate->type() == CONSTANT)
                 toNegate->set(-toNegate->value());
             else
-                toNegate->set(op::negate, Expression::make(toNegate));
+                toNegate->set(op::mul, Expression::make(toNegate), Expression::make(-1.0));
 
         }
         else
@@ -156,6 +160,28 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
 }
 
 // ----------------------------------------------------------------------------
+bool Expression::eliminateNegativeExponents(const char* variable)
+{
+    /*
+     * Only manipulate branches that are an ancestor of an expression with the
+     * specified variable.
+     */
+    bool weMatter = false;
+    if (left())  weMatter |= left()->eliminateNegativeExponents(variable);
+    if (right()) weMatter |= right()->eliminateNegativeExponents(variable);
+    if (weMatter == false && hasVariable(variable) == false)
+        return false;
+
+    if (parent() == NULL)
+        return true;
+
+    if (isOperation(op::pow) == false)
+        return true;
+
+    return true;
+}
+
+// ------------------------------------------------------------------------mul----
 bool Expression::expandProducts(const char* variable)
 {
     /*
@@ -167,6 +193,14 @@ bool Expression::expandProducts(const char* variable)
     if (right()) weMatter |= right()->expandProducts(variable);
     if (weMatter == false && hasVariable(variable) == false)
         return false;
+
+    /*
+     * Performs manipulations such as
+     *   (a+s)(b+s)  -->  ab + as + sb + ss
+     *   a(s+4)      -->  as + 4a
+     *
+     * Does not handle expressions with constant powers.
+     */
 
     if (parent() == NULL)
         return true;
@@ -183,39 +217,6 @@ bool Expression::expandProducts(const char* variable)
 
         factorInThis->expandProducts(variable);
         factorInOther->expandProducts(variable);
-    }
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-bool Expression::hoistProducts(const char* variable)
-{
-    /*
-     * Only manipulate branches that are an ancestor of an expression with the
-     * specified variable.
-     */
-    bool weMatter = false;
-    if (left())  weMatter |= left()->expandProducts(variable);
-    if (right()) weMatter |= right()->expandProducts(variable);
-    if (weMatter == false && hasVariable(variable) == false)
-        return false;
-
-    if (parent() == NULL)
-        return true;
-
-    if (isOperation(op::mul) == false)
-        return true;
-
-    if (parent()->isOperation(op::pow))
-    {
-        Expression* factorInOther = getOtherOperand();
-        Expression* factorInThis = factorInOther->clone();
-        parent()->set(op::add, this, Expression::make(op::mul, factorInOther, right()));
-        set(op::mul, factorInThis, left());
-
-        factorInThis->hoistProducts(variable);
-        factorInOther->hoistProducts(variable);
     }
 
     return true;
@@ -243,14 +244,15 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
     split->right()->eliminateDivisionsAndSubtractions(variable);
     
     /*
-     * All op::pow operations with our variable on the LHS are guaranteed
-     * to have a constant RHS. If not, error out.
+     * All op::pow operations with our variable on the LHS need to have a
+     * constant RHS. If not, error out, because such an expression cannot be
+     * reduced to a rational function.
      */
     if (enforceConstantExponent(variable) == false)
         return false;
         //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
 
-    eliminateConstantExponents(variable);
+    //eliminateConstantExponents(variable);
 
     split->left()->expandProducts(variable);
     split->right()->expandProducts(variable);
@@ -261,7 +263,7 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
 // ----------------------------------------------------------------------------
 Expression::TransferFunctionCoefficients Expression::calculateTransferFunctionCoefficients(const char* variable)
 {
-    
+    manipulateIntoRationalFunction(variable);
     
     return TransferFunctionCoefficients();
 }

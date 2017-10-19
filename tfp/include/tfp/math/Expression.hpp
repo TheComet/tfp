@@ -123,7 +123,7 @@ public:
     bool hasVariable(const char* variable) const;
     Expression* getOtherOperand() const;
 
-    void dump(const char* filename);
+    void dump(const char* filename, bool append=false);
     void dump(FILE* fp);
     void dump();
 
@@ -145,12 +145,11 @@ public:
     // Expression_manipulation.cpp
     void enforceProductLHS(const char* variable);
     bool enforceConstantExponent(const char* variable);
-    bool eliminateConstantExponents(const char* variable);
+    bool expandConstantExponentsIntoProducts(const char* variable);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     bool eliminateNegativeExponents(const char* variable);
     Expression* findOrAddLatestDivision();
     bool expandProducts(const char* variable);
-    bool hoistProducts(const char* variable);
     bool manipulateIntoRationalFunction(const char* variable);
 
     /*!

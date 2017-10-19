@@ -21,6 +21,12 @@ void Expression::optimise()
             set(right()->right());
             continue;
         }
+
+        if (right()->type() == CONSTANT)
+        {
+            set(evaluate());
+            continue;
+        }
     }
 
     // Anything beyond this point must have two operands.

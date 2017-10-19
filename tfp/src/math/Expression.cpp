@@ -340,9 +340,10 @@ void Expression::dump(FILE* fp)
     dumpRecurse(fp, this);
     fprintf(fp, "}\n\n");
 }
-void Expression::dump(const char* filename)
+void Expression::dump(const char* filename, bool append)
 {
-    FILE* fp = fopen(filename, "w");
+    const char* mode = append ? "a" : "w";
+    FILE* fp = fopen(filename, mode);
     dump(fp);
     fclose(fp);
 }

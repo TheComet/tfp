@@ -49,8 +49,9 @@ TEST(NAME, eliminate_divisions_with_variable_exponent)
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
-    ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
-    ASSERT_THAT(e->right()->right()->right()->name(), StrEq("x"));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
+    ASSERT_THAT(e->right()->right()->left()->name(), StrEq("x"));
 }
 
 TEST(NAME, eliminate_subtractions)
@@ -83,8 +84,9 @@ TEST(NAME, eliminate_subtractions_with_variable_post_factor)
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
-    ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
-    ASSERT_THAT(e->right()->right()->right()->name(), StrEq("x"));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->left()->name(), StrEq("x"));
+    ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
 }
 
 TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
@@ -95,8 +97,9 @@ TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->value(), DoubleEq(2));
-    ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
-    ASSERT_THAT(e->right()->right()->right()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
 }
 
 TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
@@ -107,8 +110,9 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->name(), StrEq("x"));
-    ASSERT_THAT(e->right()->right()->op1(), Eq(op::negate));
-    ASSERT_THAT(e->right()->right()->right()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
 }
 
 TEST(NAME, enforce_constant_exponent_on_missing_exponent)
@@ -171,36 +175,51 @@ TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
     ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(5.0));
 }
 
-TEST(NAME, factor_exponent_4)
+TEST(NAME, expand_constant_exponents_4)
 {
     Reference<Expression> e = Expression::parse("a^4");
-    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
-    e->dump("factor_constant_integer_exponent.dot");
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    e->dump("expand_constant_exponents_4.dot");
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
 }
 
-TEST(NAME, factor_exponent_1)
+TEST(NAME, expand_constant_exponents_1)
 {
     Reference<Expression> e = Expression::parse("a^1");
-    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     ASSERT_THAT(e->type(), Eq(Expression::VARIABLE));
     ASSERT_THAT(e->name(), StrEq("a"));
 }
 
-TEST(NAME, factor_exponent_0)
+TEST(NAME, expand_constant_exponents_0)
 {
     Reference<Expression> e = Expression::parse("a^0");
-    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     ASSERT_THAT(e->type(), Eq(Expression::CONSTANT));
     ASSERT_THAT(e->value(), DoubleEq(1.0));
 }
 
-TEST(NAME, factor_exponent_negative)
+TEST(NAME, expand_constant_exponents_negative_1)
 {
     Reference<Expression> e = Expression::parse("a^-1");
-    EXPECT_THROW(e->eliminateConstantExponents("a"), std::runtime_error);
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(-1));
+}
+
+TEST(NAME, expand_constant_exponents_negative_4)
+{
+    Reference<Expression> e = Expression::parse("a^-4");
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    e->dump("expand_constant_exponents_negative_4.dot");
+    ASSERT_THAT(e->op2(), Eq(op::pow));
+    ASSERT_THAT(e->right()->value(), DoubleEq(-1));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->right()->right()->op2(), Eq(op::mul));
 }
 
 TEST(NAME, expand_scalar_into_sum)
@@ -268,7 +287,7 @@ TEST(NAME, expand_binomial_exponent)
     vt->set("b", 7.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->eliminateConstantExponents("a"), Eq(true));
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     ASSERT_THAT(e->expandProducts("a"), Eq(true));
     e->dump("expand_binomial_exponent.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
@@ -285,29 +304,31 @@ void beginDump(const char* filename);
 void endDump();
 TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
-    Reference<Expression> e = Expression::parse("1/(1/s^2 - 4/(1+s) - 8/(a+4))");
+    Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
     /*
      * Solved on paper:
-     *                 (a+4)s^2 + (a+4)s^3
-     *  G(s) = ---------------------------------
-     *         (a+4) + (a+4)s + (8-4a)s^2 + 8s^3
+     *                      s^3 + 2s^4 + s^5
+     *  G(s) = ---------------------------------------------
+     *         1 + 2s + s^2 + (-4-x)s^3 + (-2x)s^4 + (-x)s^5
+     * where:
+     *     x = 8/(a+4)
      *
      * b0 = 0
      * b1 = 0
-     * b2 = a+4
-     * b3 = a+4
-     * a0 = a+4
-     * a1 = a+4
-     * a2 = 8-4a
-     * a3 = 8
-     *
+     * b2 = 0
+     * b3 = 1
+     * b4 = 2
+     * b5 = 1
+     * a0 = 1
+     * a1 = 2
+     * a2 = 1
+     * a3 = -4-8/(a+4)
+     * a4 = -16/(a+4)
+     * a5 = -8/(a+4)
      */
-    beginDump("wtf.dot");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
-    e->dump();
-    endDump();
-
     Expression::TransferFunctionCoefficients tfe = e->calculateTransferFunctionCoefficients("s");
+    //e->dump("wtf.dot", true);
+
     ASSERT_THAT(tfe.numeratorCoefficients_.size(), Eq(4u));
     ASSERT_THAT(tfe.denominatorCoefficients_.size(), Eq(4u));
     Expression* b0 = tfe.numeratorCoefficients_[0];

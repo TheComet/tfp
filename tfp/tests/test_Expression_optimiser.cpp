@@ -19,6 +19,17 @@ TEST(NAME, simplify_constant_expressions)
     EXPECT_THAT(e->value(), DoubleEq(10.0));
 }
 
+TEST(NAME, simplify_constant_expression_with_negate)
+{
+    Reference<Expression> e = Expression::make(op::pow,
+        Expression::make("a"),
+        Expression::make(op::negate,
+            Expression::make(1.0)));
+    e->optimise();
+    ASSERT_THAT(e->type(), Eq(Expression::FUNCTION2));
+    ASSERT_THAT(e->right()->value(), DoubleEq(-1));
+}
+
 TEST(NAME, simplify_constant_expressions_exponent)
 {
     tfp::Reference<Expression> e = Expression::parse("2^5");
