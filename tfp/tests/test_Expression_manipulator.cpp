@@ -17,6 +17,8 @@ TEST(NAME, enforce_product_order)
     e->enforceProductLHS("b");
     EXPECT_THAT(e->left()->name(), StrEq("b"));
     EXPECT_THAT(e->right()->name(), StrEq("a"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_divisions)
@@ -29,10 +31,7 @@ TEST(NAME, eliminate_divisions)
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(-1));
 
-    ASSERT_THAT(e->left()->parent(), Eq(e));
-    ASSERT_THAT(e->right()->parent(), Eq(e));
-    ASSERT_THAT(e->right()->left()->parent(), Eq(e->right()));
-    ASSERT_THAT(e->right()->right()->parent(), Eq(e->right()));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_divisions_with_constant_exponent)
@@ -44,6 +43,8 @@ TEST(NAME, eliminate_divisions_with_constant_exponent)
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(-2));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_divisions_with_variable_exponent)
@@ -57,6 +58,8 @@ TEST(NAME, eliminate_divisions_with_variable_exponent)
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
     ASSERT_THAT(e->right()->right()->left()->name(), StrEq("x"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_subtractions)
@@ -68,6 +71,8 @@ TEST(NAME, eliminate_subtractions)
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_subtractions_with_constant_post_factor)
@@ -79,6 +84,8 @@ TEST(NAME, eliminate_subtractions_with_constant_post_factor)
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(-2));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_subtractions_with_variable_post_factor)
@@ -92,6 +99,8 @@ TEST(NAME, eliminate_subtractions_with_variable_post_factor)
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->left()->name(), StrEq("x"));
     ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
@@ -105,6 +114,8 @@ TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
@@ -118,6 +129,8 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->right()->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_missing_exponent)
@@ -128,6 +141,8 @@ TEST(NAME, enforce_constant_exponent_on_missing_exponent)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(1.0));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_existing_constant_exponent)
@@ -138,6 +153,8 @@ TEST(NAME, enforce_constant_exponent_on_existing_constant_exponent)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(3.0));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_only_on_trees_that_have_variable)
@@ -146,28 +163,33 @@ TEST(NAME, enforce_constant_exponent_only_on_trees_that_have_variable)
     ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 
     e = Expression::parse("(a+s)^c");
     ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
     
     e = Expression::parse("(a+s)^2");
     ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_variable_exponent_fails)
 {
     Reference<Expression> e = Expression::parse("1/(s^a+4)");
     ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_expression_exponent_fails)
 {
     Reference<Expression> e = Expression::parse("1/(s^(a+1)+4)");
     ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
@@ -178,6 +200,8 @@ TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
     ASSERT_THAT(e->right()->left()->right()->value(), DoubleEq(5.0));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_constant_exponents_4)
@@ -189,12 +213,7 @@ TEST(NAME, expand_constant_exponents_4)
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
 
-    ASSERT_THAT(e->right()->parent(), Eq(e));
-    ASSERT_THAT(e->left()->parent(), Eq(e));
-    ASSERT_THAT(e->left()->right()->parent(), Eq(e->left()));
-    ASSERT_THAT(e->left()->left()->parent(), Eq(e->left()));
-    ASSERT_THAT(e->left()->left()->right()->parent(), Eq(e->left()->left()));
-    ASSERT_THAT(e->left()->left()->left()->parent(), Eq(e->left()->left()));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_constant_exponents_1)
@@ -203,6 +222,8 @@ TEST(NAME, expand_constant_exponents_1)
     ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     ASSERT_THAT(e->type(), Eq(Expression::VARIABLE));
     ASSERT_THAT(e->name(), StrEq("a"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_constant_exponents_0)
@@ -211,6 +232,8 @@ TEST(NAME, expand_constant_exponents_0)
     ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     ASSERT_THAT(e->type(), Eq(Expression::CONSTANT));
     ASSERT_THAT(e->value(), DoubleEq(1.0));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_constant_exponents_negative_1)
@@ -220,6 +243,8 @@ TEST(NAME, expand_constant_exponents_negative_1)
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->value(), DoubleEq(-1));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_constant_exponents_negative_4)
@@ -232,6 +257,8 @@ TEST(NAME, expand_constant_exponents_negative_4)
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->left()->op2(), Eq(op::mul));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_scalar_into_sum)
@@ -245,6 +272,8 @@ TEST(NAME, expand_scalar_into_sum)
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->right()->name(), StrEq("c"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_expression_into_sum)
@@ -268,6 +297,7 @@ TEST(NAME, expand_expression_into_sum)
     // Make sure subtrees were actually duplicated
     ASSERT_THAT(e->left()->left(), Ne(e->right()->left()));
     EXPECT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_binomial_product)
@@ -289,6 +319,8 @@ TEST(NAME, expand_binomial_product)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, expand_binomial_exponent)
@@ -310,6 +342,8 @@ TEST(NAME, expand_binomial_exponent)
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
     ASSERT_THAT(e->evaluate(vt), DoubleEq(beforeResult));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 void beginDump(const char* filename);

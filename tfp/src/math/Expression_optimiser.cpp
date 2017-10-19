@@ -144,3 +144,35 @@ void Expression::optimise()
     break;
     }
 }
+
+// ----------------------------------------------------------------------------
+bool Expression::checkParentConsistencies() const
+{
+    bool success = true;
+    if (left())  success &= left()->checkParentConsistencies();
+    if (right()) success &= right()->checkParentConsistencies();
+
+    if (left() && left()->parent() != this)
+    {
+        std::cout << "Parent of expression is pointing somewhere else!" << std::endl;
+        success = false;
+    }
+    if (right() && right()->parent() != this)
+    {
+        std::cout << "Parent of expression is pointing somewhere else!" << std::endl;
+        success = false;
+    }
+
+    if (left() && left()->refs() != 1)
+    {
+        std::cout << "Refcount of sub-expression is not 1" << std::endl;
+        success = false;
+    }
+    if (right() && right()->refs() != 1)
+    {
+        std::cout << "Refcount of sub-expression is not 1" << std::endl;
+        success = false;
+    }
+
+    return success;
+}

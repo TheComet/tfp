@@ -59,12 +59,14 @@ Expression* Expression::shallowClone()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::clone()
+Expression* Expression::clone(Expression* parent)
 {
     Expression* e = shallowClone();
     
-    if (left())  e->left_  = left()->clone();
-    if (right()) e->right_ = right()->clone();
+    if (left())  e->left_  = left()->clone(e);
+    if (right()) e->right_ = right()->clone(e);
+    e->parent_ = parent;
+
     return e;
 }
 
@@ -315,29 +317,33 @@ void writeName(FILE* fp, Expression* e)
         case Expression::INVALID : break;
     }
 }
-int guid = 0;
-static int dumpRecurse(FILE* fp, Expression* e)
+int guid = 1;
+static void dumpRecurse(FILE* fp, Expression* e)
 {
-    int thisId = guid++;
-    fprintf(fp, "    %d [label=", thisId);
+    std::size_t thisId = (std::size_t)e;
+    fprintf(fp, "    %lu [label=", thisId);
     writeName(fp, e);
     fprintf(fp, "];\n");
 
     if (e->right())
     {
-        fprintf(fp, "    %d -- %d [label=rhs];\n", thisId, dumpRecurse(fp, e->right()));
+        dumpRecurse(fp, e->right());
+        fprintf(fp, "    %lu -> %lu [label=rhs];\n", thisId, (std::size_t)e->right());
     }
     if (e->left())
     {
-        fprintf(fp, "    %d -- %d [label=lhs];\n", thisId, dumpRecurse(fp, e->left()));
+        dumpRecurse(fp, e->left());
+        fprintf(fp, "    %lu -> %lu [label=lhs];\n", thisId, (std::size_t)e->left());
     }
-
-    return thisId;
+    if (e->parent())
+    {
+        fprintf(fp, "    %lu -> %lu [color=\"0.2 1.0 1.0\"];\n", thisId, (std::size_t)e->parent());
+    }
 }
 void Expression::dump(FILE* fp)
 {
-    fprintf(fp, "graph graphname {\n");
-    fprintf(fp, "    %d [color=\"0.0 1.0 1.0\"];\n", guid);
+    fprintf(fp, "digraph graphname {\n");
+    fprintf(fp, "    %lu [color=\"0.0 1.0 1.0\"];\n", (std::size_t)this);
     dumpRecurse(fp, this);
     fprintf(fp, "}\n\n");
 }

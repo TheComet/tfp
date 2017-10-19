@@ -98,8 +98,8 @@ public:
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
 
     Expression* shallowClone();
-    // deep copy, except parent is NULL
-    Expression* clone();
+    // deep copy, except parent defaults to NULL
+    Expression* clone(Expression* parent=NULL);
 
     void set(const char* variableName);
     void set(double value);
@@ -193,6 +193,7 @@ public:
 
     // Expression_optimisation.cpp
     void optimise();
+    bool checkParentConsistencies() const;
 
 private:
 
