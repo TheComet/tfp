@@ -280,12 +280,6 @@ bool Expression::expand(const char* variable)
         factorInOther->expand(variable);
     }
 
-    if (parent()->isOperation(op::pow))
-    {
-        parent()->expandConstantExponentsIntoProducts(variable);
-        parent()->factorNegativeExponents(variable);
-    }
-
     return true;
 }
 
@@ -321,7 +315,12 @@ bool Expression::manipulateIntoRationalFunction(const char* variable)
     /*if (enforceConstantExponent(variable) == false)
         return false;*/
         //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
-    expandConstantExponentsIntoProducts(variable);
+    do
+    {
+        bool mutated = true;
+        mutated |= split()->right()->expandConstantExponentsIntoProducts(variable);
+        mutated |= split()->right()->expand(variable);
+        mutated |= split()->right()->expand(variable);
     root()->dump("wtf.dot", true);
 
     split->left()->expand(variable);
