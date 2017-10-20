@@ -24,7 +24,7 @@ TEST(NAME, enforce_product_order)
 TEST(NAME, eliminate_divisions)
 {
     Reference<Expression> e = Expression::parse("a/s");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
@@ -37,7 +37,7 @@ TEST(NAME, eliminate_divisions)
 TEST(NAME, eliminate_divisions_with_constant_exponent)
 {
     Reference<Expression> e = Expression::parse("a/s^2");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
@@ -51,7 +51,7 @@ TEST(NAME, eliminate_divisions_with_variable_exponent)
 {
     Reference<Expression> e = Expression::parse("a/s^x");
     e->dump("eliminate_divisions_with_variable_exponent.dot");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     e->dump("eliminate_divisions_with_variable_exponent.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -67,7 +67,7 @@ TEST(NAME, eliminate_divisions_with_variable_exponent)
 TEST(NAME, eliminate_subtractions)
 {
     Reference<Expression> e = Expression::parse("a-s");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
@@ -80,7 +80,7 @@ TEST(NAME, eliminate_subtractions)
 TEST(NAME, eliminate_subtractions_with_constant_post_factor)
 {
     Reference<Expression> e = Expression::parse("a-s*2");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
@@ -93,7 +93,7 @@ TEST(NAME, eliminate_subtractions_with_constant_post_factor)
 TEST(NAME, eliminate_subtractions_with_variable_post_factor)
 {
     Reference<Expression> e = Expression::parse("a-s*x");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
@@ -108,7 +108,7 @@ TEST(NAME, eliminate_subtractions_with_variable_post_factor)
 TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
 {
     Reference<Expression> e = Expression::parse("a-2*s");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
@@ -123,7 +123,7 @@ TEST(NAME, eliminate_subtractions_with_constant_pre_factor)
 TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
 {
     Reference<Expression> e = Expression::parse("a-x*s");
-    EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    EXPECT_THAT(e->recursivelyCall(&Expression::eliminateDivisionsAndSubtractions, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
@@ -138,7 +138,7 @@ TEST(NAME, eliminate_subtractions_with_variable_pre_factor)
 TEST(NAME, enforce_constant_exponent_on_missing_exponent)
 {
     Reference<Expression> e = Expression::parse("1/(s+4)");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), Eq(true));
     ASSERT_THAT(e->right()->op2(), Eq(op::add));
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
@@ -150,7 +150,9 @@ TEST(NAME, enforce_constant_exponent_on_missing_exponent)
 TEST(NAME, enforce_constant_exponent_on_existing_constant_exponent)
 {
     Reference<Expression> e = Expression::parse("1/(s^3+4)");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    e->dump("enforce_constant_exponent_on_existing_constant_exponent.dot");
+    ASSERT_THAT(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), Eq(false));
+    e->dump("enforce_constant_exponent_on_existing_constant_exponent.dot", true);
     ASSERT_THAT(e->right()->op2(), Eq(op::add));
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
@@ -162,19 +164,19 @@ TEST(NAME, enforce_constant_exponent_on_existing_constant_exponent)
 TEST(NAME, enforce_constant_exponent_only_on_trees_that_have_variable)
 {
     Reference<Expression> e = Expression::parse("(a+b)^c");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), Eq(false));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 
     e = Expression::parse("(a+s)^c");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    EXPECT_THROW(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), std::runtime_error);
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
     
     e = Expression::parse("(a+s)^2");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
@@ -183,21 +185,21 @@ TEST(NAME, enforce_constant_exponent_only_on_trees_that_have_variable)
 TEST(NAME, enforce_constant_exponent_on_variable_exponent_fails)
 {
     Reference<Expression> e = Expression::parse("1/(s^a+4)");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    ASSERT_THROW(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), std::runtime_error);
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_expression_exponent_fails)
 {
     Reference<Expression> e = Expression::parse("1/(s^(a+1)+4)");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(false));
+    EXPECT_THROW(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), std::runtime_error);
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
 {
     Reference<Expression> e = Expression::parse("1/(s^(4+1)+4)");
-    ASSERT_THAT(e->enforceConstantExponent("s"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::enforceConstantExponent, "s"), Eq(false));
     ASSERT_THAT(e->right()->op2(), Eq(op::add));
     ASSERT_THAT(e->right()->left()->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->left()->left()->name(), StrEq("s"));
@@ -210,7 +212,7 @@ TEST(NAME, expand_constant_exponents_4)
 {
     Reference<Expression> e = Expression::parse("a^4");
     e->dump("expand_constant_exponents_4.dot");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(true));
     e->dump("expand_constant_exponents_4.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
@@ -222,7 +224,7 @@ TEST(NAME, expand_constant_exponents_4)
 TEST(NAME, expand_constant_exponents_1)
 {
     Reference<Expression> e = Expression::parse("a^1");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(false));
     ASSERT_THAT(e->type(), Eq(Expression::VARIABLE));
     ASSERT_THAT(e->name(), StrEq("a"));
 
@@ -232,7 +234,7 @@ TEST(NAME, expand_constant_exponents_1)
 TEST(NAME, expand_constant_exponents_0)
 {
     Reference<Expression> e = Expression::parse("a^0");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(true));
     ASSERT_THAT(e->type(), Eq(Expression::CONSTANT));
     ASSERT_THAT(e->value(), DoubleEq(1.0));
 
@@ -242,7 +244,7 @@ TEST(NAME, expand_constant_exponents_0)
 TEST(NAME, expand_constant_exponents_negative_1)
 {
     Reference<Expression> e = Expression::parse("a^-1");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(false));
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->value(), DoubleEq(-1));
@@ -253,7 +255,7 @@ TEST(NAME, expand_constant_exponents_negative_1)
 TEST(NAME, expand_constant_exponents_negative_4)
 {
     Reference<Expression> e = Expression::parse("a^-4");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(true));
     e->dump("expand_constant_exponents_negative_4.dot");
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->right()->value(), DoubleEq(-1));
@@ -267,7 +269,7 @@ TEST(NAME, expand_constant_exponents_negative_4)
 TEST(NAME, expand_scalar_into_sum)
 {
     Reference<Expression> e = Expression::parse("a*(b+c)");
-    ASSERT_THAT(e->expand("b"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expand, "b"), Eq(true));
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->name(), StrEq("a"));
@@ -290,13 +292,15 @@ TEST(NAME, expand_expression_into_sum)
     vt->set("d", 17.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->expand("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expand, "a"), Eq(true));
     e->dump("expand_expression_into_sum.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->left()->left()->op2(), Eq(op::add));
-    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->right()->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->right()->op2(), Eq(op::mul));
 
     // Make sure subtrees were actually duplicated
     ASSERT_THAT(e->left()->left(), Ne(e->right()->left()));
@@ -313,7 +317,7 @@ TEST(NAME, expand_binomial_product)
     vt->set("c", 13.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->expand("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expand, "a"), Eq(true));
     e->dump("expand_binomial_product.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
@@ -335,8 +339,8 @@ TEST(NAME, expand_binomial_exponent)
     vt->set("b", 7.0);
     double beforeResult = e->evaluate(vt);
 
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
-    ASSERT_THAT(e->expand("a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expandConstantExponentsIntoProducts, "a"), Eq(true));
+    ASSERT_THAT(e->recursivelyCall(&Expression::expand, "a"), Eq(true));
     e->dump("expand_binomial_exponent.dot");
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::add));
@@ -385,7 +389,7 @@ TEST(NAME, factor_negative_exponents_in_addition)
     vt->set("s", 5.0);
     double resultBefore = e->evaluate(vt);
     e->dump("factor_negative_exponents_in_addition.dot");
-    e->factorNegativeExponents("s");
+    ASSERT_THAT(e->recursivelyCall(&Expression::factorNegativeExponents, "s"), Eq(true));
     e->dump("factor_negative_exponents_in_addition.dot", true);
     
     ASSERT_THAT(e->op2(), Eq(op::mul));

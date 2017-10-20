@@ -399,17 +399,30 @@ Expression* Expression::getOtherOperand() const
 // ----------------------------------------------------------------------------
 bool Expression::recursivelyCall(bool (Expression::*optfunc)())
 {
-	if (left() && left()->recursivelyCall(optfunc)) return true;
+    if (left() && left()->recursivelyCall(optfunc)) return true;
     if (right() && right()->recursivelyCall(optfunc)) return true;
-	return (this->*optfunc)();
+    return (this->*optfunc)();
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable)
+bool Expression::recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable, bool* hasVariable)
 {
-    if (left()  && left()->recursivelyCall(optfunc, variable)) return true;
-    if (right() && right()->recursivelyCall(optfunc, variable)) return true;
-    return (this->*optfunc)(variable);
+    /*
+     * Only manipulate branches that are an ancestor of an expression with the
+     * specified variable. Each recursive call returns true if the tree was
+     * manipulated in some way.
+     */
+    bool childWasMutated = false;
+    bool childHadVariable = false;
+    if (left())  childWasMutated |= left()->recursivelyCall(optfunc, variable, &childHadVariable);
+    if (right()) childWasMutated |= right()->recursivelyCall(optfunc, variable, &childHadVariable);
+    if (hasVariable != NULL) *hasVariable |= childHadVariable;
+
+    if (childHadVariable == false && this->hasVariable(variable) == false)
+        return false;
+
+    if (hasVariable != NULL) *hasVariable = true;
+    return (this->*optfunc)(variable) | childWasMutated;
 }
 
 // ----------------------------------------------------------------------------

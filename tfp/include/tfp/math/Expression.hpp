@@ -126,7 +126,7 @@ public:
     double evaluate(const VariableTable* vt=NULL, std::set<std::string>* visited=NULL) const;
     
     bool recursivelyCall(bool (Expression::*optfunc)());
-    bool recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable);
+    bool recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable, bool* hasVariable=NULL);
 
     /*!
      * Returns true if the types match and (depending on type) symbol names, value, or
@@ -159,16 +159,18 @@ public:
     op::Op1 op1() const { assert(type_ == FUNCTION1); return data_.op1_; }
     op::Op2 op2() const { assert(type_ == FUNCTION2); return data_.op2_; }
 
-    // Expression_manipulation.cpp
-    void enforceProductLHS(const char* variable);
+    // ------- Expression_manipulation.cpp -------------
+
+    // internal stuff
+    bool manipulateIntoRationalFunction(const char* variable);
+    bool enforceProductLHS(const char* variable);
     bool enforceConstantExponent(const char* variable);
     bool expandConstantExponentsIntoProducts(const char* variable);
     bool factorNegativeExponents(const char* variable);
-    void factorIn(Expression* e, const Expression* ignore=NULL);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     Expression* findOrAddLatestDivision();
     bool expand(const char* variable);
-    bool manipulateIntoRationalFunction(const char* variable);
+    void factorIn(Expression* e, const Expression* ignore=NULL);
 
     /*!
      * @brief Attempts to manipulate the expression into the standard "Transfer
