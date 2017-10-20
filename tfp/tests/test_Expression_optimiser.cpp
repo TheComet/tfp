@@ -272,7 +272,9 @@ TEST(NAME, optimise_multiplication_chain_with_variable_in_middle)
         Expression::make(op::mul,
             Expression::make("a"),
             Expression::make(2.0)));
+    e->dump("optimise_multiplication_chain_with_variable_in_middle.dot");
     e->optimise();
+    e->dump("optimise_multiplication_chain_with_variable_in_middle.dot", true);
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->value(), DoubleEq(4.0));
 
@@ -350,12 +352,58 @@ TEST(NAME, optimise_division_chain_with_variable_at_end)
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
+TEST(NAME, optimise_recursive_redundant_additions)
+{
+    Reference<Expression> e = Expression::make(op::add,
+        Expression::make(op::add,
+            Expression::make(5.0),
+            Expression::make("a")),
+        Expression::make(op::add,
+            Expression::make(3.0),
+            Expression::make("b")));
+    e->dump("optimise_recursive_redundant_additions.dot");
+    e->optimise();
+    e->dump("optimise_recursive_redundant_additions.dot", true);
+
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->right()->name(), StrEq("b"));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->left()->value(), DoubleEq(8.0));
+    ASSERT_THAT(e->left()->right()->name(), StrEq("a"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
+TEST(NAME, optimise_recursive_redundant_multiplications)
+{
+    Reference<Expression> e = Expression::make(op::mul,
+        Expression::make(op::mul,
+            Expression::make(3.0),
+            Expression::make("a")),
+        Expression::make(op::mul,
+            Expression::make(5.0),
+            Expression::make("b")));
+    e->dump("optimise_recursive_redundant_multiplications.dot");
+    e->optimise();
+    e->dump("optimise_recursive_redundant_multiplications.dot", true);
+
+    ASSERT_THAT(e->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->name(), StrEq("b"));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->value(), DoubleEq(15.0));
+    ASSERT_THAT(e->left()->right()->name(), StrEq("a"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
 TEST(NAME, exponentiate_two_equal_product_operands)
 {
     Reference<Expression> e = Expression::make(op::mul,
         Expression::make("a"),
         Expression::make("a"));
+    e->dump("exponentiate_two_equal_product_operands.dot");
     e->optimise();
+    e->dump("exponentiate_two_equal_product_operands.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::pow));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->value(), DoubleEq(2.0));
@@ -368,10 +416,12 @@ TEST(NAME, exponentiate_three_equal_product_operands)
         Expression::make(op::mul,
             Expression::make("a"),
             Expression::make("a")));
+    e->dump("exponentiate_three_equal_product_operands.dot");
     e->optimise();
+    e->dump("exponentiate_three_equal_product_operands.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::pow));
-    ASSERT_THAT(e->right()->name(), StrEq("a"));
-    ASSERT_THAT(e->left()->value(), DoubleEq(3.0));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(3.0));
 }
 
 TEST(NAME, exponentiate_chain_of_product_operands_with_constant_in_middle)
@@ -381,7 +431,9 @@ TEST(NAME, exponentiate_chain_of_product_operands_with_constant_in_middle)
         Expression::make(op::mul,
             Expression::make(5.0),
             Expression::make("a")));
+    e->dump("exponentiate_chain_of_product_operands_with_constant_in_middle.dot");
     e->optimise();
+    e->dump("exponentiate_chain_of_product_operands_with_constant_in_middle.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->value(), DoubleEq(5.0));
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
@@ -389,6 +441,38 @@ TEST(NAME, exponentiate_chain_of_product_operands_with_constant_in_middle)
     ASSERT_THAT(e->right()->right()->value(), DoubleEq(2.0));
 }
 
-TEST(NAME, sort_chain_of_operations)
+TEST(NAME, collapse_chain_of_3_add_operations)
 {
+    Reference<Expression> e = Expression::make(op::add,
+        Expression::make(5.0),
+        Expression::make(op::add,
+            Expression::make("a"),
+            Expression::make(op::add,
+                Expression::make("b"),
+                Expression::make(8.0))));
+    e->dump("collapse_chain_of_3_add_operations.dot");
+    e->recursivelyCall(&Expression::collapseChainOfOperations);
+    e->dump("collapse_chain_of_3_add_operations.dot", true);
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("b"));
+    ASSERT_THAT(e->right()->right()->value(), DoubleEq(13.0));
+}
+
+TEST(NAME, collapse_chain_of_3_mul_operations)
+{
+    Reference<Expression> e = Expression::make(op::mul,
+        Expression::make(3.0),
+        Expression::make(op::mul,
+            Expression::make("a"),
+            Expression::make(op::mul,
+                Expression::make("b"),
+                Expression::make(2.0))));
+    e->dump("collapse_chain_of_3_mul_operations.dot");
+    e->recursivelyCall(&Expression::collapseChainOfOperations);
+    e->dump("collapse_chain_of_3_mul_operations.dot", true);
+    ASSERT_THAT(e->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("b"));
+    ASSERT_THAT(e->right()->right()->value(), DoubleEq(6.0));
 }

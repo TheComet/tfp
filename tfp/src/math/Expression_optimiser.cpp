@@ -23,6 +23,7 @@ void Expression::optimise()
         mutated |= recursivelyCall(&Expression::optimiseUselessExponents);
         mutated |= recursivelyCall(&Expression::optimiseAdditionsIntoProducts);
         mutated |= recursivelyCall(&Expression::optimiseExponentiate);
+        mutated |= recursivelyCall(&Expression::collapseChainOfOperations);
     } while(mutated);
 }
 
@@ -175,7 +176,37 @@ bool Expression::optimiseUselessExponents()
 // ----------------------------------------------------------------------------
 bool Expression::optimiseAdditionsIntoProducts()
 {
-    return false;  // TODO
+    if (right() == NULL || left() == NULL)
+        return false;
+
+    if (isOperation(op::add))
+    {
+        /*
+         * Choose one of our operands that is not constant. The constant
+         * operands are handled in collapseChainOfOperations().
+         * We will then search the tree for another node that matches this one.
+         */
+        Reference<Expression>& nonConstant = left()->type() == CONSTANT ? right_ : left_;
+
+        // Travel up the chain of op::muls...
+        Expression* top;
+        for (top = nonConstant; top->parent() != NULL && top->parent()->isOperation(op::add); top = top->parent())
+        {}
+        if (top == nonConstant)
+            return false;
+
+        // And search downwards again for any expression node that is the same
+        // as one of our non-constant operands
+        Expression* same = top->findSame(nonConstant);
+        if (same == NULL)
+            return false;
+
+        nonConstant = Expression::make(op::mul, nonConstant, Expression::make(2.0));
+        same->parent()->set(same->getOtherOperand());
+        return true;
+    }
+
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -184,23 +215,53 @@ bool Expression::optimiseExponentiate()
     if (right() == NULL || left() == NULL)
         return false;
 
-    if (isOperation(op::mul) && left()->isSameAs(right()))
+    if (isOperation(op::mul))
     {
-        set(op::pow, left(), Expression::make(2.0));
+        /*
+         * Choose one of our operands that is not constant. The constant
+         * operands are handled in collapseChainOfOperations().
+         * We will then search the tree for another node that matches this one.
+         */
+        Reference<Expression>& nonConstant = left()->type() == CONSTANT ? right_ : left_;
+
+        // Travel up the chain of op::muls...
+        Expression* top;
+        for (top = nonConstant; top->parent() != NULL && top->parent()->isOperation(op::mul); top = top->parent())
+        {}
+        if (top == nonConstant)
+            return false;
+
+        // And search downwards again for any expression node that is the same
+        // as one of our non-constant operands
+        Expression* same = top->findSame(nonConstant);
+        if (same == NULL)
+            return false;
+
+        nonConstant = Expression::make(op::pow, nonConstant, Expression::make(2.0));
+        same->parent()->set(same->getOtherOperand());
         return true;
     }
 
-    if (isOperation(op::pow) && parent() && parent()->isOperation(op::mul))
+    if (isOperation(op::pow))
     {
-        Expression* otherOperand = getOtherOperand();
-        if (left()->isSameAs(otherOperand))
+        // TODO move this into its own function, as the two above
+        // TODO travel up chain, recurse down again
+        // TODO write unit test that falsifies this.
+        Expression* e = this;
+        while ((e = e->parent()) != NULL && e->isOperation(op::mul))
         {
-            parent()->set(op::pow,
-                this,
-                Expression::make(op::add,
-                    right(),
-                    Expression::make(1.0)));
-            return true;
+            if (left()->isSameAs(e->left()))
+            {
+                right_ = Expression::make(op::add, right(), Expression::make(1.0));
+                e->set(e->right());
+                return true;
+            }
+            if (left()->isSameAs(e->right()))
+            {
+                right_ = Expression::make(op::add, right(), Expression::make(1.0));
+                e->set(e->left());
+                return true;
+            }
         }
     }
 
@@ -210,73 +271,64 @@ bool Expression::optimiseExponentiate()
 // ----------------------------------------------------------------------------
 bool Expression::collapseChainOfOperations()
 {
-    bool ret = false;
+    if (left() && left()->type() != CONSTANT && right() && right()->type() != CONSTANT)
+        return false;
 
-    if (isOperation(op::mul) && (left()->type() == CONSTANT || right()->type() == CONSTANT))
+    if (isOperation(op::add))
     {
-        double product = left()->type() == CONSTANT ? left()->value() : right()->value();
-        Expression* e = parent();
-        while (e != NULL && e->isOperation(op::mul))
+        // Travel up the chain of op::adds...
+        Expression* e;
+        for (e = this; e->parent() != NULL && e->parent()->isOperation(op::add);)
         {
-            if (e->left()->type() == CONSTANT || e->right()->type() == CONSTANT)
-            {
-                if (e->left()->type() == CONSTANT)
-                {
-                    product *= e->left()->value();
-                    e->set(e->right());
-                    ret = true;
-                }
-                else
-                {
-                    product *= e->right()->value();
-                    e->set(e->left());
-                    ret = true;
-                }
-            }
             e = e->parent();
+            if (e->left()->type() == CONSTANT || e->right()->type() == CONSTANT)
+                break;
         }
+        if (e == this)
+            return false;
 
-        if (e->left()->type() == CONSTANT)
-            e->left()->set(product);
-        else
-            e->right()->set(product);
+        // And search downwards again for any expression node that has a constant
+        e = e->findLorR(op::add, CONSTANT, this);
+        if (e == NULL)
+            return false;
 
-        return ret;
+        Expression* lhs = left()->type() == CONSTANT ? left() : right();
+        Expression* rhs = e->left()->type() == CONSTANT ? e->left() : e->right();
+        Expression* collapse = e->left()->type() == CONSTANT ? e->right() : e->left();
+
+        lhs->set(lhs->value() + rhs->value());
+        e->set(collapse);
+        return true;
     }
 
-    if (isOperation(op::add) && (left()->type() == CONSTANT || right()->type() == CONSTANT))
+    if (isOperation(op::mul))
     {
-        double sum = left()->type() == CONSTANT ? left()->value() : right()->value();
-        Expression* e = parent();
-        while (e != NULL && e->isOperation(op::mul))
+        // Travel up the chain of op::adds...
+        Expression* e;
+        for (e = this; e->parent() != NULL && e->parent()->isOperation(op::mul);)
         {
-            if (e->left()->type() == CONSTANT || e->right()->type() == CONSTANT)
-            {
-                if (e->left()->type() == CONSTANT)
-                {
-                    sum += e->left()->value();
-                    e->set(e->right());
-                    ret = true;
-                }
-                else
-                {
-                    sum += e->right()->value();
-                    e->set(e->left());
-                    ret = true;
-                }
-            }
             e = e->parent();
+            if (e->left()->type() == CONSTANT || e->right()->type() == CONSTANT)
+                break;
         }
+        if (e == this)
+            return false;
 
-        if (e->left()->type() == CONSTANT)
-            e->left()->set(sum);
-        else
-            e->right()->set(sum);
+        // And search downwards again for any expression node that has a constant
+        e = e->findLorR(op::mul, CONSTANT, this);
+        if (e == NULL)
+            return false;
 
-        return ret;
+        Expression* lhs = left()->type() == CONSTANT ? left() : right();
+        Expression* rhs = e->left()->type() == CONSTANT ? e->left() : e->right();
+        Expression* collapse = e->left()->type() == CONSTANT ? e->right() : e->left();
+
+        lhs->set(lhs->value() * rhs->value());
+        e->set(collapse);
+        return true;
     }
 
-    return ret;
+    return false;
 }
 
 // ----------------------------------------------------------------------------

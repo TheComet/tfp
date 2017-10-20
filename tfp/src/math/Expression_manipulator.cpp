@@ -126,6 +126,7 @@ bool Expression::factorNegativeExponents(const char* variable)
     if (isOperation(op::pow) == false)
         return true;
 
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -251,6 +252,7 @@ bool Expression::expand(const char* variable)
     if (parent()->isOperation(op::pow))
     {
         parent()->expandConstantExponentsIntoProducts(variable);
+        parent()->factorNegativeExponents(variable);
     }
 
     return true;

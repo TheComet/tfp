@@ -204,6 +204,32 @@ Expression* Expression::find(op::Op2 func)
 }
 
 // ----------------------------------------------------------------------------
+Expression* Expression::findLorR(op::Op2 func, Type LorR, Expression* ignore)
+{
+    if (type() == FUNCTION2 && op2() == func)
+        if ((left() && left()->type() == LorR) || (right() && right()->type() == LorR))
+            if (ignore && ignore != this)
+                return this;
+
+    Expression* e;
+    if (left())  if ((e = left()->findLorR(func, LorR, ignore)) != NULL) return e;
+    if (right()) if ((e = right()->findLorR(func, LorR, ignore)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::findSame(Expression* match)
+{
+    if (this != match && isSameAs(match))
+        return this;
+
+    Expression* e;
+    if (left())  if ((e = left()->findSame(match)) != NULL) return e;
+    if (right()) if ((e = right()->findSame(match)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
 static void addVariableToTable(VariableTable* vt, const Expression* e)
 {
     if (e == NULL)
@@ -257,13 +283,17 @@ bool Expression::isSameAs(Expression* other) const
 {
     if (type() != other->type())
         return false;
+    if (left() && left()->isSameAs(other) == false)
+        return false;
+    if (right() && right()->isSameAs(other) == false)
+        return false;
 
     switch (type())
     {
-        case CONSTANT  : return value() == other->value();
-        case VARIABLE  : return strcmp(name(), other->name()) == 0;
-        case FUNCTION1 : return op1() == other->op1();
-        case FUNCTION2 : return op2() == other->op2();
+        case CONSTANT  : return (value() == other->value());
+        case VARIABLE  : return (strcmp(name(), other->name()) == 0);
+        case FUNCTION1 : return (op1() == other->op1());
+        case FUNCTION2 : return (op2() == other->op2());
         default        : return false;
     }
 }
@@ -301,7 +331,8 @@ bool Expression::hasVariable(const char* variable) const
 // ----------------------------------------------------------------------------
 Expression* Expression::getOtherOperand() const
 {
-    assert(type() == FUNCTION2);
+    assert(parent() != NULL);
+    assert(parent()->type() == FUNCTION2);
     return parent()->left() == this ? parent()->right() : parent()->left();
 }
 

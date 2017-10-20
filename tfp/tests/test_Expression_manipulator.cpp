@@ -279,6 +279,7 @@ TEST(NAME, expand_scalar_into_sum)
 TEST(NAME, expand_expression_into_sum)
 {
     Reference<Expression> e = Expression::parse("(a+b)*(c+d)");
+    e->dump("expand_expression_into_sum.dot");
     Reference<VariableTable> vt = e->generateVariableTable();
     vt->set("a", 3.0);
     vt->set("b", 7.0);
@@ -287,7 +288,7 @@ TEST(NAME, expand_expression_into_sum)
     double beforeResult = e->evaluate(vt);
 
     ASSERT_THAT(e->expand("a"), Eq(true));
-    e->dump("expand_expression_into_sum.dot");
+    e->dump("expand_expression_into_sum.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->op2(), Eq(op::add));
@@ -374,6 +375,12 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      * a5 = -8/(a+4)
      */
     Expression::TransferFunctionCoefficients tfe = e->calculateTransferFunctionCoefficients("s");
+    e->recursivelyCall(&Expression::optimiseConstantExpressions);
+    e->recursivelyCall(&Expression::optimiseUselessAdditions);
+    e->recursivelyCall(&Expression::optimiseUselessProducts);
+    e->recursivelyCall(&Expression::optimiseAdditionsIntoProducts);
+    e->recursivelyCall(&Expression::optimiseExponentiate);
+    e->dump("wtf.dot", true);
 
     ASSERT_THAT(tfe.numeratorCoefficients_.size(), Eq(4u));
     ASSERT_THAT(tfe.denominatorCoefficients_.size(), Eq(4u));

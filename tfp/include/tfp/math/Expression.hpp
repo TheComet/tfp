@@ -112,6 +112,13 @@ public:
     Expression* find(double value);
     Expression* find(op::Op1 func);
     Expression* find(op::Op2 func);
+    /*!
+     * Recursively finds an expression node of type FUNCTION2 that has at least
+     * one operand that matches the specified type. If ignore is not NULL,
+     * then the returned expression is guaranteed not to be ignore.
+     */
+    Expression* findLorR(op::Op2 func, Type LorR, Expression* ignore=NULL);
+    Expression* findSame(Expression* match);
 
     VariableTable* generateVariableTable() const;
     double evaluate(const VariableTable* vt=NULL, std::set<std::string>* visited=NULL) const;
