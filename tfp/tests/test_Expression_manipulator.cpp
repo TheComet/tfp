@@ -50,7 +50,9 @@ TEST(NAME, eliminate_divisions_with_constant_exponent)
 TEST(NAME, eliminate_divisions_with_variable_exponent)
 {
     Reference<Expression> e = Expression::parse("a/s^x");
+    e->dump("eliminate_divisions_with_variable_exponent.dot");
     EXPECT_THAT(e->eliminateDivisionsAndSubtractions("s"), Eq(true));
+    e->dump("eliminate_divisions_with_variable_exponent.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
     ASSERT_THAT(e->right()->op2(), Eq(op::pow));
@@ -207,8 +209,9 @@ TEST(NAME, enforce_constant_exponent_on_consant_exponent_expression)
 TEST(NAME, expand_constant_exponents_4)
 {
     Reference<Expression> e = Expression::parse("a^4");
-    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
     e->dump("expand_constant_exponents_4.dot");
+    ASSERT_THAT(e->expandConstantExponentsIntoProducts("a"), Eq(true));
+    e->dump("expand_constant_exponents_4.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
@@ -355,11 +358,11 @@ TEST(NAME, factor_in_single_addition)
     e->dump("factor_in_single_addition.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->left()->left()->name(), StrEq("c"));
-    ASSERT_THAT(e->left()->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->right()->name(), StrEq("c"));
     ASSERT_THAT(e->right()->op2(), Eq(op::mul));
-    ASSERT_THAT(e->right()->left()->name(), StrEq("c"));
-    ASSERT_THAT(e->right()->right()->name(), StrEq("b"));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("b"));
+    ASSERT_THAT(e->right()->right()->name(), StrEq("c"));
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
@@ -371,6 +374,33 @@ TEST(NAME, factor_in_complex)
     e->factorIn(Expression::make("s"));
     e->dump("factor_in_complex.dot", true);
 
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
+TEST(NAME, factor_negative_exponents_in_addition)
+{
+    Reference<Expression> e = Expression::parse("a+s^-3");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("s", 5.0);
+    double resultBefore = e->evaluate(vt);
+    e->dump("factor_negative_exponents_in_addition.dot");
+    e->factorNegativeExponents("s");
+    e->dump("factor_negative_exponents_in_addition.dot", true);
+    
+    ASSERT_THAT(e->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->right()->value(), DoubleEq(1.0));
+    ASSERT_THAT(e->left()->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->left()->right()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->left()->right()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->left()->left()->right()->right()->value(), DoubleEq(3.0));
+    ASSERT_THAT(e->right()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->right()->right()->value(), DoubleEq(-3.0));
+    
+    ASSERT_THAT(e->evaluate(vt), DoubleEq(resultBefore));
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 

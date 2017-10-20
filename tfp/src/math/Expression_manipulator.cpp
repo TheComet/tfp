@@ -41,12 +41,12 @@ bool Expression::enforceConstantExponent(const char* variable)
         if (e->isOperation(op::pow))
             if (e->right()->type() != CONSTANT)  // RHS has to be constant
                 return false;
-    
+
     // If immediate parent is already pow (and has a constant RHS), we're done.
     if (parent()->isOperation(op::pow) == true)
         return true;
-    
-    set (op::pow, shallowClone(), Expression::make(1.0));
+
+    set(op::pow, this, Expression::make(1.0));
     return success;
 }
 
@@ -88,19 +88,17 @@ bool Expression::expandConstantExponentsIntoProducts(const char* variable)
     }
 
     Expression* toFactor = left();
-    Expression* e = Expression::make(op::mul, toFactor->clone(), toFactor);
+    set(op::mul, toFactor, toFactor->clone());
     int expandTimes = exponent < 0 ? -exponent : exponent;
     for (int i = 2; i != expandTimes; ++i)
     {
-        e = Expression::make(op::mul, e, toFactor->clone());
+        set(op::mul, this, toFactor->clone());
     }
 
     if (exponent < 0)
     {
-        e = Expression::make(op::pow, e, Expression::make(-1.0));
+        set(op::pow, this, Expression::make(-1.0));
     }
-
-    set(e);
 
     return true;
 }
@@ -113,8 +111,8 @@ bool Expression::factorNegativeExponents(const char* variable)
      * specified variable.
      */
     bool weMatter = false;
-    if (left())  weMatter |= left()->eliminateDivisionsAndSubtractions(variable);
-    if (right()) weMatter |= right()->eliminateDivisionsAndSubtractions(variable);
+    if (left())  weMatter |= left()->factorNegativeExponents(variable);
+    if (right()) weMatter |= right()->factorNegativeExponents(variable);
     if (weMatter == false && hasVariable(variable) == false)
         return false;
 
@@ -135,9 +133,13 @@ bool Expression::factorNegativeExponents(const char* variable)
 
     // This operation only makes sense if there is an add above us
     Expression* add = this;
+    Expression* firstNonAddOpInChain = this;
     while ((add = add->parent()) != NULL)
+    {
         if (add->isOperation(op::add))
             break;
+        firstNonAddOpInChain = add;
+    }
     if (add == NULL)
         return true;
 
@@ -145,22 +147,42 @@ bool Expression::factorNegativeExponents(const char* variable)
     while (add->parent() && add->parent()->isOperation(op::add))
         add = add->parent();
 
+    /*
+     * We've reached the highest add operator, now factor in s^c to cancel out
+     * s^-c.
+     *
+     * From above, while searching for the first add operator above us, we kept
+     * track of the first non-add operator. This is because factorIn would use
+     * this to insert the factor, so we have to tell it to ignore that node.
+     */
+    Expression* toFactorIn = clone();
+    if (toFactorIn->right()->type() == CONSTANT)
+        toFactorIn->right()->set(-toFactorIn->right()->value());
+    else
+        toFactorIn->right()->set(op::mul, toFactorIn->right(), Expression::make(-1.0));
 
+    add->factorIn(toFactorIn, firstNonAddOpInChain);
+
+    // We get moved out of the brackets and set to 1.0
+    add->set(op::mul, add, swapWith(Expression::make(1.0)));
 
     return true;
 }
 
 // ----------------------------------------------------------------------------
-void Expression::factorIn(Expression* e)
+void Expression::factorIn(Expression* e, const Expression* ignore)
 {
+    if (this == ignore)
+        return;
+
     if (isOperation(op::add))
     {
-        left()->factorIn(e);
-        right()->factorIn(e);
+        left()->factorIn(e, ignore);
+        right()->factorIn(e, ignore);
     }
     else
     {
-        set(op::mul, this->shallowClone(), e->clone());
+        set(op::mul, this, e->clone());
     }
 }
 
@@ -196,7 +218,7 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
     {
         if (isOperation(ops[i].outer) == false)
             continue;
-        
+
         if (hasRHSOperation(ops[i].inner))
         {
             Expression* toNegate = right()->right();
@@ -204,7 +226,7 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
             if (toNegate->type() == CONSTANT)
                 toNegate->set(-toNegate->value());
             else
-                toNegate->set(op::mul, toNegate->shallowClone(), Expression::make(-1.0));
+                toNegate->set(op::mul, toNegate, Expression::make(-1.0));
 
         }
         else

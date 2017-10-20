@@ -97,15 +97,17 @@ public:
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
 
-    Expression* shallowClone() const;
-    // deep copy, except parent defaults to NULL
+    void copyDataFrom(const Expression* other);
+    void stealDataFrom(Expression* other);
+    Expression* swapWith(Expression* other);
+    // deep copy, parent of root node defaults to NULL
     Expression* clone(Expression* parent=NULL) const;
 
+    void collapseIntoParent();
     void set(const char* variableName);
     void set(double value);
     void set(op::Op1 func, Expression* rhs);
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
-    void set(const Expression* other);
     void reset();
     
     Expression* find(const char* variableName);
@@ -152,17 +154,17 @@ public:
     Expression* left() const { return left_; }
     Expression* right() const { return right_; }
     Type type() const { return type_; }
-    const char* name() const { assert(type_ == VARIABLE); return name_; }
-    double value() const { assert(type_ == CONSTANT); return value_; }
-    op::Op1 op1() const { assert(type_ == FUNCTION1); return op1_; }
-    op::Op2 op2() const { assert(type_ == FUNCTION2); return op2_; }
+    const char* name() const { assert(type_ == VARIABLE); return data_.name_; }
+    double value() const { assert(type_ == CONSTANT); return data_.value_; }
+    op::Op1 op1() const { assert(type_ == FUNCTION1); return data_.op1_; }
+    op::Op2 op2() const { assert(type_ == FUNCTION2); return data_.op2_; }
 
     // Expression_manipulation.cpp
     void enforceProductLHS(const char* variable);
     bool enforceConstantExponent(const char* variable);
     bool expandConstantExponentsIntoProducts(const char* variable);
     bool factorNegativeExponents(const char* variable);
-    void factorIn(Expression* e);
+    void factorIn(Expression* e, const Expression* ignore=NULL);
     bool eliminateDivisionsAndSubtractions(const char* variable);
     Expression* findOrAddLatestDivision();
     bool expand(const char* variable);
@@ -228,7 +230,7 @@ private:
         char* name_;
         op::Op1 op1_;
         op::Op2 op2_;
-    };
+    } data_;
     Expression* parent_;
     tfp::Reference<Expression> left_;
     tfp::Reference<Expression> right_;

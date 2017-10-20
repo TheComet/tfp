@@ -51,23 +51,69 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::shallowClone() const
+void Expression::copyDataFrom(const Expression* other)
 {
-    Expression* e = new Expression;
-    e->set(this);
-    return e;
+    type_ = other->type();
+    if (other->type() == VARIABLE)
+    {
+        data_.name_ = (char*)malloc((strlen(other->name()) + 1) * sizeof(char));
+        strcpy(data_.name_, other->name());
+    }
+    else
+    {
+        memcpy(&data_, &other->data_, sizeof(data_));
+    }
+}
+
+// ----------------------------------------------------------------------------
+void Expression::stealDataFrom(Expression* other)
+{
+    type_ = other->type();
+    memcpy(&data_, &other->data_, sizeof(data_));
+
+    other->type_ = INVALID;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::swapWith(Expression* other)
+{
+    Reference<Expression>& operand = parent()->left() == this ? parent()->left_ : parent()->right_;
+    operand.detach();
+    operand = other;
+    other->parent_ = parent();
+    parent_ = NULL;
+    return this;
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::clone(Expression* parent) const
 {
-    Expression* e = shallowClone();
-    
-    if (left())  e->left_  = left()->clone(e);
-    if (right()) e->right_ = right()->clone(e);
+    Expression* e = new Expression;
+    e->copyDataFrom(this);
     e->parent_ = parent;
 
+    if (left())  e->left_  = left()->clone(e);
+    if (right()) e->right_ = right()->clone(e);
+
     return e;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::collapseIntoParent()
+{
+    Expression* p = parent();
+    if (p == NULL)
+        return;
+
+    p->stealDataFrom(this);
+
+    addRef();
+    p->left_  = left();
+    p->right_ = right();
+    releaseRef();
+
+    if (p->left_)  p->left_->parent_ = p;
+    if (p->right_) p->right_->parent_ = p;
 }
 
 // ----------------------------------------------------------------------------
@@ -75,11 +121,11 @@ void Expression::set(const char* variableName)
 {
     reset();
 
-    type_ = VARIABLE;
-    left_ = NULL;
+    type_  = VARIABLE;
+    left_  = NULL;
     right_ = NULL;
-    name_ = (char*)malloc((sizeof(char) + 1) * strlen(variableName));
-    strcpy(name_, variableName);
+    data_.name_ = (char*)malloc((sizeof(char) + 1) * strlen(variableName));
+    strcpy(data_.name_, variableName);
 }
 
 // ----------------------------------------------------------------------------
@@ -87,39 +133,78 @@ void Expression::set(double value)
 {
     reset();
 
-    type_ = CONSTANT;
-    left_ = NULL;
+    type_  = CONSTANT;
+    left_  = NULL;
     right_ = NULL;
-    value_ = value;
+    data_.value_ = value;
 }
 
 // ----------------------------------------------------------------------------
 void Expression::set(op::Op1 func, Expression* rhs)
 {
-    reset();
+    if (rhs == this)
+    {
+        right_ = new Expression;
+        right_->stealDataFrom(this);
+    }
+    else
+    {
+        reset();
+        right_ = rhs;
+    }
 
-    type_ = FUNCTION1;
-    op1_ = func;
-    right_ = rhs;
-    left_ = NULL;
+    type_        = FUNCTION1;
+    data_.op1_   = func;
+    left_        = NULL;
     rhs->parent_ = this;
-    if (rhs->left()) rhs->left()->parent_ = rhs;
-    if (rhs->right()) rhs->right()->parent_ = rhs;
 }
 
 // ----------------------------------------------------------------------------
 void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 {
-    reset();
+    assert(rhs != this || lhs != this);
+
+    if (rhs == this || lhs == this)
+    {
+        // We need to become our own LHS/RHS, so first, copy ourselves into a
+        // new expression node
+        Expression* e = new Expression;
+        e->stealDataFrom(this);
+        e->left_ = left_;
+        e->right_ = right_;
+        if (e->left_)  e->left_->parent_ = e;
+        if (e->right_) e->right_->parent_ = e;
+
+        if (rhs == this)
+        {
+            // Now assign new node as RHS
+            right_ = e;
+            left_ = lhs;
+        }
+        else
+        {
+            // Now assign new node as LHS
+            left_ = e;
+            right_ = rhs;
+        }
+
+        left_->parent_ = this;
+        right_->parent_ = this;
+    }
+    else
+    {
+        reset();
+        rhs->addRef();  // our left() might be the current rhs object
+        left_ = lhs;
+        right_ = rhs;
+        rhs->releaseRef();
+        left_->parent_ = this;
+        right_->parent_ = this;
+    }
 
     type_ = FUNCTION2;
-    op2_ = func;
-    tfp::Reference<Expression> ptrl(lhs);
-    tfp::Reference<Expression> ptrr(rhs);
-    left_ = lhs;
-    right_ = rhs;
-    lhs->parent_ = this;
-    rhs->parent_ = this;
+    data_.op2_ = func;
+
     if (lhs->left()) lhs->left()->parent_ = lhs;
     if (lhs->right()) lhs->right()->parent_ = lhs;
     if (rhs->left()) rhs->left()->parent_ = rhs;
@@ -127,34 +212,10 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-void Expression::set(const Expression* other)
-{
-    reset();
-
-    type_ = other->type_;
-    switch (type_)
-    {
-        case CONSTANT  : value_ = other->value_; break;
-        case FUNCTION1 : op1_ = other->op1_; break;
-        case FUNCTION2 : op2_ = other->op2_; break;
-        case VARIABLE  :
-            name_ = (char*)malloc((strlen(other->name_) + 1) * sizeof(char));
-            strcpy(name_, other->name_);
-            break;
-        case INVALID: break;
-    }
-
-    left_ = other->left_;
-    right_ = other->right_;
-    if (left_) left_->parent_ = this;
-    if (right_) right_->parent_ = this;
-}
-
-// ----------------------------------------------------------------------------
 void Expression::reset()
 {
     if (type_ == VARIABLE)
-        free(name_);
+        free(data_.name_);
     type_ = INVALID;
 }
 
@@ -163,7 +224,7 @@ Expression* Expression::find(const char* variableName)
 {
     if (type() == VARIABLE && strcmp(name(), variableName) == 0)
         return this;
-    
+
     if (left())  return left()->find(variableName);
     if (right()) return right()->find(variableName);
     return NULL;
@@ -338,21 +399,17 @@ Expression* Expression::getOtherOperand() const
 // ----------------------------------------------------------------------------
 bool Expression::recursivelyCall(bool (Expression::*optfunc)())
 {
-    bool mutated = false;
-    if (left())  mutated |= left()->recursivelyCall(optfunc);
-    if (right()) mutated |= right()->recursivelyCall(optfunc);
-    mutated |= (this->*optfunc)();
-    return mutated;
+	if (left() && left()->recursivelyCall(optfunc)) return true;
+    if (right() && right()->recursivelyCall(optfunc)) return true;
+	return (this->*optfunc)();
 }
 
 // ----------------------------------------------------------------------------
 bool Expression::recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable)
 {
-    bool mutated = false;
-    if (left())  mutated |= left()->recursivelyCall(optfunc, variable);
-    if (right()) mutated |= right()->recursivelyCall(optfunc, variable);
-    mutated |= (this->*optfunc)(variable);
-    return mutated;
+    if (left()  && left()->recursivelyCall(optfunc, variable)) return true;
+    if (right() && right()->recursivelyCall(optfunc, variable)) return true;
+    return (this->*optfunc)(variable);
 }
 
 // ----------------------------------------------------------------------------
