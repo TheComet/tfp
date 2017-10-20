@@ -347,12 +347,38 @@ TEST(NAME, expand_binomial_exponent)
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
+TEST(NAME, factor_in_single_addition)
+{
+    Reference<Expression> e = Expression::parse("a+b");
+    e->dump("factor_in_single_addition.dot");
+    e->factorIn(Expression::make("c"));
+    e->dump("factor_in_single_addition.dot", true);
+    ASSERT_THAT(e->op2(), Eq(op::add));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->name(), StrEq("c"));
+    ASSERT_THAT(e->left()->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->right()->left()->name(), StrEq("c"));
+    ASSERT_THAT(e->right()->right()->name(), StrEq("b"));
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
+TEST(NAME, factor_in_complex)
+{
+    Reference<Expression> e = Expression::parse("a+b*g+c+d*e^(3+f)");
+    e->dump("factor_in_complex.dot");
+    e->factorIn(Expression::make("s"));
+    e->dump("factor_in_complex.dot", true);
+
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
 void beginDump(const char* filename);
 void endDump();
 TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
-    //Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
-    Reference<Expression> e = Expression::parse("1/(4/(1+s)^2)");
+    Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
     /*
      * Solved on paper:
      *                      s^3 + 2s^4 + s^5

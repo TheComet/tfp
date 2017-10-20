@@ -97,15 +97,15 @@ public:
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
 
-    Expression* shallowClone();
+    Expression* shallowClone() const;
     // deep copy, except parent defaults to NULL
-    Expression* clone(Expression* parent=NULL);
+    Expression* clone(Expression* parent=NULL) const;
 
     void set(const char* variableName);
     void set(double value);
     void set(op::Op1 func, Expression* rhs);
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
-    void set(Expression* other);
+    void set(const Expression* other);
     void reset();
     
     Expression* find(const char* variableName);
@@ -162,8 +162,8 @@ public:
     bool enforceConstantExponent(const char* variable);
     bool expandConstantExponentsIntoProducts(const char* variable);
     bool factorNegativeExponents(const char* variable);
+    void factorIn(Expression* e);
     bool eliminateDivisionsAndSubtractions(const char* variable);
-    bool eliminateNegativeExponents(const char* variable);
     Expression* findOrAddLatestDivision();
     bool expand(const char* variable);
     bool manipulateIntoRationalFunction(const char* variable);

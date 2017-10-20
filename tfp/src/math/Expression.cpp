@@ -51,7 +51,7 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::shallowClone()
+Expression* Expression::shallowClone() const
 {
     Expression* e = new Expression;
     e->set(this);
@@ -59,7 +59,7 @@ Expression* Expression::shallowClone()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::clone(Expression* parent)
+Expression* Expression::clone(Expression* parent) const
 {
     Expression* e = shallowClone();
     
@@ -127,7 +127,7 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
-void Expression::set(Expression* other)
+void Expression::set(const Expression* other)
 {
     reset();
 
@@ -144,7 +144,6 @@ void Expression::set(Expression* other)
         case INVALID: break;
     }
 
-    tfp::Reference<Expression> ptr(other);
     left_ = other->left_;
     right_ = other->right_;
     if (left_) left_->parent_ = this;

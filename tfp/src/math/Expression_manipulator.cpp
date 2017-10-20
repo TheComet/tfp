@@ -121,12 +121,47 @@ bool Expression::factorNegativeExponents(const char* variable)
     /*
      * Does the following manipulations:
      *    x + ys^-c (c=const)   ->   s^-c(xs^c + y)
-     *    x + ys^-c1 + zs^-c2 (c1=const,c2=const)  ->  s^-c(xs^c + ys^(c-c1) + zs^(c-c2)) (such that c-c1 >= 0 and c-c2 >= 0)
      */
     if (isOperation(op::pow) == false)
         return true;
+    if (right()->type() != CONSTANT || std::floor(right()->value()) != right()->value())
+        throw std::runtime_error("Expression is raised to a non-integer value, can't factor!");
 
-    return false;
+    int exponent = (int)right()->value();
+
+    // Nothing to do
+    if (exponent >= 0)
+        return true;
+
+    // This operation only makes sense if there is an add above us
+    Expression* add = this;
+    while ((add = add->parent()) != NULL)
+        if (add->isOperation(op::add))
+            break;
+    if (add == NULL)
+        return true;
+
+    // Maybe there's more
+    while (add->parent() && add->parent()->isOperation(op::add))
+        add = add->parent();
+
+
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::factorIn(Expression* e)
+{
+    if (isOperation(op::add))
+    {
+        left()->factorIn(e);
+        right()->factorIn(e);
+    }
+    else
+    {
+        set(op::mul, this->shallowClone(), e->clone());
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -181,32 +216,6 @@ bool Expression::eliminateDivisionsAndSubtractions(const char* variable)
                     Expression::make(-1)));
         }
     }
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-bool Expression::eliminateNegativeExponents(const char* variable)
-{
-    /*
-     * Only manipulate branches that are an ancestor of an expression with the
-     * specified variable.
-     */
-    bool weMatter = false;
-    if (left())  weMatter |= left()->eliminateNegativeExponents(variable);
-    if (right()) weMatter |= right()->eliminateNegativeExponents(variable);
-    if (weMatter == false && hasVariable(variable) == false)
-        return false;
-
-    /*
-     * Does the following manipulations:
-     */
-
-    if (parent() == NULL)
-        return true;
-
-    if (isOperation(op::pow) == false)
-        return true;
 
     return true;
 }
