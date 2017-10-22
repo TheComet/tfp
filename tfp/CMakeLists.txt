@@ -42,12 +42,13 @@ set (tfp_HEADERS_MOC
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_parser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_manipulator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_optimiser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_optimiser_constantExpressions.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_optimiser_factor.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression_optimiser_uselessOperations.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator_RationalFunction.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Constants.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Simplifications.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
@@ -86,10 +87,10 @@ if (TFP_BUILD_TESTS)
     set (tfp_test_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_manipulator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser_constantExpressions.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser_factor.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_optimiser_uselessOperations.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp")
     add_executable (test_all

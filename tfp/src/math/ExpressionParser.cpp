@@ -1,27 +1,11 @@
+#include "tfp/math/ExpressionParser.hpp"
 #include "tfp/math/Expression.hpp"
 #include <cstring>
-#include <cctype>
-#include <cmath>
-
-namespace tfp {
-namespace op {
-
-double add(double a, double b) { return a + b; }
-double sub(double a, double b) { return a - b; }
-double mul(double a, double b) { return a * b; }
-double div(double a, double b) { return a / b; }
-double pow(double a, double b) { return std::pow(a, b); }
-double mod(double a, double b) { return std::fmod(a, b); }
-double negate(double a) { return -a; }
-double comma(double a, double b) { return b; }
-
-}
-}
 
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isAtEnd()
+bool ExpressionParser::isAtEnd()
 {
     if (*next_ == '\0')
         return true;
@@ -29,7 +13,7 @@ bool Expression::Parser::isAtEnd()
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isSymbol()
+bool ExpressionParser::isSymbol()
 {
     if (isalpha(*next_))
         return true;
@@ -39,13 +23,13 @@ bool Expression::Parser::isSymbol()
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isNumber()
+bool ExpressionParser::isNumber()
 {
     return isdigit(*next_) || *next_ == '.';
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::Parser::isOperator()
+bool ExpressionParser::isOperator()
 {
     if (strchr("+-*/^", *next_))
         return true;
@@ -53,7 +37,7 @@ bool Expression::Parser::isOperator()
 }
 
 // ----------------------------------------------------------------------------
-void Expression::Parser::nextToken()
+void ExpressionParser::nextToken()
 {
     type_ = TOK_NULL;
 
@@ -100,7 +84,7 @@ void Expression::Parser::nextToken()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::base()
+Expression* ExpressionParser::base()
 {
     switch (type_)
     {
@@ -135,7 +119,7 @@ Expression* Expression::Parser::base()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::power()
+Expression* ExpressionParser::power()
 {
     int sign = 1;
     while (type_ == TOK_INFIX && (function_ == op::add || function_ == op::sub))
@@ -152,7 +136,7 @@ Expression* Expression::Parser::power()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::factor()
+Expression* ExpressionParser::factor()
 {
     Expression* ret = power();
 
@@ -167,7 +151,7 @@ Expression* Expression::Parser::factor()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::term()
+Expression* ExpressionParser::term()
 {
     Expression* ret = factor();
 
@@ -182,7 +166,7 @@ Expression* Expression::Parser::term()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::expr()
+Expression* ExpressionParser::expr()
 {
     Expression* ret = term();
 
@@ -197,7 +181,7 @@ Expression* Expression::Parser::expr()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::list()
+Expression* ExpressionParser::list()
 {
     Expression* ret = expr();
 
@@ -211,7 +195,7 @@ Expression* Expression::Parser::list()
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::Parser::parse(const char* str)
+Expression* ExpressionParser::parse(const char* str)
 {
     start_ = next_ = str;
     nextToken();
@@ -224,16 +208,4 @@ Expression* Expression::Parser::parse(const char* str)
     }
 
     return result;
-}
-
-// ----------------------------------------------------------------------------
-Expression* Expression::parse(const char* str)
-{
-    Parser parser;
-    Expression* e = parser.parse(str);
-    if (e == NULL)
-        return NULL;
-
-    e->optimise();
-    return e;
 }

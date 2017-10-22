@@ -81,8 +81,9 @@ TEST(NAME, constant_subtraction_chain_with_variable_in_middle)
             Expression::make(1.0)));
     e->optimise();
     ASSERT_THAT(e->op2(), Eq(op::sub));
-    ASSERT_THAT(e->left()->value(), DoubleEq(2.0));
-    ASSERT_THAT(e->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->type(), Eq(Expression::VARIABLE));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(2.0));
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
@@ -111,8 +112,9 @@ TEST(NAME, constant_division_chain_with_variable_in_middle)
             Expression::make("a"),
             Expression::make(2.0)));
     e->optimise();
-    ASSERT_THAT(e->left()->value(), DoubleEq(16.0));
-    ASSERT_THAT(e->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->type(), Eq(Expression::VARIABLE));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(16.0));
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
@@ -140,8 +142,8 @@ TEST(NAME, constant_subtraction_chain_with_variable_at_end)
             Expression::make("a")));
     e->optimise();
     ASSERT_THAT(e->op2(), Eq(op::add));
-    ASSERT_THAT(e->left()->value(), DoubleEq(1.0));
-    ASSERT_THAT(e->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(1.0));
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
@@ -168,8 +170,9 @@ TEST(NAME, constant_division_chain_with_variable_at_end)
             Expression::make(2.0),
             Expression::make("a")));
     e->optimise();
-    ASSERT_THAT(e->left()->value(), DoubleEq(4.0));
-    ASSERT_THAT(e->right()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->type(), Eq(Expression::VARIABLE));
+    ASSERT_THAT(e->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->right()->value(), DoubleEq(4.0));
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
@@ -183,9 +186,9 @@ TEST(NAME, constant_recursive_redundant_additions)
         Expression::make(op::add,
             Expression::make(3.0),
             Expression::make("b")));
-    e->dump("optimise_recursive_redundant_additions.dot");
+    e->dump("constant_recursive_redundant_additions.dot");
     e->optimise();
-    e->dump("optimise_recursive_redundant_additions.dot", true);
+    e->dump("constant_recursive_redundant_additions.dot", true);
 
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->right()->name(), StrEq("b"));
@@ -228,7 +231,7 @@ TEST(NAME, constant_chain_of_additions_with_2_variables_in_middle)
                 Expression::make("b"),
                 Expression::make(8.0))));
     e->dump("constant_chain_of_additions_with_2_variables_in_middle.dot");
-    e->recursivelyCall(&Expression::collapseChainOfOperations);
+    e->optimise();
     e->dump("constant_chain_of_additions_with_2_variables_in_middle.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->name(), StrEq("a"));
@@ -248,7 +251,7 @@ TEST(NAME, constant_chain_of_products_with_2_variables_in_middle)
                 Expression::make("b"),
                 Expression::make(2.0))));
     e->dump("constant_chain_of_products_with_2_variables_in_middle.dot");
-    e->recursivelyCall(&Expression::collapseChainOfOperations);
+    e->optimise();
     e->dump("constant_chain_of_products_with_2_variables_in_middle.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::mul));
     ASSERT_THAT(e->left()->name(), StrEq("a"));

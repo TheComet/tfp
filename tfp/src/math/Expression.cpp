@@ -1,7 +1,26 @@
 #include "tfp/math/Expression.hpp"
+#include "tfp/math/ExpressionParser.hpp"
+#include "tfp/math/ExpressionOptimiser.hpp"
 #include "tfp/math/VariableTable.hpp"
 #include <string.h>
 #include <cassert>
+#include <cmath>
+#include <iostream>
+
+namespace tfp {
+namespace op {
+
+double add(double a, double b) { return a + b; }
+double sub(double a, double b) { return a - b; }
+double mul(double a, double b) { return a * b; }
+double div(double a, double b) { return a / b; }
+double pow(double a, double b) { return std::pow(a, b); }
+double mod(double a, double b) { return std::fmod(a, b); }
+double negate(double a) { return -a; }
+double comma(double a, double b) { return b; }
+
+}
+}
 
 using namespace tfp;
 
@@ -17,6 +36,19 @@ Expression::~Expression()
 {
     reset();
 }
+
+// ----------------------------------------------------------------------------
+Expression* Expression::parse(const char* str)
+{
+    ExpressionParser parser;
+    Expression* e = parser.parse(str);
+    if (e == NULL)
+        return NULL;
+
+    e->optimise();
+    return e;
+}
+
 
 // ----------------------------------------------------------------------------
 Expression* Expression::make(const char* variableName)
@@ -96,6 +128,14 @@ Expression* Expression::clone(Expression* parent) const
     if (right()) e->right_ = right()->clone(e);
 
     return e;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::swapOperands()
+{
+    Reference<Expression> tmp = right_;
+    right_ = left_;
+    left_ = tmp;
 }
 
 // ----------------------------------------------------------------------------
@@ -220,6 +260,13 @@ void Expression::reset()
 }
 
 // ----------------------------------------------------------------------------
+bool Expression::optimise()
+{
+    ExpressionOptimiser optimise;
+    return optimise.everything(this);
+}
+
+// ----------------------------------------------------------------------------
 Expression* Expression::find(const char* variableName)
 {
     if (type() == VARIABLE && strcmp(name(), variableName) == 0)
@@ -264,7 +311,7 @@ Expression* Expression::find(op::Op2 func)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::findLorR(op::Op2 func, Type LorR, Expression* ignore)
+Expression* Expression::findLorR(op::Op2 func, Type LorR, const Expression* ignore)
 {
     if (type() == FUNCTION2 && op2() == func)
         if ((left() && left()->type() == LorR) || (right() && right()->type() == LorR))
@@ -278,7 +325,7 @@ Expression* Expression::findLorR(op::Op2 func, Type LorR, Expression* ignore)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::findSame(Expression* match)
+Expression* Expression::findSame(const Expression* match)
 {
     if (this != match && isSameAs(match))
         return this;
@@ -286,6 +333,59 @@ Expression* Expression::findSame(Expression* match)
     Expression* e;
     if (left())  if ((e = left()->findSame(match)) != NULL) return e;
     if (right()) if ((e = right()->findSame(match)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::findOpWithSameLHS(op::Op2 func, const Expression* match)
+{
+    if (parent() && this != match && this != parent()->right() &&
+            parent()->isOperation(func) && isSameAs(match))
+        return parent();
+
+    Expression* e;
+    if (left())  if ((e = left()->findOpWithSameLHS(func, match)) != NULL) return e;
+    if (right()) if ((e = right()->findOpWithSameLHS(func, match)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::findOpWithNegativeRHS(op::Op2 func)
+{
+    if (isOperation(func) && right()->type() == CONSTANT && right()->value() < 0.0)
+        return this;
+
+    Expression* e;
+    if (left())  if ((e = left()->findOpWithNegativeRHS(func)) != NULL) return e;
+    if (right()) if ((e = right()->findOpWithNegativeRHS(func)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::travelUpChain(op::Op2 func)
+{
+    Expression* top;
+    if (parent() == NULL)
+        return NULL;
+    for (top = this; top->parent() != NULL && top->parent()->isOperation(func);)
+        top = top->parent();
+    if (top == this)
+        return NULL;
+    return top;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::findSameDownChain(op::Op2 func, const Expression* match)
+{
+    if (this != match && isSameAs(match))
+        return this;
+
+    if (isOperation(func) == false)
+        return NULL;
+
+    Expression* e;
+    if ((e = left()->findSameDownChain(func, match)) != NULL) return e;
+    if ((e = right()->findSameDownChain(func, match)) != NULL) return e;
     return NULL;
 }
 
@@ -339,7 +439,7 @@ double Expression::evaluate(const VariableTable* vt, std::set<std::string>* visi
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::isSameAs(Expression* other) const
+bool Expression::isSameAs(const Expression* other) const
 {
     if (type() != other->type())
         return false;
@@ -397,32 +497,35 @@ Expression* Expression::getOtherOperand() const
 }
 
 // ----------------------------------------------------------------------------
-bool Expression::recursivelyCall(bool (Expression::*optfunc)())
+bool Expression::checkParentConsistencies() const
 {
-    if (left() && left()->recursivelyCall(optfunc)) return true;
-    if (right() && right()->recursivelyCall(optfunc)) return true;
-    return (this->*optfunc)();
-}
+    bool success = true;
+    if (left())  success &= left()->checkParentConsistencies();
+    if (right()) success &= right()->checkParentConsistencies();
 
-// ----------------------------------------------------------------------------
-bool Expression::recursivelyCall(bool (Expression::*optfunc)(const char*), const char* variable, bool* hasVariable)
-{
-    /*
-     * Only manipulate branches that are an ancestor of an expression with the
-     * specified variable. Each recursive call returns true if the tree was
-     * manipulated in some way.
-     */
-    bool childWasMutated = false;
-    bool childHadVariable = false;
-    if (left())  childWasMutated |= left()->recursivelyCall(optfunc, variable, &childHadVariable);
-    if (right()) childWasMutated |= right()->recursivelyCall(optfunc, variable, &childHadVariable);
-    if (hasVariable != NULL) *hasVariable |= childHadVariable;
+    if (left() && left()->parent() != this)
+    {
+        std::cout << "Parent of expression is pointing somewhere else!" << std::endl;
+        success = false;
+    }
+    if (right() && right()->parent() != this)
+    {
+        std::cout << "Parent of expression is pointing somewhere else!" << std::endl;
+        success = false;
+    }
 
-    if (childHadVariable == false && this->hasVariable(variable) == false)
-        return false;
+    if (left() && left()->refs() != 1)
+    {
+        std::cout << "Refcount of sub-expression is not 1" << std::endl;
+        success = false;
+    }
+    if (right() && right()->refs() != 1)
+    {
+        std::cout << "Refcount of sub-expression is not 1" << std::endl;
+        success = false;
+    }
 
-    if (hasVariable != NULL) *hasVariable = true;
-    return (this->*optfunc)(variable) | childWasMutated;
+    return success;
 }
 
 // ----------------------------------------------------------------------------
@@ -438,11 +541,11 @@ void endDump()
 }
 static void writeFunction(FILE* fp, op::Op2 f)
 {
-    if (f == op::add) fprintf(fp, "\"+\"");
-    else if (f == op::sub) fprintf(fp, "\"-\"");
-    else if (f == op::mul) fprintf(fp, "\"*\"");
-    else if (f == op::div) fprintf(fp, "\"/\"");
-    else if (f == op::pow) fprintf(fp, "\"^\"");
+    if (f == op::add) fprintf(fp, "+");
+    else if (f == op::sub) fprintf(fp, "-");
+    else if (f == op::mul) fprintf(fp, "*");
+    else if (f == op::div) fprintf(fp, "/");
+    else if (f == op::pow) fprintf(fp, "^");
 }
 static void writeFunction(FILE* fp, op::Op1 f)
 {
@@ -463,9 +566,9 @@ int guid = 1;
 static void dumpRecurse(FILE* fp, Expression* e)
 {
     std::size_t thisId = (std::size_t)e;
-    fprintf(fp, "    %lu [label=", thisId);
+    fprintf(fp, "    %lu [label=\"", thisId);
     writeName(fp, e);
-    fprintf(fp, "];\n");
+    fprintf(fp, "\"];\n");
 
     if (e->right())
     {
