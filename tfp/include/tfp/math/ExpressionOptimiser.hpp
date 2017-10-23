@@ -17,17 +17,23 @@ public:
 
 private:
     bool recursivelyCall(bool (ExpressionOptimiser::*optfunc)(Expression*), Expression* e);
-    bool optimiseMultipleNegates(Expression* e);
-    bool optimiseConstantExpressions(Expression* e);
-    bool optimiseUselessAdditions(Expression* e);
-    bool optimiseUselessSubtractions(Expression* e);
-    bool optimiseUselessProducts(Expression* e);
-    bool optimiseUselessDivisions(Expression* e);
-    bool optimiseUselessExponents(Expression* e);
-    bool collapseChainOfOperations(Expression* e);
-    bool optimiseExponentiate(Expression* e);
-    bool optimiseCombineExponents(Expression* e);
-    bool optimiseAdditionsIntoProducts(Expression* e);
+
+    // UselessOperations
+    bool removeMultipleNegates(Expression* e);
+    bool removeUselessAdditions(Expression* e);
+    bool removeUselessSubtractions(Expression* e);
+    bool removeUselessProducts(Expression* e);
+    bool removeUselessDivisions(Expression* e);
+    bool removeUselessExponents(Expression* e);
+
+    // Simplifications
+    bool simplifySums(Expression* e);
+    bool simplifyProducts(Expression* e);
+    bool simplifyExponents(Expression* e);
+
+    // Constants
+    bool evaluateConstantExpressions(Expression* e);
+    bool combineConstants(Expression* e);
 };
 
 }

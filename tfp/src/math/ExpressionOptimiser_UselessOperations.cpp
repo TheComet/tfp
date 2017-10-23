@@ -4,7 +4,7 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseMultipleNegates(Expression* e)
+bool ExpressionOptimiser::removeMultipleNegates(Expression* e)
 {
     if (e->type() != Expression::FUNCTION1) return false;
     if (e->isOperation(op::negate) == false || e->hasRHSOperation(op::negate) == false)
@@ -16,7 +16,7 @@ bool ExpressionOptimiser::optimiseMultipleNegates(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseUselessAdditions(Expression* e)
+bool ExpressionOptimiser::removeUselessAdditions(Expression* e)
 {
     if (e->isOperation(op::add) == false)
         return false;
@@ -35,7 +35,7 @@ bool ExpressionOptimiser::optimiseUselessAdditions(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseUselessSubtractions(Expression* e)
+bool ExpressionOptimiser::removeUselessSubtractions(Expression* e)
 {
     if (e->isOperation(op::sub) == false)
         return false;
@@ -54,7 +54,7 @@ bool ExpressionOptimiser::optimiseUselessSubtractions(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseUselessProducts(Expression* e)
+bool ExpressionOptimiser::removeUselessProducts(Expression* e)
 {
     if (e->isOperation(op::mul) == false)
         return false;
@@ -90,7 +90,7 @@ bool ExpressionOptimiser::optimiseUselessProducts(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseUselessDivisions(Expression* e)
+bool ExpressionOptimiser::removeUselessDivisions(Expression* e)
 {
     if (e->isOperation(op::div) == false)
         return false;
@@ -119,7 +119,7 @@ bool ExpressionOptimiser::optimiseUselessDivisions(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseUselessExponents(Expression* e)
+bool ExpressionOptimiser::removeUselessExponents(Expression* e)
 {
     if (e->isOperation(op::pow) == false)
         return false;

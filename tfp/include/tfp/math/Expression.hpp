@@ -49,6 +49,7 @@ public:
     void copyDataFrom(const Expression* other);
     void stealDataFrom(Expression* other);
     Expression* swapWith(Expression* other);
+    void unlinkFromTree();
     // deep copy, parent of root node defaults to NULL
     Expression* clone(Expression* parent=NULL) const;
     void swapOperands();

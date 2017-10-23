@@ -4,7 +4,7 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseAdditionsIntoProducts(Expression* e)
+bool ExpressionOptimiser::simplifySums(Expression* e)
 {
     // Travel up the chain of op::adds...
     Expression* top = e->travelUpChain(op::add);
@@ -56,7 +56,7 @@ bool ExpressionOptimiser::optimiseAdditionsIntoProducts(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseExponentiate(Expression* e)
+bool ExpressionOptimiser::simplifyProducts(Expression* e)
 {
     // Travel up the chain of op::muls...
     Expression* top = e->travelUpChain(op::mul);
@@ -96,7 +96,7 @@ bool ExpressionOptimiser::optimiseExponentiate(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseCombineExponents(Expression* e)
+bool ExpressionOptimiser::simplifyExponents(Expression* e)
 {
     if (e->isOperation(op::pow) == false)
         return false;

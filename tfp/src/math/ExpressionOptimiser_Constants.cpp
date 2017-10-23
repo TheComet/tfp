@@ -4,7 +4,7 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::optimiseConstantExpressions(Expression* e)
+bool ExpressionOptimiser::evaluateConstantExpressions(Expression* e)
 {
     if (e->type() == Expression::FUNCTION1 &&
         e->right()->type() == Expression::CONSTANT)
@@ -13,7 +13,6 @@ bool ExpressionOptimiser::optimiseConstantExpressions(Expression* e)
         return true;
     }
 
-    // Anything beyond this point must have two operands.
     if (e->type() == Expression::FUNCTION2 &&
         e->left()->type() == Expression::CONSTANT &&
         e->right()->type() == Expression::CONSTANT)
@@ -25,7 +24,7 @@ bool ExpressionOptimiser::optimiseConstantExpressions(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::collapseChainOfOperations(Expression* e)
+bool ExpressionOptimiser::combineConstants(Expression* e)
 {
     if (e->type() != Expression::FUNCTION2)
         return false;

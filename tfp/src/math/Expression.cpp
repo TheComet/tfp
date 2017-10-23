@@ -118,6 +118,17 @@ Expression* Expression::swapWith(Expression* other)
 }
 
 // ----------------------------------------------------------------------------
+void Expression::unlinkFromTree()
+{
+    if (parent() == NULL)
+        return;
+
+    Reference<Expression>& operand = parent()->left() == this ? parent()->left_ : parent()->right_;
+    operand.detach();
+    parent_ = NULL;
+}
+
+// ----------------------------------------------------------------------------
 Expression* Expression::clone(Expression* parent) const
 {
     Expression* e = new Expression;
@@ -150,6 +161,7 @@ void Expression::collapseIntoParent()
     addRef();
     p->left_  = left();
     p->right_ = right();
+    parent_ = NULL;
     releaseRef();
 
     if (p->left_)  p->left_->parent_ = p;

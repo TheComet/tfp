@@ -16,6 +16,8 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
      * numerator from the denominator. By default, use the last division
      * operator we can find in the tree. If none exists, create a div operator
      * that has no effect.
+     *
+     * XXX Does this actually produce the correct results?
      */
     Expression* split = e->find(op::div);
     if (split == NULL)
@@ -37,22 +39,16 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
     /*if (enforceConstantExponent(variable) == false)
         return false;*/
         //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
-    split->dump("wtf.dot");
     bool weAreDone = false;
     ExpressionOptimiser optimise;
     while (true)
     {
-        recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->left(), variable);
-        recursivelyCall(&TFManipulator::expand, split->left(), variable);
         recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->right(), variable);
         recursivelyCall(&TFManipulator::expand, split->right(), variable);
-        split->dump("wtf.dot", true);
-        optimise.everything(split->left());
-        optimise.everything(split->right());
-        split->dump("wtf.dot", true);
+        optimise.constants(split->right());
+        optimise.simplify(split->right());
 
         recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable);
-        split->dump("wtf.dot", true);
 
         bool didFactorStuffOut = false;
         while (true)
@@ -70,7 +66,6 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
             expToFactorOut->right()->set(-expToFactorOut->right()->value());
             factorIn(split->left(), expToFactorOut);
             expToFactorOut->getOtherOperand()->collapseIntoParent();
-            split->dump("wtf.dot", true);
             didFactorStuffOut = true;
         }
 
@@ -81,18 +76,87 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
             weAreDone = true;
     }
 
-    split->dump("wtf.dot", true);
-    optimise.everything(split);
-    split->dump("wtf.dot", true);
+    bool mutated;
+    do
+    {
+        mutated = false;
+        mutated |= recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->left(), variable);
+        mutated |= recursivelyCall(&TFManipulator::expand, split->left(), variable);
+    } while (mutated);
+
+    optimise.everything(e);
 
     return false;
 }
 
 // ----------------------------------------------------------------------------
+typedef std::pair< int, Reference<Expression> > CoeffExp;
+typedef std::vector<CoeffExp> UnsortedCoeffs;
+static bool coeffsPow(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
+{
+    if (e->isOperation(op::pow))
+    {
+        return coeffsPow(coeffs, e->right(), variable) |
+               coeffsPow(coeffs, e->left(), variable);
+    }
+    else
+    {
+        if (e->hasVariable(variable))
+        {
+            CoeffExp coeff;
+            if (e->parent()->isOperation(op::pow))
+                coeff.first = (int)e->parent()->right()->value();
+            else
+                coeff.first = 1;
+
+            e = e->parent()->isOperation(op::pow) ? e->parent() : e;
+            Expression* top = e;
+            while (top->parent() && top->parent()->isOperation(op::mul))
+                top = top->parent();
+
+            coeff.second = top;
+            e->getOtherOperand()->collapseIntoParent();
+            top->getOtherOperand()->collapseIntoParent();
+            coeffs->push_back(coeff);
+            return true;
+        }
+    }
+    return false;
+}
+static bool coeffsMul(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
+{
+    if (e->isOperation(op::mul))
+    {
+        return coeffsMul(coeffs, e->right(), variable) ||
+               coeffsMul(coeffs, e->left(), variable);
+    }
+    else
+    {
+        return coeffsPow(coeffs, e, variable);
+    }
+}
+static bool coeffsAdd(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
+{
+    if (e->isOperation(op::add))
+    {
+        return coeffsAdd(coeffs, e->right(), variable) ||
+               coeffsAdd(coeffs, e->left(), variable);
+    }
+    else
+    {
+        return coeffsMul(coeffs, e, variable);
+    }
+}
+
 TFManipulator::TFCoefficients
 TFManipulator::calculateTransferFunctionCoefficients(Expression* e, const char* variable)
 {
     manipulateIntoRationalFunction(e, variable);
+
+    UnsortedCoeffs num;
+    UnsortedCoeffs den;
+    //while (coeffsAdd(&num, e->left(), variable)) { e->dump("wtf.dot", true); }
+    while (coeffsAdd(&den, e->right(), variable)) { e->dump("wtf.dot", true); }
 
     return TFCoefficients();
 }

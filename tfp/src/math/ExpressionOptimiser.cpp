@@ -29,8 +29,8 @@ bool ExpressionOptimiser::constants(Expression* e)
     do
     {
         mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseConstantExpressions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::collapseChainOfOperations, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::evaluateConstantExpressions, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::combineConstants, e);
 
         if (mutated)
             overallMutated = true;
@@ -46,12 +46,12 @@ bool ExpressionOptimiser::uselessOperations(Expression* e)
     do
     {
         mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseMultipleNegates, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseUselessAdditions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseUselessSubtractions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseUselessProducts, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseUselessDivisions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseUselessExponents, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeMultipleNegates, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessAdditions, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessSubtractions, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessProducts, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessDivisions, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessExponents, e);
 
         if (mutated)
             overallMutated = true;
@@ -67,9 +67,9 @@ bool ExpressionOptimiser::simplify(Expression* e)
     do
     {
         mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseAdditionsIntoProducts, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseExponentiate, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::optimiseCombineExponents, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::simplifySums, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::simplifyProducts, e);
+        mutated |= recursivelyCall(&ExpressionOptimiser::simplifyExponents, e);
 
         if (mutated)
             overallMutated = true;
