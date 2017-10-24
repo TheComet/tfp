@@ -6,75 +6,59 @@ using namespace tfp;
 // ----------------------------------------------------------------------------
 bool ExpressionOptimiser::everything(Expression* e)
 {
-    bool mutated;
-    bool overallMutated = false;
-    do
+    bool mutated = false;
+    while (constants(e) |
+           uselessOperations(e) |
+           simplify(e))
     {
-        mutated = false;
-        mutated |= constants(e);
-        mutated |= uselessOperations(e);
-        mutated |= simplify(e);
+        mutated = true;
+    }
 
-        if (mutated)
-            overallMutated = true;
-    } while (mutated);
-    return overallMutated;
+    return mutated;
 }
 
 // ----------------------------------------------------------------------------
 bool ExpressionOptimiser::constants(Expression* e)
 {
-    bool mutated;
-    bool overallMutated = false;
-    do
+    bool mutated = false;
+    while (recursivelyCall(&ExpressionOptimiser::evaluateConstantExpressions, e) |
+           recursivelyCall(&ExpressionOptimiser::combineConstants, e))
     {
-        mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::evaluateConstantExpressions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::combineConstants, e);
+        mutated = true;
+    }
 
-        if (mutated)
-            overallMutated = true;
-    } while (mutated);
-    return overallMutated;
+    return mutated;
 }
 
 // ----------------------------------------------------------------------------
 bool ExpressionOptimiser::uselessOperations(Expression* e)
 {
-    bool mutated;
-    bool overallMutated = false;
-    do
+    bool mutated = false;
+    while (
+        recursivelyCall(&ExpressionOptimiser::removeMultipleNegates, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessAdditions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessSubtractions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessProducts, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessDivisions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessExponents, e))
     {
-        mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeMultipleNegates, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessAdditions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessSubtractions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessProducts, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessDivisions, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::removeUselessExponents, e);
-
-        if (mutated)
-            overallMutated = true;
-    } while (mutated);
-    return overallMutated;
+        mutated = true;
+    }
+    return mutated;
 }
 
 // ----------------------------------------------------------------------------
 bool ExpressionOptimiser::simplify(Expression* e)
 {
-    bool mutated;
-    bool overallMutated = false;
-    do
+    bool mutated = false;
+    while (recursivelyCall(&ExpressionOptimiser::simplifySums, e) |
+           recursivelyCall(&ExpressionOptimiser::simplifyProducts, e) |
+           recursivelyCall(&ExpressionOptimiser::simplifyExponents, e))
     {
-        mutated = false;
-        mutated |= recursivelyCall(&ExpressionOptimiser::simplifySums, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::simplifyProducts, e);
-        mutated |= recursivelyCall(&ExpressionOptimiser::simplifyExponents, e);
+        mutated = true;
+    }
 
-        if (mutated)
-            overallMutated = true;
-    } while (mutated);
-    return overallMutated;
+    return mutated;
 }
 
 // ----------------------------------------------------------------------------

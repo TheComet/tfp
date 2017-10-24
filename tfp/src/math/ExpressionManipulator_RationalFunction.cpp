@@ -53,6 +53,8 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
         bool didFactorStuffOut = false;
         while (true)
         {
+            // XXX This can potentially get stuck in an endless loop if the negative exponent cannot be
+            // factored out.
             Expression* expToFactorOut = split->right()->findOpWithNegativeRHS(op::pow);
             if (expToFactorOut == NULL)
                 break;
@@ -76,13 +78,10 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
             weAreDone = true;
     }
 
-    bool mutated;
-    do
-    {
-        mutated = false;
-        mutated |= recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->left(), variable);
-        mutated |= recursivelyCall(&TFManipulator::expand, split->left(), variable);
-    } while (mutated);
+    while (optimise.uselessOperations(split->left()) |
+           recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->left(), variable) |
+           recursivelyCall(&TFManipulator::expand, split->left(), variable))
+    {}
 
     optimise.everything(e);
 
@@ -155,8 +154,8 @@ TFManipulator::calculateTransferFunctionCoefficients(Expression* e, const char* 
 
     UnsortedCoeffs num;
     UnsortedCoeffs den;
-    //while (coeffsAdd(&num, e->left(), variable)) { e->dump("wtf.dot", true); }
-    while (coeffsAdd(&den, e->right(), variable)) { e->dump("wtf.dot", true); }
+    while (coeffsAdd(&num, e->left(), variable)) {}
+    while (coeffsAdd(&den, e->right(), variable)) {}
 
     return TFCoefficients();
 }

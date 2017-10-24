@@ -502,15 +502,17 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      */
     Reference<VariableTable> vt = e->generateVariableTable();
     vt->set("a", 13);
+    vt->set("s", 17);
     double valueBefore = e->evaluate(vt);
     TFManipulator m;
 
     e->dump("wtf.dot");
     m.manipulateIntoRationalFunction(e, "s");
     e->dump("wtf.dot", true);
-    m.calculateTransferFunctionCoefficients(e, "s");
-
     ASSERT_THAT(e->evaluate(vt), DoubleEq(valueBefore));
+
+    //m.calculateTransferFunctionCoefficients(e, "s");
+    e->dump("wtf.dot", true);
 
     /*
     ASSERT_THAT(tfc.numeratorCoefficients_.size(), Eq(4u));
