@@ -1,1 +1,1 @@
-pugixml.*|tests/googlemock.*|tests/googletest.*|gmock.*|qwt.*|kiss.*|python-cmake-buildsystem.*
+thirdparty.*|tests/googlemock.*|tests/googletest.*
