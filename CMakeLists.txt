@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.1.0)
 cmake_policy (VERSION 3.0.0)
 if (POLICY CMP0053)
     cmake_policy (SET CMP0053 OLD)
@@ -85,6 +85,7 @@ endforeach (OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 # compiler definitions and flags
 ###############################################################################
 
+set (CMAKE_CXX_STANDARD 11)
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     if (CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions (-DDEBUG)

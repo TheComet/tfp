@@ -50,6 +50,7 @@ public:
 
     Expression* findOrAddLatestDivision(Expression* e);
     bool manipulateIntoRationalFunction(Expression* e, const char* variable);
+    bool factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable);
 
     /*!
      * @brief Attempts to manipulate the expression into the standard "Transfer

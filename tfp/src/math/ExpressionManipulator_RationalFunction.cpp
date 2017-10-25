@@ -9,6 +9,30 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
+bool TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable)
+{
+    if (e->isOperation(op::mul))
+    {
+        return factorNegativeExponentsToNumerator(e->left(), numerator, variable) |
+               factorNegativeExponentsToNumerator(e->right(), numerator, variable);
+    }
+    
+    if (e->isOperation(op::pow) == false)
+        return false;
+    
+    if (e->right()->type() != Expression::CONSTANT || e->right()->value() > 0.0)
+        return false;
+    
+    if (e->left()->find(variable) == NULL)
+        return false;
+    
+    e->right()->set(-e->right()->value());
+    factorIn(numerator, e);
+    e->getOtherOperand()->collapseIntoParent();
+    return true;
+}
+
+// ----------------------------------------------------------------------------
 bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
 {
     /*
@@ -50,31 +74,10 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
 
         recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable);
 
-        bool didFactorStuffOut = false;
-        while (true)
-        {
-            // XXX This can potentially get stuck in an endless loop if the negative exponent cannot be
-            // factored out.
-            Expression* expToFactorOut = split->right()->findOpWithNegativeRHS(op::pow);
-            if (expToFactorOut == NULL)
-                break;
-
-            Expression* e = expToFactorOut->parent();
-            while (e->isOperation(op::mul))
-                e = e->parent();
-            if (e != split)
-                continue;
-
-            expToFactorOut->right()->set(-expToFactorOut->right()->value());
-            factorIn(split->left(), expToFactorOut);
-            expToFactorOut->getOtherOperand()->collapseIntoParent();
-            didFactorStuffOut = true;
-        }
-
         if (weAreDone)
             break;
 
-        if (didFactorStuffOut == false)
+        if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == false)
             weAreDone = true;
     }
 
