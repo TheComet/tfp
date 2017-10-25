@@ -16,16 +16,13 @@ bool TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression
         return factorNegativeExponentsToNumerator(e->left(), numerator, variable) |
                factorNegativeExponentsToNumerator(e->right(), numerator, variable);
     }
-    
+
     if (e->isOperation(op::pow) == false)
         return false;
-    
-    if (e->right()->type() != Expression::CONSTANT || e->right()->value() > 0.0)
+
+    if (e->right()->type() != Expression::CONSTANT || e->right()->value() >= 0.0)
         return false;
-    
-    if (e->left()->find(variable) == NULL)
-        return false;
-    
+
     e->right()->set(-e->right()->value());
     factorIn(numerator, e);
     e->getOtherOperand()->collapseIntoParent();
@@ -70,15 +67,17 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
         recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->right(), variable);
         recursivelyCall(&TFManipulator::expand, split->right(), variable);
         optimise.constants(split->right());
-        optimise.simplify(split->right());
+        optimise.uselessOperations(split->right());
 
         recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable);
 
         if (weAreDone)
             break;
 
+        e->root()->dump("wtf.dot", true);
         if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == false)
             weAreDone = true;
+        e->root()->dump("wtf.dot", true);
     }
 
     while (optimise.uselessOperations(split->left()) |
