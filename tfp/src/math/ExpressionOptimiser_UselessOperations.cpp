@@ -58,7 +58,7 @@ bool ExpressionOptimiser::removeUselessProducts(Expression* e)
 {
     if (e->isOperation(op::mul) == false)
         return false;
-    
+
     if (e->left()->type() == Expression::CONSTANT)
     {
         if (e->left()->value() == 1.0)
@@ -72,7 +72,7 @@ bool ExpressionOptimiser::removeUselessProducts(Expression* e)
             return true;;
         }
     }
-    
+
     if (e->right()->type() == Expression::CONSTANT)
     {
         if (e->right()->value() == 1.0)

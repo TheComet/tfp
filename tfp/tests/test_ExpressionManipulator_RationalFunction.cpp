@@ -446,8 +446,39 @@ TEST(NAME, factor_negative_exponents_in_addition)
 TEST(NAME, factor_negative_exponents_does_nothing_if_already_factored)
 {
     Reference<Expression> e = Expression::parse("s^-3*(a*s^3+1)");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("s", 5.0);
+    double resultBefore = e->evaluate(vt);
+
     TFManipulator m;
     ASSERT_THAT(m.recursivelyCall(&ExpressionManipulator::factorNegativeExponents, e, "s"), Eq(false));
+
+    ASSERT_THAT(e->evaluate(vt), DoubleEq(resultBefore));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
+}
+
+TEST(NAME, factor_negative_exponents_from_deniminator_into_numerator_leaves_factor_in_denominator)
+{
+    Reference<Expression> e = Expression::parse("a/(2*s^-3)");
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 3.0);
+    vt->set("s", 5.0);
+    double resultBefore = e->evaluate(vt);
+
+    TFManipulator m;
+    e->dump("factor_negative_exponents_from_deniminator_into_numerator_leaves_factor_in_denominator.dot");
+    ASSERT_THAT(m.factorNegativeExponentsToNumerator(e->right(), e->left(), "s"), Eq(true));
+    e->dump("factor_negative_exponents_from_deniminator_into_numerator_leaves_factor_in_denominator.dot", true);
+    ASSERT_THAT(e->right()->value(), DoubleEq(2.0));
+    ASSERT_THAT(e->left()->op2(), Eq(op::mul));
+    ASSERT_THAT(e->left()->left()->name(), StrEq("a"));
+    ASSERT_THAT(e->left()->right()->op2(), Eq(op::pow));
+    ASSERT_THAT(e->left()->right()->left()->name(), StrEq("s"));
+    ASSERT_THAT(e->left()->right()->right()->value(), DoubleEq(3.0));
+
+    ASSERT_THAT(e->evaluate(vt), DoubleEq(resultBefore));
+    ASSERT_THAT(e->checkParentConsistencies(), Eq(true));
 }
 
 TEST(NAME, factor_negative_exponents_on_chain_of_additions)
@@ -500,16 +531,21 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      * a4 = -16/(a+4)
      * a5 = -8/(a+4)
      */
-    Reference<VariableTable> vt = e->generateVariableTable();
-    vt->set("a", 13);
-    vt->set("s", 17);
-    double valueBefore = e->evaluate(vt);
+    Reference<VariableTable> vt1 = e->generateVariableTable();
+    Reference<VariableTable> vt2 = e->generateVariableTable();
+    vt1->set("a", 13);
+    vt1->set("s", 17);
+    vt2->set("a", 34);
+    vt2->set("s", 877);
+    double valueBefore1 = e->evaluate(vt1);
+    double valueBefore2 = e->evaluate(vt2);
     TFManipulator m;
 
     e->dump("wtf.dot");
     m.manipulateIntoRationalFunction(e, "s");
     e->dump("wtf.dot", true);
-    ASSERT_THAT(e->evaluate(vt), DoubleEq(valueBefore));
+    EXPECT_THAT(e->evaluate(vt1), DoubleEq(valueBefore1));
+    EXPECT_THAT(e->evaluate(vt2), DoubleEq(valueBefore2));
 
     //m.calculateTransferFunctionCoefficients(e, "s");
     e->dump("wtf.dot", true);

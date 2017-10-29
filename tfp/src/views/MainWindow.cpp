@@ -1,4 +1,3 @@
-#include "tfp/views/MainWindow.hpp"
 #include "tfp/ui_MainWindow.h"
 #include "tfp/models/System.hpp"
 #include "tfp/plugin/Plugin.hpp"
@@ -6,6 +5,8 @@
 #include "tfp/plugin/Tool.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/views/DataTree.hpp"
+#include "tfp/views/MainWindow.hpp"
+#include "tfp/views/SettingsView.hpp"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QMdiArea>
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     
     // Window icon and title
     setWindowIcon(QIcon(":/icons/icon.ico"));
-    setWindowTitle("Transfer Function Plotter");
+    setWindowTitle(qtTrId(ID_APP_TITLE));
 
 /*
     mdiArea_->setViewMode(QMdiArea::TabbedView);
@@ -91,6 +92,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(tools1_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool1(const QString&)));
     connect(tools2_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool2(const QString&)));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(onActionQuitTriggered()));
+    connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(onActionSettingsTriggered()));
 
     loadTool1("DPSFG");
     loadTool2("Bode Plot");
@@ -174,6 +177,20 @@ void MainWindow::loadTool2(const QString& name)
     Util::clearLayout(toolContainer2_->layout());
     tool->setSystem(activeSystem_);
     toolContainer2_->layout()->addWidget(tool);
+}
+
+// ----------------------------------------------------------------------------
+void MainWindow::onActionQuitTriggered()
+{
+    close();
+}
+
+// ----------------------------------------------------------------------------
+void MainWindow::onActionSettingsTriggered()
+{
+    SettingsView* settingsView = new SettingsView;
+    settingsView->setAttribute(Qt::WA_DeleteOnClose);
+    settingsView->show();
 }
 
 } // namespace tfp

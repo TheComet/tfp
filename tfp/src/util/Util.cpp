@@ -3,6 +3,7 @@
 #include <QLayout>
 #include <QSpacerItem>
 #include <QWidget>
+#include <QStandardPaths>
 
 #include <qwt_plot_textlabel.h>
 
@@ -38,6 +39,16 @@ QwtPlotTextLabel* Util::createLoadingTextLabel()
     label->setText(text);
 
     return label;
+}
+
+// ----------------------------------------------------------------------------
+QDir Util::getConfigDir()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if(QDir(path).exists() == false)
+        QDir().mkdir(path);
+
+    return QDir(path);
 }
 
 } // namespace tfp

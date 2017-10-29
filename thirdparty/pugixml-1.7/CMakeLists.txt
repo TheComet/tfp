@@ -40,6 +40,9 @@ set (PUGIXML_INCLUDE_DIRS
     CACHE STRING "pugiXML include directories")
 include_directories (${PUGIXML_INCLUDE_DIRS})
 
+unset (PUGIXML_LIBRARIES CACHE)
+set (PUGIXML_LIBRARIES pugixml CACHE STRING "PugiXML library")
+
 add_library(pugixml ${BUILD_TYPE} ${SOURCES})
 
 # generates the correct project files for visual studio, setting the correct

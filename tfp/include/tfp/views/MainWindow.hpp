@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
+#include "tfp/models/Translation.hpp"
 #include "tfp/util/Reference.hpp"
 #include <QMainWindow>
 
@@ -37,6 +38,10 @@ public:
 public slots:
     void loadTool1(const QString& name);
     void loadTool2(const QString& name);
+
+private slots:
+    void onActionQuitTriggered();
+    void onActionSettingsTriggered();
 
 private:
     void loadPlugins();

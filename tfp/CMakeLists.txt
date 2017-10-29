@@ -38,7 +38,8 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SettingsView.hpp")
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
@@ -51,7 +52,9 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
@@ -63,6 +66,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Plugin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plugin/PluginManager.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Tool.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/Logger.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
@@ -73,9 +77,11 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp")
 set (tfp_FORMS
-        "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui")
+        "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui"
+        "${CMAKE_CURRENT_LIST_DIR}/forms/SettingsView.ui")
 set (tfp_RESOURCES
         "${CMAKE_CURRENT_LIST_DIR}/res/res.qrc")
 

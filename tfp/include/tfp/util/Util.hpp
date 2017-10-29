@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
+#include <QDir>
 
 class QLayout;
 class QwtPlotTextLabel;
@@ -21,6 +22,8 @@ struct TFP_PUBLIC_API Util
      * has been centralised here.
      */
     static QwtPlotTextLabel* createLoadingTextLabel();
+
+    static QDir getConfigDir();
 };
 
 } // namespace tfp

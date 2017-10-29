@@ -30,6 +30,12 @@ bool TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression
 }
 
 // ----------------------------------------------------------------------------
+inline bool logically_equal(double a, double b, double error_factor=1.0)
+{
+  return a==b ||
+    std::abs(a-b)<std::abs(std::min(a,b))*std::numeric_limits<double>::epsilon()*
+                  error_factor;
+}
 bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
 {
     /*
@@ -52,6 +58,11 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
     recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->left(), variable);
     recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->right(), variable);
 
+    Reference<VariableTable> vt = e->generateVariableTable();
+    vt->set("a", 23);
+    vt->set("s", 7);
+    double a = e->evaluate(vt);
+
     /*
      * All op::pow operations with our variable on the LHS need to have a
      * constant RHS. If not, error out, because such an expression cannot be
@@ -64,12 +75,33 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
     ExpressionOptimiser optimise;
     while (true)
     {
+        double b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
+        e->dump("wtf.dot", true);
         recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->right(), variable);
+        b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
+        e->dump("wtf.dot", true);
         recursivelyCall(&TFManipulator::expand, split->right(), variable);
+        b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
+        e->dump("wtf.dot", true);
         optimise.constants(split->right());
+        b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
+        e->dump("wtf.dot", true);
         optimise.uselessOperations(split->right());
+        b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
 
-        recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable);
+        recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable);b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
 
         if (weAreDone)
             break;
@@ -78,6 +110,9 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
         if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == false)
             weAreDone = true;
         e->root()->dump("wtf.dot", true);
+        b = e->evaluate(vt);
+        if (logically_equal(a, b) == false)
+            std::cout << "oh oh" << std::endl;
     }
 
     while (optimise.uselessOperations(split->left()) |
