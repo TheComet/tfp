@@ -597,18 +597,20 @@ static void dumpRecurse(FILE* fp, Expression* e)
         fprintf(fp, "    %lu -> %lu [color=\"0.2 1.0 1.0\"];\n", thisId, (std::size_t)e->parent());
     }
 }
-void Expression::dump(FILE* fp)
+void Expression::dump(FILE* fp, const char* context)
 {
     fprintf(fp, "digraph graphname {\n");
+    if (strlen(context) > 0)
+        fprintf(fp, "    context [label=\"%s\"];\n", context);
     fprintf(fp, "    %lu [color=\"0.0 1.0 1.0\"];\n", (std::size_t)this);
     dumpRecurse(fp, this);
     fprintf(fp, "}\n\n");
 }
-void Expression::dump(const char* filename, bool append)
+void Expression::dump(const char* filename, bool append, const char* context)
 {
     const char* mode = append ? "a" : "w";
     FILE* fp = fopen(filename, mode);
-    dump(fp);
+    dump(fp, context);
     fclose(fp);
 }
 void Expression::dump()

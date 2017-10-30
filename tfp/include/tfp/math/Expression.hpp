@@ -111,8 +111,8 @@ public:
     op::Op1 op1() const { assert(type_ == FUNCTION1); return data_.op1_; }
     op::Op2 op2() const { assert(type_ == FUNCTION2); return data_.op2_; }
 
-    void dump(const char* filename, bool append=false);
-    void dump(FILE* fp);
+    void dump(const char* filename, bool append=false, const char* context="");
+    void dump(FILE* fp, const char* context="");
     void dump();
 
 private:

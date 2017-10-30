@@ -10,6 +10,7 @@ bool ExpressionOptimiser::evaluateConstantExpressions(Expression* e)
         e->right()->type() == Expression::CONSTANT)
     {
         e->set(e->evaluate());
+        e->root()->dump("wtf.dot", true, "evaluateConstantExpressions 1");
         return true;
     }
 
@@ -18,6 +19,7 @@ bool ExpressionOptimiser::evaluateConstantExpressions(Expression* e)
         e->right()->type() == Expression::CONSTANT)
     {
         e->set(e->evaluate());
+        e->root()->dump("wtf.dot", true, "evaluateConstantExpressions 2");
         return true;
     }
     return false;
@@ -57,6 +59,7 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
 
         lhs->set(lhs->value() + rhs->value());
         collapse->collapseIntoParent();
+        e->root()->dump("wtf.dot", true, "combineConstants 1");
         return true;
     }
 
@@ -85,6 +88,7 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
 
         lhs->set(lhs->value() * rhs->value());
         collapse->collapseIntoParent();
+        e->root()->dump("wtf.dot", true, "combineConstants 2");
         return true;
     }
 

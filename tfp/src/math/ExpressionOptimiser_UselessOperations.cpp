@@ -12,6 +12,7 @@ bool ExpressionOptimiser::removeMultipleNegates(Expression* e)
 
     e->right()->right()->collapseIntoParent();
     e->right()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
     return true;
 }
 
@@ -24,11 +25,13 @@ bool ExpressionOptimiser::removeUselessAdditions(Expression* e)
     if (e->left()->type() == Expression::CONSTANT && e->left()->value() == 0.0)
     {
         e->right()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
         return true;
     }
     if (e->right()->type() == Expression::CONSTANT && e->right()->value() == 0.0)
     {
         e->left()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
         return true;
     }
     return false;
@@ -43,11 +46,13 @@ bool ExpressionOptimiser::removeUselessSubtractions(Expression* e)
     if (e->left()->type() == Expression::CONSTANT && e->left()->value() == 0.0)
     {
         e->set(op::negate, e->right());
+        e->root()->dump("wtf.dot", true);
         return true;
     }
     if (e->right()->type() == Expression::CONSTANT && e->right()->value() == 0.0)
     {
         e->left()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
         return true;
     }
     return false;
@@ -64,11 +69,13 @@ bool ExpressionOptimiser::removeUselessProducts(Expression* e)
         if (e->left()->value() == 1.0)
         {
             e->right()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
             return true;
         }
         if (e->left()->value() == -1.0)
         {
             e->set(op::negate, e->right());
+        e->root()->dump("wtf.dot", true);
             return true;;
         }
     }
@@ -78,11 +85,13 @@ bool ExpressionOptimiser::removeUselessProducts(Expression* e)
         if (e->right()->value() == 1.0)
         {
             e->left()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
             return true;
         }
         else if (e->right()->value() == -1.0)
         {
             e->set(op::negate, e->left());
+        e->root()->dump("wtf.dot", true);
             return true;
         }
     }
@@ -100,11 +109,13 @@ bool ExpressionOptimiser::removeUselessDivisions(Expression* e)
         if (e->right()->value() == 1.0)
         {
             e->left()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
             return true;
         }
         if (e->right()->value() == -1.0)
         {
             e->set(op::negate, e->left());
+        e->root()->dump("wtf.dot", true);
             return true;
         }
     }
@@ -112,6 +123,7 @@ bool ExpressionOptimiser::removeUselessDivisions(Expression* e)
     if (e->left()->isSameAs(e->right()))
     {
         e->set(1.0);
+        e->root()->dump("wtf.dot", true);
         return true;
     }
 
@@ -127,6 +139,7 @@ bool ExpressionOptimiser::removeUselessExponents(Expression* e)
     if (e->right()->type() == Expression::CONSTANT && e->right()->value() == 1.0)
     {
         e->left()->collapseIntoParent();
+        e->root()->dump("wtf.dot", true);
         return true;
     }
     return false;
