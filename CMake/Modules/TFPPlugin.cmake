@@ -1,6 +1,11 @@
 function (add_plugin TARGET)
     set (multiValueArgs SOURCES INCLUDE_DIRS HEADERS TEST_SOURCES FORMS RESOURCES TRANSLATIONS)
     cmake_parse_arguments (add_plugin "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    
+    option (TFP_ENABLE_${TARGET} "Whether or not to build the ${TARGET} plugin" ON)
+    if (NOT TFP_ENABLE_${TARGET})
+        return ()
+    endif ()
 
     if (NOT TARGET)
         message (FATAL_ERROR "Require a target name to add_plugin() call: add_plugin(<target name> [...])")
