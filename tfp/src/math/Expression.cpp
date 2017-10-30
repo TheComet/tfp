@@ -294,7 +294,7 @@ Expression* Expression::find(double value)
 {
     if (type() == CONSTANT && this->value() == value)
         return this;
-    
+
     if (left())  return left()->find(value);
     if (right()) return right()->find(value);
     return NULL;

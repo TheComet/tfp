@@ -29,7 +29,6 @@ bool ExpressionOptimiser::simplifySums(Expression* e)
             else
                 e->right()->set(op::add, e->right(), Expression::make(1.0));
             same->getOtherOperand()->collapseIntoParent();
-            e->root()->dump("wtf.dot", true);
             return true;
         }
         // Try matching our RHS
@@ -41,7 +40,6 @@ bool ExpressionOptimiser::simplifySums(Expression* e)
             else
                 e->left()->set(op::add, e->left(), Expression::make(1.0));
             same->getOtherOperand()->collapseIntoParent();
-            e->root()->dump("wtf.dot", true);
             return true;
         }
         return false;
@@ -54,7 +52,6 @@ bool ExpressionOptimiser::simplifySums(Expression* e)
 
     e->set(op::mul, e, Expression::make(2.0));
     same->getOtherOperand()->collapseIntoParent();
-    e->root()->dump("wtf.dot", true);
     return true;
 }
 
@@ -95,7 +92,6 @@ bool ExpressionOptimiser::simplifyProducts(Expression* e)
         e->set(op::pow, e, Expression::make(2.0));
     }
     same->getOtherOperand()->collapseIntoParent();
-    e->root()->dump("wtf.dot", true);
     return true;
 }
 
@@ -118,6 +114,5 @@ bool ExpressionOptimiser::simplifyExponents(Expression* e)
 
     e->right()->set(op::add, e->right(), same->right());
     same->getOtherOperand()->collapseIntoParent();
-    e->root()->dump("wtf.dot", true);
     return true;
 }

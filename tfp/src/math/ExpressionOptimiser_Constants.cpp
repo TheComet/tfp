@@ -10,7 +10,6 @@ bool ExpressionOptimiser::evaluateConstantExpressions(Expression* e)
         e->right()->type() == Expression::CONSTANT)
     {
         e->set(e->evaluate());
-        e->root()->dump("wtf.dot", true, "evaluateConstantExpressions 1");
         return true;
     }
 
@@ -19,7 +18,6 @@ bool ExpressionOptimiser::evaluateConstantExpressions(Expression* e)
         e->right()->type() == Expression::CONSTANT)
     {
         e->set(e->evaluate());
-        e->root()->dump("wtf.dot", true, "evaluateConstantExpressions 2");
         return true;
     }
     return false;
@@ -37,15 +35,8 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
     if (e->isOperation(op::add))
     {
         // Travel up the chain of op::adds...
-        Expression* top;
-        for (top = e; top->parent() != NULL && top->parent()->isOperation(op::add);)
-        {
-            top = top->parent();
-            if (top->left()->type() == Expression::CONSTANT ||
-                top->right()->type() == Expression::CONSTANT)
-                break;
-        }
-        if (top == e)
+        Expression* top = e->travelUpChain(op::add);
+        if (top == NULL)
             return false;
 
         // And search downwards again for any expression node that has a constant
@@ -59,22 +50,14 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
 
         lhs->set(lhs->value() + rhs->value());
         collapse->collapseIntoParent();
-        e->root()->dump("wtf.dot", true, "combineConstants 1");
         return true;
     }
 
     if (e->isOperation(op::mul))
     {
         // Travel up the chain of op::adds...
-        Expression* top;
-        for (top = e; top->parent() != NULL && top->parent()->isOperation(op::mul);)
-        {
-            top = top->parent();
-            if (top->left()->type() == Expression::CONSTANT ||
-                top->right()->type() == Expression::CONSTANT)
-                break;
-        }
-        if (top == e)
+        Expression* top = e->travelUpChain(op::mul);
+        if (top == NULL)
             return false;
 
         // And search downwards again for any expression node that has a constant
@@ -88,7 +71,6 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
 
         lhs->set(lhs->value() * rhs->value());
         collapse->collapseIntoParent();
-        e->root()->dump("wtf.dot", true, "combineConstants 2");
         return true;
     }
 

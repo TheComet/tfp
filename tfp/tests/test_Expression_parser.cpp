@@ -2,7 +2,7 @@
 #include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME Expression_parser
+#define NAME ExpressionParser
 
 using namespace testing;
 using namespace tfp;

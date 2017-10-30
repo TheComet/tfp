@@ -35,11 +35,11 @@ bool ExpressionOptimiser::uselessOperations(Expression* e)
 {
     bool mutated = false;
     while (
-        //recursivelyCall(&ExpressionOptimiser::removeMultipleNegates, e) |
-        //recursivelyCall(&ExpressionOptimiser::removeUselessAdditions, e) |
-        //recursivelyCall(&ExpressionOptimiser::removeUselessSubtractions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeMultipleNegates, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessAdditions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessSubtractions, e) |
         recursivelyCall(&ExpressionOptimiser::removeUselessProducts, e) |
-        //recursivelyCall(&ExpressionOptimiser::removeUselessDivisions, e) |
+        recursivelyCall(&ExpressionOptimiser::removeUselessDivisions, e) |
         recursivelyCall(&ExpressionOptimiser::removeUselessExponents, e))
     {
         mutated = true;

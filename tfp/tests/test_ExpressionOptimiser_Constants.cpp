@@ -2,7 +2,7 @@
 #include "tfp/math/Expression.hpp"
 #include "tfp/util/Reference.hpp"
 
-#define NAME Expression_optimiser
+#define NAME ExpressionOptimiser
 
 using namespace testing;
 using namespace tfp;
