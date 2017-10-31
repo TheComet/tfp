@@ -542,12 +542,10 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
     TFManipulator m;
 
     e->dump("wtf.dot");
-    m.manipulateIntoRationalFunction(e, "s");
-    e->dump("wtf.dot", true);
     EXPECT_THAT(e->evaluate(vt1), DoubleEq(valueBefore1));
     EXPECT_THAT(e->evaluate(vt2), DoubleEq(valueBefore2));
 
-    //m.calculateTransferFunctionCoefficients(e, "s");
+    m.calculateTransferFunctionCoefficients(e, "s");
     e->dump("wtf.dot", true);
 
     /*

@@ -36,6 +36,22 @@ public:
         FUNCTION2
     };
 
+    struct RecurseAll { bool operator()(Expression* e) {
+        return e != NULL;
+    }};
+    template <op::Op2 op>
+    struct RecurseOnOp2 { bool operator()(Expression* e) {
+        return e->type() == FUNCTION2 && e->op2() == op ? true : false;
+    }};
+
+    struct MatchAll { bool operator()(Expression* e) {
+        return true;
+    }};
+    template <Type type>
+    struct MatchOperandType { bool operator()(Expression* e) {
+        return e->left()->type() == type || e->right()->type() == type ? true : false;
+    }};
+
     Expression();
     ~Expression();
 
@@ -61,18 +77,34 @@ public:
     void set(op::Op2 func, Expression* lhs, Expression* rhs);
     void reset();
     bool optimise();
-    
-    Expression* find(const char* variableName);
+
+    template <class Matcher=MatchAll, class RecurseCondition=RecurseAll>
+    Expression* find(Expression* ignore=NULL)
+    {
+        Matcher match;
+        RecurseCondition recurse;
+        Expression* e;
+
+        if (this == ignore)
+            return NULL;
+
+        if (match(this)) return this;
+        if (recurse(left()) && (e = left()->find<Matcher, RecurseCondition>(ignore)) != NULL)
+            return e;
+        if (recurse(right()) && (e = right()->find<Matcher, RecurseCondition>(ignore)) != NULL)
+            return e;
+        return NULL;
+    }
+
     Expression* find(double value);
+    Expression* find(const char* variable);
     Expression* find(op::Op1 func);
     Expression* find(op::Op2 func);
-
     /*!
      * Recursively finds an expression node of type FUNCTION2 that has at least
      * one operand that matches the specified type. If ignore is not NULL,
      * then the returned expression is guaranteed not to be ignore.
      */
-    Expression* findLorR(op::Op2 func, Type LorR, const Expression* ignore=NULL);
     Expression* findSame(const Expression* match);
     Expression* findOpWithSameLHS(op::Op2 func, const Expression* match);
     Expression* findOpWithNegativeRHS(op::Op2 func);

@@ -323,20 +323,6 @@ Expression* Expression::find(op::Op2 func)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::findLorR(op::Op2 func, Type LorR, const Expression* ignore)
-{
-    if (type() == FUNCTION2 && op2() == func)
-        if ((left() && left()->type() == LorR) || (right() && right()->type() == LorR))
-            if (ignore && ignore != this)
-                return this;
-
-    Expression* e;
-    if (left())  if ((e = left()->findLorR(func, LorR, ignore)) != NULL) return e;
-    if (right()) if ((e = right()->findLorR(func, LorR, ignore)) != NULL) return e;
-    return NULL;
-}
-
-// ----------------------------------------------------------------------------
 Expression* Expression::findSame(const Expression* match)
 {
     if (this != match && isSameAs(match))

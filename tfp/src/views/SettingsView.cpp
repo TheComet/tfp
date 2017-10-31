@@ -156,8 +156,8 @@ QStringList SettingsView::scanForLocales() const
 
     for(QStringList::iterator it = translationList.begin(); it != translationList.end(); ++it)
     {
-        it->truncate(it->lastIndexOf('.'));  // e.g. "tfp_en_GB"
-        it->remove(0, it->indexOf('_') + 1); // e.g. "en_GB"
+        it->truncate(it->lastIndexOf('.'));   // e.g. "tfp_en_GB"
+        it->remove(0, it->indexOf('_') + 1);  // e.g. "en_GB"
     }
 
     return translationList;
@@ -166,7 +166,7 @@ QStringList SettingsView::scanForLocales() const
 // ----------------------------------------------------------------------------
 QString SettingsView::getSystemLocale() const
 {
-    QString defaultLocale = QLocale::system().name();        // e.g. "en_GB"
+    QString defaultLocale = QLocale::system().name();  // e.g. "en_GB"
     return defaultLocale;
 }
 
