@@ -88,73 +88,58 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
 }
 
 // ----------------------------------------------------------------------------
-typedef std::pair< int, Reference<Expression> > CoeffExp;
-typedef std::vector<CoeffExp> UnsortedCoeffs;
-static bool coeff(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
-{
-    if (e->hasVariable(variable) == false)
-        return false;
-
-    // If parent is power operator, its RHS is the coefficient degree. Otherwise
-    // assume degree of 1
-    CoeffExp coeff;
-    if (e->parent()->isOperation(op::pow))
-    {
-        if (e->parent()->right()->type() != Expression::CONSTANT)
-            throw std::runtime_error("Exptected a constant degree!");
-        coeff.first = (int)e->parent()->right()->value();
-    }
-    else
-        coeff.first = 1;
-
-    // Travel up the chain of multiplications to get the complete coefficient expression
-    e = e->parent()->isOperation(op::pow) ? e->parent() : e;
-    Expression* top = e;
-    while (top->parent() && top->parent()->isOperation(op::mul))
-        top = top->parent();
-    coeff.second = top;
-    coeffs->push_back(coeff);
-
-    if (top->parent() == NULL)
-        return false;
-
-    e->getOtherOperand()->collapseIntoParent();
-    top->getOtherOperand()->collapseIntoParent();
-    return true;
-}
-static bool coeffsPow(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
-{
-    if (e->isOperation(op::pow))
-    {
-        return coeff(coeffs, e->left(), variable);
-    }
-    else
-    {
-        return coeff(coeffs, e, variable);
-    }
-}
-static bool coeffsMul(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
-{
-    if (e->isOperation(op::mul))
-    {
-        return coeffsMul(coeffs, e->right(), variable) ||
-               coeffsMul(coeffs, e->left(), variable);
-    }
-    else
-    {
-        return coeffsPow(coeffs, e, variable);
-    }
-}
-static bool coeffsAdd(UnsortedCoeffs* coeffs, Expression* e, const char* variable)
+typedef std::vector< Reference<Expression> > ExpressionList;
+static void splitSums(ExpressionList* sums, Expression* e)
 {
     if (e->isOperation(op::add))
     {
-        return coeffsAdd(coeffs, e->right(), variable) ||
-               coeffsAdd(coeffs, e->left(), variable);
+        splitSums(sums, e->left());
+        splitSums(sums, e->right());
     }
     else
     {
-        return coeffsMul(coeffs, e, variable);
+        sums->push_back(e->unlinkFromTree());
+    }
+}
+
+static void resizeCoefficientList(ExpressionList* coeffs, std::size_t size)
+{
+    while (coeffs->size() < size)
+        coeffs->push_back(NULL);
+}
+
+static void combineSumsIntoCoefficients(ExpressionList* coeffs, const ExpressionList& sums, const char* variable)
+{
+    for (ExpressionList::const_iterator it = sums.begin(); it != sums.end(); ++it)
+    {
+        int order = 0;
+        
+        // Determine coefficient order by finding the variable we're a function of and checking its exponent.
+        Expression* var = (*it)->find(variable);
+        if (var != NULL)
+        {
+            if (var->parent() && var->parent()->isOperation(op::pow))
+            {
+                if (var->parent()->right()->type() != Expression::CONSTANT)
+                    throw ExpressionManipulator::NonConstantExponentException("Can't calculate order.");
+                order = (int)var->parent()->right()->value();
+                
+                // Eliminate variable and power expression so we are left with the coefficient only
+                if (var->parent()->parent())
+                    var->parent()->getOtherOperand()->collapseIntoParent();
+            }
+            else
+            {
+                // No exponent is the same as an exponent of 1
+                order = 1;
+                // Eliminate variable so we are left with the coefficient only
+                if (var->parent())
+                    var->parent()->getOtherOperand()->collapseIntoParent();
+            }
+        }
+
+        resizeCoefficientList(coeffs, order + 1);
+        (*coeffs)[order] = (*coeffs)[order] == NULL ? *it : Expression::make(op::add, (*coeffs)[0], *it);
     }
 }
 
@@ -164,19 +149,39 @@ TFManipulator::calculateTransferFunctionCoefficients(Expression* e, const char* 
     manipulateIntoRationalFunction(e, variable);
     e->dump("wtf.dot", true);
 
-    Reference<Expression> numerator = e->left();
-    Reference<Expression> denominator = e->right();
-    numerator->unlinkFromTree();
-    denominator->unlinkFromTree();
+    ExpressionList numSums;
+    ExpressionList denSums;
+    splitSums(&numSums, e->left());
+    splitSums(&denSums, e->right());
+    
+    for (std::size_t i = 0; i != numSums.size(); ++i)
+    {
+        std::stringstream ss; ss << "(sums) numerator degree: " << i;
+        numSums[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
+    for (std::size_t i = 0; i != denSums.size(); ++i)
+    {
+        std::stringstream ss; ss << "(sums) denominator degree: " << i;
+        denSums[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
+    
+    ExpressionList numCoeffs;
+    ExpressionList denCoeffs;
+    combineSumsIntoCoefficients(&numCoeffs, numSums, variable);
+    combineSumsIntoCoefficients(&denCoeffs, denSums, variable);
+    
+    e->dump("wtf.dot", true);
 
-    UnsortedCoeffs num;
-    UnsortedCoeffs den;
-    numerator->dump("wtf.dot", true);
-    while (coeffsAdd(&num, numerator, variable)) {
-        numerator->dump("wtf.dot", true); }
-    denominator->dump("wtf.dot", true);
-    while (coeffsAdd(&den, denominator, variable)) {
-        denominator->dump("wtf.dot", true); }
+    for (std::size_t i = 0; i != numCoeffs.size(); ++i)
+    {
+        std::stringstream ss; ss << "(coeffs) numerator degree: " << i;
+        numCoeffs[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
+    for (std::size_t i = 0; i != denCoeffs.size(); ++i)
+    {
+        std::stringstream ss; ss << "(coeffs) denominator degree: " << i;
+        denCoeffs[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
 
     return TFCoefficients();
 }

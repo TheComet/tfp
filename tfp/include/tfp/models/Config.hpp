@@ -1,10 +1,11 @@
 #pragma once
 
+#include "tfp/config.hpp"
 #include <QString>
 
 namespace tfp {
 
-class Config
+class TFP_PUBLIC_API Config
 {
 public:
     void load();
@@ -20,6 +21,6 @@ public:
     } expressionSolver;
 };
 
-extern Config g_config;
+extern TFP_PUBLIC_API Config g_config;
 
 }

@@ -118,14 +118,16 @@ Expression* Expression::swapWith(Expression* other)
 }
 
 // ----------------------------------------------------------------------------
-void Expression::unlinkFromTree()
+Expression* Expression::unlinkFromTree()
 {
     if (parent() == NULL)
-        return;
+        return this;
 
     Reference<Expression>& operand = parent()->left() == this ? parent()->left_ : parent()->right_;
     operand.detach();
     parent_ = NULL;
+    
+    return this;
 }
 
 // ----------------------------------------------------------------------------
