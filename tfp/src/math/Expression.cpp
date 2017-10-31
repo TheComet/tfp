@@ -286,8 +286,9 @@ Expression* Expression::find(const char* variableName)
     if (type() == VARIABLE && strcmp(name(), variableName) == 0)
         return this;
 
-    if (left())  return left()->find(variableName);
-    if (right()) return right()->find(variableName);
+    Expression* e;
+    if (left() && (e = left()->find(variableName)) != NULL) return e;
+    if (right() && (e = right()->find(variableName)) != NULL) return e;
     return NULL;
 }
 
@@ -297,8 +298,9 @@ Expression* Expression::find(double value)
     if (type() == CONSTANT && this->value() == value)
         return this;
 
-    if (left())  return left()->find(value);
-    if (right()) return right()->find(value);
+    Expression* e;
+    if (left() && (e = left()->find(value)) != NULL) return e;
+    if (right() && (e = right()->find(value)) != NULL) return e;
     return NULL;
 }
 
@@ -307,9 +309,10 @@ Expression* Expression::find(op::Op1 func)
 {
     if (type() == FUNCTION1 && op1() == func)
         return this;
-    
-    if (left())  return left()->find(func);
-    if (right()) return right()->find(func);
+
+    Expression* e;
+    if (left() && (e = left()->find(func)) != NULL) return e;
+    if (right() && (e = right()->find(func)) != NULL) return e;
     return NULL;
 }
 
@@ -318,9 +321,10 @@ Expression* Expression::find(op::Op2 func)
 {
     if (type() == FUNCTION2 && op2() == func)
         return this;
-    
-    if (left())  return left()->find(func);
-    if (right()) return right()->find(func);
+
+    Expression* e;
+    if (left() && (e = left()->find(func)) != NULL) return e;
+    if (right() && (e = right()->find(func)) != NULL) return e;
     return NULL;
 }
 
@@ -443,9 +447,9 @@ bool Expression::isSameAs(const Expression* other) const
 {
     if (type() != other->type())
         return false;
-    if (left() && left()->isSameAs(other) == false)
+    if (left() && other->left() && left()->isSameAs(other->left()) == false)
         return false;
-    if (right() && right()->isSameAs(other) == false)
+    if (right() && other->right() && right()->isSameAs(other->right()) == false)
         return false;
 
     switch (type())

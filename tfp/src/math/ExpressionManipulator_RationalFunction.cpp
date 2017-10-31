@@ -82,14 +82,12 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
            recursivelyCall(&TFManipulator::expand, split, variable))
     {}
 
-    optimise.everything(e);
-
     return false;
 }
 
 // ----------------------------------------------------------------------------
-typedef std::vector< Reference<Expression> > ExpressionList;
-static void splitSums(ExpressionList* sums, Expression* e)
+static void splitSums(TFManipulator::TFCoefficients::Coefficients* sums,
+                      Expression* e)
 {
     if (e->isOperation(op::add))
     {
@@ -102,15 +100,18 @@ static void splitSums(ExpressionList* sums, Expression* e)
     }
 }
 
-static void resizeCoefficientList(ExpressionList* coeffs, std::size_t size)
+static void resizeCoefficientList(TFManipulator::TFCoefficients::Coefficients* coeffs,
+                                  std::size_t size)
 {
     while (coeffs->size() < size)
-        coeffs->push_back(NULL);
+        coeffs->push_back(Expression::make(0.0));
 }
 
-static void combineSumsIntoCoefficients(ExpressionList* coeffs, const ExpressionList& sums, const char* variable)
+static void combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficients* coeffs,
+                                        const TFManipulator::TFCoefficients::Coefficients& sums,
+                                        const char* variable)
 {
-    for (ExpressionList::const_iterator it = sums.begin(); it != sums.end(); ++it)
+    for (TFManipulator::TFCoefficients::Coefficients::const_iterator it = sums.begin(); it != sums.end(); ++it)
     {
         int order = 0;
         
@@ -127,6 +128,8 @@ static void combineSumsIntoCoefficients(ExpressionList* coeffs, const Expression
                 // Eliminate variable and power expression so we are left with the coefficient only
                 if (var->parent()->parent())
                     var->parent()->getOtherOperand()->collapseIntoParent();
+                else
+                    var->parent()->set(1.0);
             }
             else
             {
@@ -134,12 +137,14 @@ static void combineSumsIntoCoefficients(ExpressionList* coeffs, const Expression
                 order = 1;
                 // Eliminate variable so we are left with the coefficient only
                 if (var->parent())
-                    var->parent()->getOtherOperand()->collapseIntoParent();
+                    var->getOtherOperand()->collapseIntoParent();
+                else
+                    var->set(1.0);
             }
         }
 
         resizeCoefficientList(coeffs, order + 1);
-        (*coeffs)[order] = (*coeffs)[order] == NULL ? *it : Expression::make(op::add, (*coeffs)[0], *it);
+        (*coeffs)[order] = Expression::make(op::add, (*coeffs)[order], *it);
     }
 }
 
@@ -147,43 +152,27 @@ TFManipulator::TFCoefficients
 TFManipulator::calculateTransferFunctionCoefficients(Expression* e, const char* variable)
 {
     manipulateIntoRationalFunction(e, variable);
-    e->dump("wtf.dot", true);
 
-    ExpressionList numSums;
-    ExpressionList denSums;
+    TFCoefficients::Coefficients numSums;
+    TFCoefficients::Coefficients denSums;
     splitSums(&numSums, e->left());
     splitSums(&denSums, e->right());
-    
+
     for (std::size_t i = 0; i != numSums.size(); ++i)
-    {
-        std::stringstream ss; ss << "(sums) numerator degree: " << i;
-        numSums[i]->dump("wtf.dot", true, ss.str().c_str());
-    }
+        numSums[i]->optimise();
     for (std::size_t i = 0; i != denSums.size(); ++i)
-    {
-        std::stringstream ss; ss << "(sums) denominator degree: " << i;
-        denSums[i]->dump("wtf.dot", true, ss.str().c_str());
-    }
-    
-    ExpressionList numCoeffs;
-    ExpressionList denCoeffs;
-    combineSumsIntoCoefficients(&numCoeffs, numSums, variable);
-    combineSumsIntoCoefficients(&denCoeffs, denSums, variable);
-    
-    e->dump("wtf.dot", true);
+        denSums[i]->optimise();
 
-    for (std::size_t i = 0; i != numCoeffs.size(); ++i)
-    {
-        std::stringstream ss; ss << "(coeffs) numerator degree: " << i;
-        numCoeffs[i]->dump("wtf.dot", true, ss.str().c_str());
-    }
-    for (std::size_t i = 0; i != denCoeffs.size(); ++i)
-    {
-        std::stringstream ss; ss << "(coeffs) denominator degree: " << i;
-        denCoeffs[i]->dump("wtf.dot", true, ss.str().c_str());
-    }
+    TFCoefficients coeffs;
+    combineSumsIntoCoefficients(&coeffs.numerator, numSums, variable);
+    combineSumsIntoCoefficients(&coeffs.denominator, denSums, variable);
 
-    return TFCoefficients();
+    for (std::size_t i = 0; i != coeffs.numerator.size(); ++i)
+        coeffs.numerator[i]->optimise();
+    for (std::size_t i = 0; i != coeffs.denominator.size(); ++i)
+        coeffs.denominator[i]->optimise();
+
+    return coeffs;
 }
 
 // ----------------------------------------------------------------------------
@@ -191,18 +180,18 @@ tfp::TransferFunction<double>
 TFManipulator::calculateTransferFunction(const TFCoefficients& tfe,
                                          const VariableTable* vt)
 {
-    tfp::CoefficientPolynomial<double> numerator(tfe.numeratorCoefficients_.size());
-    tfp::CoefficientPolynomial<double> denominator(tfe.denominatorCoefficients_.size());
+    tfp::CoefficientPolynomial<double> numerator(tfe.numerator.size());
+    tfp::CoefficientPolynomial<double> denominator(tfe.denominator.size());
 
-    for (std::size_t i = 0; i != tfe.numeratorCoefficients_.size(); ++i)
+    for (std::size_t i = 0; i != tfe.numerator.size(); ++i)
     {
-        double value = tfe.numeratorCoefficients_[i]->evaluate(vt);
+        double value = tfe.numerator[i]->evaluate(vt);
         numerator.setCoefficient(i, value);
     }
 
-    for (std::size_t i = 0; i != tfe.denominatorCoefficients_.size(); ++i)
+    for (std::size_t i = 0; i != tfe.denominator.size(); ++i)
     {
-        double value = tfe.denominatorCoefficients_[i]->evaluate(vt);
+        double value = tfe.denominator[i]->evaluate(vt);
         numerator.setCoefficient(i, value);
     }
 

@@ -531,40 +531,37 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      * a4 = -16/(a+4)
      * a5 = -8/(a+4)
      */
-    Reference<VariableTable> vt1 = e->generateVariableTable();
-    Reference<VariableTable> vt2 = e->generateVariableTable();
-    vt1->set("a", 13);
-    vt1->set("s", 17);
-    vt2->set("a", 34);
-    vt2->set("s", 877);
-    double valueBefore1 = e->evaluate(vt1);
-    double valueBefore2 = e->evaluate(vt2);
-    TFManipulator m;
-
     e->dump("wtf.dot");
-    EXPECT_THAT(e->evaluate(vt1), DoubleEq(valueBefore1));
-    EXPECT_THAT(e->evaluate(vt2), DoubleEq(valueBefore2));
+    TFManipulator m;
+    TFManipulator::TFCoefficients tfc = m.calculateTransferFunctionCoefficients(e, "s");
 
-    m.calculateTransferFunctionCoefficients(e, "s");
-    e->dump("wtf.dot", true);
+    for (std::size_t i = 0; i != tfc.numerator.size(); ++i)
+    {
+        std::stringstream ss; ss << "numerator, degree " <<i;
+        tfc.numerator[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
+    for (std::size_t i = 0; i != tfc.denominator.size(); ++i)
+    {
+        std::stringstream ss; ss << "denominator, degree " <<i;
+        tfc.denominator[i]->dump("wtf.dot", true, ss.str().c_str());
+    }
 
-    /*
-    ASSERT_THAT(tfc.numeratorCoefficients_.size(), Eq(4u));
-    ASSERT_THAT(tfc.denominatorCoefficients_.size(), Eq(4u));
-    Expression* b0 = tfc.numeratorCoefficients_[0];
-    Expression* b1 = tfc.numeratorCoefficients_[1];
-    Expression* b2 = tfc.numeratorCoefficients_[2];
-    Expression* b3 = tfc.numeratorCoefficients_[3];
-    Expression* a0 = tfc.denominatorCoefficients_[0];
-    Expression* a1 = tfc.denominatorCoefficients_[1];
-    Expression* a2 = tfc.denominatorCoefficients_[2];
-    Expression* a3 = tfc.denominatorCoefficients_[3];
-    EXPECT_THAT(b0->value(), DoubleEq(0));
-    EXPECT_THAT(b1->value(), DoubleEq(0));
-    EXPECT_THAT(b2->op2(), Eq(op::add));
-    EXPECT_THAT(b3->op2(), Eq(op::add));
-    EXPECT_THAT(a0->op2(), Eq(op::add));
-    EXPECT_THAT(a1->op2(), Eq(op::add));
-    EXPECT_THAT(a2->op2(), Eq(op::sub));
-    EXPECT_THAT(a3->value(), DoubleEq(8));*/
+    Reference<VariableTable> vt = new VariableTable;
+    vt->add("a", 7.2);
+    ASSERT_THAT(tfc.numerator.size(), Eq(6u));
+    ASSERT_THAT(tfc.denominator.size(), Eq(6u));
+
+    ASSERT_THAT(tfc.numerator[0]->evaluate(vt), DoubleEq(0.0));
+    ASSERT_THAT(tfc.numerator[1]->evaluate(vt), DoubleEq(0.0));
+    ASSERT_THAT(tfc.numerator[2]->evaluate(vt), DoubleEq(0.0));
+    ASSERT_THAT(tfc.numerator[3]->evaluate(vt), DoubleEq(1.0));
+    ASSERT_THAT(tfc.numerator[4]->evaluate(vt), DoubleEq(2.0));
+    ASSERT_THAT(tfc.numerator[5]->evaluate(vt), DoubleEq(1.0));
+
+    ASSERT_THAT(tfc.denominator[0]->evaluate(vt), DoubleEq(1.0));
+    ASSERT_THAT(tfc.denominator[1]->evaluate(vt), DoubleEq(2.0));
+    ASSERT_THAT(tfc.denominator[2]->evaluate(vt), DoubleEq(1.0));
+    ASSERT_THAT(tfc.denominator[3]->evaluate(vt), DoubleEq(-4.0 - 8.0 / (7.2 + 4.0)));
+    ASSERT_THAT(tfc.denominator[4]->evaluate(vt), DoubleEq(-16.0 / (7.2 + 4.0)));
+    ASSERT_THAT(tfc.denominator[5]->evaluate(vt), DoubleEq(-8.0 / (7.2 + 4.0)));
 }

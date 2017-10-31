@@ -43,9 +43,8 @@ public:
     struct TFCoefficients
     {
         typedef std::vector< tfp::Reference<Expression> > Coefficients;
-        Coefficients numeratorCoefficients_;
-        Coefficients denominatorCoefficients_;
-        std::string argumentVariable_;
+        Coefficients numerator;
+        Coefficients denominator;
     };
 
     Expression* findOrAddLatestDivision(Expression* e);
