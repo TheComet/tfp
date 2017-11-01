@@ -23,6 +23,12 @@ struct TFP_PUBLIC_API Util
      */
     static QwtPlotTextLabel* createLoadingTextLabel();
 
+    /*!
+     * @brief Taken from boost::hash_combine. Combines two hash values into a
+     * new hash value.
+     */
+    static std::size_t combineHashes(std::size_t lhs, std::size_t rhs);
+
     static QDir getConfigDir();
 };
 

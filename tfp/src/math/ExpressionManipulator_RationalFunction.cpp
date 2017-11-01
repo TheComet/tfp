@@ -60,9 +60,6 @@ bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* va
      * constant RHS. If not, error out, because such an expression cannot be
      * reduced to a rational function.
      */
-    /*if (enforceConstantExponent(variable) == false)
-        return false;*/
-        //throw std::runtime_error("This expression has variable exponents! These cannot be reduced to a rational function.");
     ExpressionOptimiser optimise;
     while (true)
     {
@@ -192,7 +189,7 @@ TFManipulator::calculateTransferFunction(const TFCoefficients& tfe,
     for (std::size_t i = 0; i != tfe.denominator.size(); ++i)
     {
         double value = tfe.denominator[i]->evaluate(vt);
-        numerator.setCoefficient(i, value);
+        denominator.setCoefficient(i, value);
     }
 
     return tfp::TransferFunction<double>(numerator, denominator);

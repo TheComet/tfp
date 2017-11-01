@@ -70,7 +70,7 @@ RootPolynomial<T> CoefficientPolynomial<T>::roots() const
         return RootPolynomial<T>();
 
     // Each coefficient is divided by this factor to make it a monic polynomial
-    T factor = coefficients_(0);
+    T factor = coefficients_(size);
 
     // Zero-order polynomial has no roots, but it still has a factor equal to
     // the largest coefficient

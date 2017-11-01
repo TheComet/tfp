@@ -2,6 +2,7 @@
 #include "tfp/math/ExpressionParser.hpp"
 #include "tfp/math/ExpressionOptimiser.hpp"
 #include "tfp/math/VariableTable.hpp"
+#include "tfp/util/Util.hpp"
 #include <string.h>
 #include <cassert>
 #include <cmath>
@@ -100,8 +101,8 @@ void Expression::copyDataFrom(const Expression* other)
 // ----------------------------------------------------------------------------
 void Expression::stealDataFrom(Expression* other)
 {
-    type_ = other->type();
-    memcpy(&data_, &other->data_, sizeof(data_));
+    type_ = other->type_;
+    data_ = other->data_;
 
     other->type_ = INVALID;
 }
@@ -115,6 +116,18 @@ Expression* Expression::swapWith(Expression* other)
     other->parent_ = parent();
     parent_ = NULL;
     return this;
+}
+
+// ----------------------------------------------------------------------------
+void Expression::replaceWith(Expression* other)
+{
+    Reference<Expression> ref(other);
+    stealDataFrom(other);
+    left_ = other->left_;
+    right_ = other->right_;
+    if (left_)  left_->parent_ = this;
+    if (right_) right_->parent_ = this;
+
 }
 
 // ----------------------------------------------------------------------------
@@ -417,13 +430,41 @@ static void addVariableToTable(VariableTable* vt, const Expression* e)
             defaultValue = 1;
     }
 
-    vt->add(e->name(), defaultValue);
+    vt->set(e->name(), defaultValue);
 }
 VariableTable* Expression::generateVariableTable() const
 {
     VariableTable* vt = new VariableTable;
     addVariableToTable(vt, this);
     return vt;
+}
+
+// ----------------------------------------------------------------------------
+static void insertSubstitutionsRecursive(VariableTable* vt, Expression* e, std::set<std::size_t>* visited)
+{
+    if (e->left()) insertSubstitutionsRecursive(vt, e->left(), visited);
+    if (e->right()) insertSubstitutionsRecursive(vt, e->right(), visited);
+    if (e->type() != Expression::VARIABLE)
+        return;
+
+    Expression* resolved = vt->get(e->name());
+    if (resolved == NULL)
+        return;
+
+    // Keep track of which expression node was substituted with which resolved
+    // expression
+    std::size_t hash = Util::combineHashes(std::size_t(e), std::size_t(resolved));
+    if (visited->insert(hash).second == false)
+        throw std::runtime_error("Error: cyclic expression dependency detected while substituting.");
+
+    // Clone resolved expression and replace variable with it
+    e->replaceWith(resolved->clone());
+    insertSubstitutionsRecursive(vt, e, visited);
+}
+void Expression::insertSubstitutions(VariableTable* vt)
+{
+    std::set<std::size_t> visited;
+    insertSubstitutionsRecursive(vt, this, &visited);
 }
 
 // ----------------------------------------------------------------------------
@@ -560,6 +601,7 @@ void writeName(FILE* fp, Expression* e)
     switch (e->type())
     {
         case Expression::CONSTANT  : fprintf(fp, "%f", e->value()); break;
+        case Expression::INF       : fprintf(fp, "inf"); break;
         case Expression::VARIABLE  : fprintf(fp, "%s", e->name());  break;
         case Expression::FUNCTION1 : writeFunction(fp, e->op1()); break;
         case Expression::FUNCTION2 : writeFunction(fp, e->op2()); break;

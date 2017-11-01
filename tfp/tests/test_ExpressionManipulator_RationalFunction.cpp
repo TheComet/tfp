@@ -503,8 +503,6 @@ TEST(NAME, lala)
     e->dump("wtf.dot", true);
 }
 
-void beginDump(const char* filename);
-void endDump();
 TEST(NAME, compute_transfer_function_coefficient_expressions)
 {
     Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
@@ -531,23 +529,23 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
      * a4 = -16/(a+4)
      * a5 = -8/(a+4)
      */
-    e->dump("wtf.dot");
+    e->dump("compute_transfer_function_coefficient_expressions.dot");
     TFManipulator m;
     TFManipulator::TFCoefficients tfc = m.calculateTransferFunctionCoefficients(e, "s");
 
     for (std::size_t i = 0; i != tfc.numerator.size(); ++i)
     {
         std::stringstream ss; ss << "numerator, degree " <<i;
-        tfc.numerator[i]->dump("wtf.dot", true, ss.str().c_str());
+        tfc.numerator[i]->dump("compute_transfer_function_coefficient_expressions.dot", true, ss.str().c_str());
     }
     for (std::size_t i = 0; i != tfc.denominator.size(); ++i)
     {
         std::stringstream ss; ss << "denominator, degree " <<i;
-        tfc.denominator[i]->dump("wtf.dot", true, ss.str().c_str());
+        tfc.denominator[i]->dump("compute_transfer_function_coefficient_expressions.dot", true, ss.str().c_str());
     }
 
     Reference<VariableTable> vt = new VariableTable;
-    vt->add("a", 7.2);
+    vt->set("a", 7.2);
     ASSERT_THAT(tfc.numerator.size(), Eq(6u));
     ASSERT_THAT(tfc.denominator.size(), Eq(6u));
 
@@ -564,4 +562,108 @@ TEST(NAME, compute_transfer_function_coefficient_expressions)
     ASSERT_THAT(tfc.denominator[3]->evaluate(vt), DoubleEq(-4.0 - 8.0 / (7.2 + 4.0)));
     ASSERT_THAT(tfc.denominator[4]->evaluate(vt), DoubleEq(-16.0 / (7.2 + 4.0)));
     ASSERT_THAT(tfc.denominator[5]->evaluate(vt), DoubleEq(-8.0 / (7.2 + 4.0)));
+}
+
+TEST(NAME, compute_transfer_function)
+{
+    Reference<Expression> e = Expression::parse("1/(1/s^3 - 4/(1+s)^2 - 8/(a+4))");
+    /*
+     * Solved on paper:
+     *                      s^3 + 2s^4 + s^5
+     *  G(s) = ---------------------------------------------
+     *         1 + 2s + s^2 + (-4-x)s^3 + (-2x)s^4 + (-x)s^5
+     * where:
+     *     x = 8/(a+4)
+     *
+     * b0 = 0
+     * b1 = 0
+     * b2 = 0
+     * b3 = 1
+     * b4 = 2
+     * b5 = 1
+     * a0 = 1
+     * a1 = 2
+     * a2 = 1
+     * a3 = -4-8/(a+4)
+     * a4 = -16/(a+4)
+     * a5 = -8/(a+4)
+     */
+    e->dump("compute_transfer_function.dot");
+    TFManipulator m;
+    TFManipulator::TFCoefficients tfc = m.calculateTransferFunctionCoefficients(e, "s");
+
+    for (std::size_t i = 0; i != tfc.numerator.size(); ++i)
+    {
+        std::stringstream ss; ss << "numerator, degree " <<i;
+        tfc.numerator[i]->dump("compute_transfer_function.dot", true, ss.str().c_str());
+    }
+    for (std::size_t i = 0; i != tfc.denominator.size(); ++i)
+    {
+        std::stringstream ss; ss << "denominator, degree " <<i;
+        tfc.denominator[i]->dump("compute_transfer_function.dot", true, ss.str().c_str());
+    }
+
+    Reference<VariableTable> vt = new VariableTable;
+    vt->set("a", 7.2);
+    TransferFunction<double> tf = m.calculateTransferFunction(tfc, vt);
+    ASSERT_THAT(tf.numerator().size(), Eq(5));
+    ASSERT_THAT(tf.denominator().size(), Eq(5));
+}
+
+TEST(NAME, active_lowpass_filter)
+{
+    /*
+     *                    C
+     *             +------||------+
+     *             |              |
+     *             |      G2      |
+     *             o-----\/\/\----o
+     *             |              |
+     * Vin   G1    |  |'-.        |
+     * O---\/\/\---o--| -  '-.    |     Vout
+     *                |        >--o------O
+     *             +--| +  .-'
+     *            _|_ |.-'
+     *                                               1
+     *                                              --- = y2 = G1 + G2 + sC
+     * Vin        I2        V2                       z2
+     *  o---->----o---->----o-.  -1
+     *      G1    |    z2       '-.          Vout
+     *            |                 o---->----o
+     *            |             .-'      A    |
+     *             \        o-'  1           /
+     *              '-,                   ,-'
+     *                  '-------<-------'
+     *                       G2 + sC
+     *
+     * P1 = -G1*z2*A
+     * L1 = -A*(G2+s*C)*z2
+     */
+    Reference<Expression> e = Expression::parse("P1/(1-L1)");
+    e->dump("active_lowpass_filter.dot");
+
+    Reference<VariableTable> vt = new VariableTable;
+    vt->set("P1", "-G1*z2*A");
+    vt->set("L1", "-A*(G2+s*C)*z2");
+    vt->set("z2", "1/(G1 + G2 + s*C)");
+    e->insertSubstitutions(vt);
+    e->dump("active_lowpass_filter.dot", true, "Substitution");
+
+    TFManipulator m;
+    TFManipulator::TFCoefficients tfc = m.calculateTransferFunctionCoefficients(e, "s");
+    for (std::size_t i = 0; i != tfc.numerator.size(); ++i)
+    {
+        std::stringstream ss; ss << "numerator, degree " <<i;
+        tfc.numerator[i]->dump("compute_transfer_function.dot", true, ss.str().c_str());
+    }
+    for (std::size_t i = 0; i != tfc.denominator.size(); ++i)
+    {
+        std::stringstream ss; ss << "denominator, degree " <<i;
+        tfc.denominator[i]->dump("compute_transfer_function.dot", true, ss.str().c_str());
+    }
+
+
+    TransferFunction<double> tf = m.calculateTransferFunction(tfc, vt);
+    ASSERT_THAT(tf.numerator().size(), Eq(5));
+    ASSERT_THAT(tf.denominator().size(), Eq(5));
 }

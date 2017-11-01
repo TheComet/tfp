@@ -27,10 +27,10 @@ TEST(NAME, evaluate_with_variables)
 {
     Reference<Expression> e = Expression::parse("(a+3*c)^d + e");
     Reference<VariableTable> vt = new VariableTable;
-    vt->add("a", 2);
-    vt->add("c", 4);
-    vt->add("d", 2);
-    vt->add("e", 5);
+    vt->set("a", 2);
+    vt->set("c", 4);
+    vt->set("d", 2);
+    vt->set("e", 5);
     EXPECT_THAT(e->evaluate(vt), DoubleEq(201));
 }
 
@@ -52,4 +52,25 @@ TEST(NAME, clone_actually_deep_copies)
     ASSERT_THAT(e1->left()->left(), Ne(e2->left()->left()));
     ASSERT_THAT(e1->left()->left()->name(), StrEq(e2->left()->left()->name()));
     ASSERT_THAT(e1->left()->right()->name(), StrEq(e2->left()->right()->name()));
+}
+
+TEST(NAME, substitute_simple)
+{
+    Reference<Expression> e1 = Expression::make("a");
+    Reference<VariableTable> vt = new VariableTable;
+    vt->set("a", "b");
+    vt->set("b", "c");
+    e1->insertSubstitutions(vt);
+    ASSERT_THAT(e1->name(), StrEq("c"));
+}
+
+TEST(NAME, substitute_with_cycles_fails)
+{
+    Reference<Expression> e1 = Expression::make("a");
+    Reference<VariableTable> vt = new VariableTable;
+    vt->set("a", "b");
+    vt->set("b", "c");
+    vt->set("c", "d");
+    vt->set("d", "b");
+    EXPECT_THROW(e1->insertSubstitutions(vt), std::runtime_error);
 }

@@ -42,6 +42,13 @@ QwtPlotTextLabel* Util::createLoadingTextLabel()
 }
 
 // ----------------------------------------------------------------------------
+std::size_t Util::combineHashes(std::size_t lhs, std::size_t rhs)
+{
+    lhs^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+    return lhs;
+}
+
+// ----------------------------------------------------------------------------
 QDir Util::getConfigDir()
 {
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);

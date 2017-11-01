@@ -31,6 +31,7 @@ public:
     {
         INVALID,
         CONSTANT,
+        INF,
         VARIABLE,
         FUNCTION1,
         FUNCTION2
@@ -65,6 +66,7 @@ public:
     void copyDataFrom(const Expression* other);
     void stealDataFrom(Expression* other);
     Expression* swapWith(Expression* other);
+    void replaceWith(Expression* other);
     Expression* unlinkFromTree();
     // deep copy, parent of root node defaults to NULL
     Expression* clone(Expression* parent=NULL) const;
@@ -112,6 +114,14 @@ public:
     Expression* findSameDownChain(op::Op2 func, const Expression* match);
 
     VariableTable* generateVariableTable() const;
+    /*!
+     * Any entries in the variable table that don't directly resolve to a value
+     * (that is, they resolve to another expression) are inserted into the
+     * expression tree and the corresponding entries in the variable table are
+     * deleted.
+     */
+    void insertSubstitutions(VariableTable* vt);
+
     double evaluate(const VariableTable* vt=NULL, std::set<std::string>* visited=NULL) const;
     
     bool checkParentConsistencies() const;

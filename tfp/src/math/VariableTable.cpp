@@ -4,60 +4,28 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-void VariableTable::add(std::string name, double value)
-{
-    table_[name] = Expression::make(value);
-}
-
-// ----------------------------------------------------------------------------
-void VariableTable::add(std::string name, const char* expression)
-{
-    Expression* e = Expression::parse(expression);
-    if (table_.insert(std::pair< std::string, tfp::Reference<Expression> >(
-        name, e
-    )).second == false)
-    {
-        throw std::runtime_error("Tried adding variable \"" + name + "\" but it already exists!");
-    }
-
-    /*
-     * If the expression was not a constant, it's possible that further
-     * variables were introduced.
-     */
-    if (e->type() != Expression::CONSTANT)
-    {
-        tfp::Reference<VariableTable> vt = e->generateVariableTable();
-        merge(*vt);
-    }
-}
-
-// ----------------------------------------------------------------------------
 void VariableTable::set(std::string name, double value)
 {
-    table_.at(name)->set(value);
+    Table::const_iterator it = table_.find(name);
+    if (it == table_.end())
+        table_[name] = Expression::make(value);
+    else
+        it->second->set(value);
 }
 
 // ----------------------------------------------------------------------------
 void VariableTable::set(std::string name, const char* expression)
 {
-    Expression* e = Expression::parse(expression);
-    table_.at(name) = e;
-
-    /*
-     * If the expression was not a constant, it's possible that further
-     * variables were introduced.
-     */
-    if (e->type() != Expression::CONSTANT)
-    {
-        tfp::Reference<VariableTable> vt = e->generateVariableTable();
-        merge(*vt);
-    }
+    table_[name] = Expression::parse(expression);
 }
 
 // ----------------------------------------------------------------------------
 Expression* VariableTable::get(const std::string& name) const
 {
-    return table_.at(name);
+    Table::const_iterator it = table_.find(name);
+    if (it == table_.end())
+        return NULL;
+    return it->second;
 }
 
 // ----------------------------------------------------------------------------
