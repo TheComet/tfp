@@ -7,6 +7,10 @@
 #include "tfp/views/DataTree.hpp"
 #include "tfp/views/MainWindow.hpp"
 #include "tfp/views/SettingsView.hpp"
+#include "tfp/views/ToolContainer.hpp"
+#include "ads/DockManager.h"
+#include "ads/DockWidget.h"
+#include "ads/DockAreaWidget.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QMdiArea>
@@ -41,12 +45,8 @@ protected:
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    mdiArea_(new QMdiArea),
     dataTree_(new DataTree),
-    tools1_(new QComboBox),
-    tools2_(new QComboBox),
-    toolContainer1_(new QWidget),
-    toolContainer2_(new QWidget),
+    dockManager_(NULL),
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
@@ -55,14 +55,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/icons/icon.ico"));
     setWindowTitle(qtTrId(ID_APP_TITLE));
 
-/*
-    mdiArea_->setViewMode(QMdiArea::TabbedView);
-    mdiArea_->setTabsClosable(true);
-    mdiArea_->setTabsMovable(true);
-    ui->centralWidget->layout()->addWidget(mdiArea_);
-    mdiArea_->setVisible(false);*/
-
     loadPlugins();
+    
+    /*
     tools1_ = new QComboBox;
     tools2_ = new QComboBox;
     QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();
@@ -70,33 +65,32 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         tools1_->addItem((*it)->name);
         tools2_->addItem((*it)->name);
-    }
+    }*/
 
     QWidget* leftPane = new QWidget;
     leftPane->setLayout(new QVBoxLayout);
     leftPane->layout()->addWidget(dataTree_);
-    leftPane->layout()->addWidget(tools1_);
-    leftPane->layout()->addWidget(tools2_);
 
     activeSystem_ = newSystem("System");
-    toolContainer1_->setLayout(new QHBoxLayout);
-    toolContainer2_->setLayout(new QHBoxLayout);
+    
+    QMainWindow* visualiserContainer = new QMainWindow;
+    dockManager_ = new ads::CDockManager(visualiserContainer);
 
     QSplitter* splitter = new QSplitter;
     ui->centralWidget->layout()->addWidget(splitter);
     splitter->addWidget(leftPane);
-    splitter->addWidget(toolContainer1_);
-    splitter->addWidget(toolContainer2_);
+    splitter->addWidget(dockManager_);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
+    
+    dockManager_->addDockWidget(ads::LeftDockWidgetArea, newDockableTool(Plugin::GENERATOR));
+    dockManager_->addDockWidget(ads::RightDockWidgetArea, newDockableTool(Plugin::VISUALISER));
+    dockManager_->addDockWidget(ads::TopDockWidgetArea, newDockableTool(Plugin::VISUALISER));
+    dockManager_->addDockWidget(ads::BottomDockWidgetArea, newDockableTool(Plugin::VISUALISER));
+    dockManager_->addDockWidget(ads::RightDockWidgetArea, newDockableTool(Plugin::VISUALISER));
 
-    connect(tools1_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool1(const QString&)));
-    connect(tools2_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(loadTool2(const QString&)));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(onActionQuitTriggered()));
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(onActionSettingsTriggered()));
-
-    loadTool1("DPSFG");
-    loadTool2("Bode Plot");
 }
 
 // ----------------------------------------------------------------------------
@@ -138,45 +132,17 @@ void MainWindow::deleteSystem(System* system)
 }
 
 // ----------------------------------------------------------------------------
-void MainWindow::loadTool1(const QString& name)
+ads::CDockWidget* MainWindow::newDockableTool(Plugin::Category category)
 {
-    Tool* tool = pluginManager_->createTool(name);
-    if (tool == NULL)
-        return;
-
-    // Update combo box
-    for (int i = 0; i < tools1_->count(); ++i)
-        if (tools1_->itemText(i) == name)
-        {
-            bool blocked = blockSignals(true);
-            tools1_->setCurrentIndex(i);
-            blockSignals(blocked);
-            break;
-        }
-
-    Util::clearLayout(toolContainer1_->layout());
-    tool->setSystem(activeSystem_);
-    toolContainer1_->layout()->addWidget(tool);
-}
-void MainWindow::loadTool2(const QString& name)
-{
-    Tool* tool = pluginManager_->createTool(name);
-    if (tool == NULL)
-        return;
-
-    // Update combo box
-    for (int i = 0; i < tools2_->count(); ++i)
-        if (tools2_->itemText(i) == name)
-        {
-            bool blocked = blockSignals(true);
-            tools2_->setCurrentIndex(i);
-            blockSignals(blocked);
-            break;
-        }
-
-    Util::clearLayout(toolContainer2_->layout());
-    tool->setSystem(activeSystem_);
-    toolContainer2_->layout()->addWidget(tool);
+    ToolContainer* toolContainer = new ToolContainer;
+    toolContainer->setPluginManager(pluginManager_);
+    toolContainer->setSystem(activeSystem_);
+    toolContainer->populateToolsList(category);
+    
+    ads::CDockWidget* dockWidget = new ads::CDockWidget("Test");
+    dockWidget->setWidget(toolContainer);
+    
+    return dockWidget;
 }
 
 // ----------------------------------------------------------------------------

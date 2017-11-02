@@ -39,7 +39,8 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SettingsView.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SettingsView.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/ToolContainer.hpp")
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
@@ -78,7 +79,8 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/ToolContainer.cpp")
 set (tfp_FORMS
         "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui"
         "${CMAKE_CURRENT_LIST_DIR}/forms/SettingsView.ui")
@@ -138,6 +140,7 @@ create_vcproj_userfile (tfp)
 include_directories (${KISS_FFT_INCLUDE_DIRS})
 include_directories (${QWT_INCLUDE_DIRS})
 include_directories (${QWTPLOT3D_INCLUDE_DIRS})
+include_directories (${ADS_INCLUDE_DIRS})
 include_directories (${EIGEN_INCLUDE_DIRS})
 include_directories (${PUGIXML_INCLUDE_DIRS})
 
@@ -147,6 +150,7 @@ target_link_libraries (tfp Qt5::Gui)
 
 target_link_libraries (tfp ${QWT_LIBRARIES})
 target_link_libraries (tfp ${QWTPLOT3D_LIBRARIES})
+target_link_libraries (tfp ${ADS_LIBRARIES})
 target_link_libraries (tfp ${KISS_FFT_LIBRARIES})
 target_link_libraries (tfp ${PUGIXML_LIBRARIES})
 

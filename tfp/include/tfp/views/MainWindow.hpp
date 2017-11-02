@@ -3,10 +3,16 @@
 #include "tfp/config.hpp"
 #include "tfp/models/Translation.hpp"
 #include "tfp/util/Reference.hpp"
+#include "tfp/plugin/Plugin.hpp"
 #include <QMainWindow>
 
 namespace Ui {
     class MainWindow;
+}
+
+namespace ads {
+    class CDockManager;
+    class CDockWidget;
 }
 
 class QMdiArea;
@@ -34,10 +40,7 @@ public:
 
     System* newSystem(const QString& name);
     void deleteSystem(System* system);
-
-public slots:
-    void loadTool1(const QString& name);
-    void loadTool2(const QString& name);
+    ads::CDockWidget* newDockableTool(Plugin::Category category);
 
 private slots:
     void onActionQuitTriggered();
@@ -48,12 +51,8 @@ private:
 
 private:
     Ui::MainWindow* ui;
-    QMdiArea* mdiArea_;
     DataTree* dataTree_;
-    QComboBox* tools1_;
-    QComboBox* tools2_;
-    QWidget* toolContainer1_;
-    QWidget* toolContainer2_;
+    ads::CDockManager* dockManager_;
     Reference<PluginManager> pluginManager_;
     Reference<System> activeSystem_;
 };

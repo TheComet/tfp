@@ -104,6 +104,8 @@ bool Plugin::registerTool(ToolFactory* factory,
 {
     if (toolFactories_.find(name) != toolFactories_.end())
         return false;
+    factory->category = category;
+    factory->subCategory = subCategory;
     factory->name = name;
     factory->author = author;
     factory->blurb = blurb;
