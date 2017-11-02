@@ -56,8 +56,10 @@ double VariableTable::valueOf(std::string name) const
 // ----------------------------------------------------------------------------
 double VariableTable::valueOf(std::string name, std::set<std::string>* visited) const
 {
-    Expression* e = table_.at(name);
+    Expression* e = get(name);
+    if (e == NULL)
+        throw MissingEntryException(name.c_str());
     if (e->type() == Expression::VARIABLE && visited->insert(name).second == false)
-        throw std::runtime_error("Error: cyclic expression dependency detected while looking up value of variable");
+        throw CyclicDependencyException(name.c_str());
     return e->evaluate(this, visited);
 }
