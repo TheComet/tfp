@@ -2,9 +2,9 @@ Transfer Function Plotter
 =========================
 
 An  application  for  designing, manipulating and visualising the behaviour of
-LTI systems based on transfer functions.
+LTI (linear time-invariant) systems based on transfer functions.
 
-Transfer functions are commonly used by engineers to describe systems in control theory, or to describe filters, or even to describe the small-signal behaviour of micro electronics.
+Transfer functions are used in the analysis of the dynamic behaviour of many single-input single-output physical processes, typically within the fields of signal processing, communication theory, control theory and in micro electronics.
 
 Features being worked on are:
 
