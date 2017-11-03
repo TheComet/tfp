@@ -40,7 +40,7 @@ public:
 
     System* newSystem(const QString& name);
     void deleteSystem(System* system);
-    ads::CDockWidget* newDockableTool(Plugin::Category category);
+    ads::CDockWidget* newDockableTool(Plugin::Category category, const char* toolName);
 
 private slots:
     void onActionQuitTriggered();

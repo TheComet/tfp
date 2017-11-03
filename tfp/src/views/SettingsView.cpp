@@ -9,7 +9,8 @@ using namespace tfp;
 static const char* g_categoryTitles[] = {
     "Language Options",
     "Algorithm Settings",
-    "Configure Expression Solver"
+    "Configure Expression Solver",
+    "Plot Settings"
 };
 
 // ----------------------------------------------------------------------------
@@ -33,13 +34,14 @@ SettingsView::SettingsView(QWidget* parent) :
     ui->checkBox_allowVariableeExponents->installEventFilter(this);
     ui->checkBox_analyticalExponents->installEventFilter(this);
     ui->checkBox_exponentialExpansion->installEventFilter(this);
-    ui->spinBox_expansionCount->installEventFilter(this);
+    ui->container_exponentialExpansionSettings->installEventFilter(this);
+    ui->radioButton_fixedDataPoints->installEventFilter(this);
+    ui->radioButton_optimalDataPoints->installEventFilter(this);
 
     connect(ui->pushButton_ok, SIGNAL(released()), this, SLOT(onPushButtonOKReleased()));
     connect(ui->pushButton_apply, SIGNAL(released()), this, SLOT(onPushButtonApplyReleased()));
     connect(ui->pushButton_cancel, SIGNAL(released()), this, SLOT(onPushButtonCancelReleased()));
     connect(ui->treeWidget_categories, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onTreeItemClicked(QTreeWidgetItem*,int)));
-    connect(ui->checkBox_exponentialExpansion, SIGNAL(toggled(bool)), this, SLOT(onCheckBoxExponentialExpansionToggled(bool)));
 
     loadConfigIntoUI(&g_config);
     setCategoryIndex(0);
@@ -58,6 +60,11 @@ void SettingsView::saveUISettingsToConfig(Config* config)
     config->expressionSolver.analyticalExponents = ui->checkBox_analyticalExponents->isChecked();
     config->expressionSolver.exponentialExpansion = ui->checkBox_exponentialExpansion->isChecked();
     config->expressionSolver.expansionCount = ui->spinBox_expansionCount->value();
+
+    config->plot.dataPointMode = ui->radioButton_optimalDataPoints->isChecked() ? 0 : 1;
+    config->plot.fixedDataPoints = ui->spinBox_fixedDataPoints->value();
+    config->plot.minDataPoints = ui->spinBox_minDataPoints->value();
+    config->plot.maxDataPoints = ui->spinBox_maxDataPoints->value();
 }
 
 // ----------------------------------------------------------------------------
@@ -85,6 +92,14 @@ void SettingsView::loadConfigIntoUI(Config* config)
     ui->checkBox_analyticalExponents->setChecked(config->expressionSolver.analyticalExponents);
     ui->checkBox_exponentialExpansion->setChecked(config->expressionSolver.exponentialExpansion);
     ui->spinBox_expansionCount->setValue(config->expressionSolver.expansionCount);
+
+    if (config->plot.dataPointMode == 0)
+        ui->radioButton_optimalDataPoints->setChecked(true);
+    else
+        ui->radioButton_fixedDataPoints->setChecked(true);
+    ui->spinBox_fixedDataPoints->setValue(config->plot.fixedDataPoints);
+    ui->spinBox_minDataPoints->setValue(config->plot.minDataPoints);
+    ui->spinBox_maxDataPoints->setValue(config->plot.maxDataPoints);
 }
 
 // ----------------------------------------------------------------------------
@@ -105,8 +120,12 @@ bool SettingsView::eventFilter(QObject* obj, QEvent* event)
             ui->label_description->setText(qtTrId(ID_DESCRIPTION_ANALYTICALEXPONENTS));
         else if(obj == ui->checkBox_exponentialExpansion)
             ui->label_description->setText(qtTrId(ID_DESCRIPTION_EXPONENTIALEXPANSION));
-        else if(obj == ui->spinBox_expansionCount)
+        else if(obj == ui->container_exponentialExpansionSettings)
             ui->label_description->setText(qtTrId(ID_DESCRIPTION_EXPANSIONCOUNT));
+        else if(obj == ui->radioButton_fixedDataPoints)
+            ui->label_description->setText(qtTrId(ID_DESCRIPTION_FIXEDDATAPOINTSMODE));
+        else if(obj == ui->radioButton_optimalDataPoints)
+            ui->label_description->setText(qtTrId(ID_DESCRIPTION_OPTIMALDATAPOINTSMODE));
         else
             ui->label_description->setText(ID_DESCRIPTION_NONE);
     }
@@ -139,12 +158,6 @@ void SettingsView::onPushButtonCancelReleased()
 void SettingsView::onTreeItemClicked(QTreeWidgetItem* item, int column)
 {
     setCategoryIndex(categoryIndexMap_[item]);
-}
-
-// ----------------------------------------------------------------------------
-void SettingsView::onCheckBoxExponentialExpansionToggled(bool checked)
-{
-    ui->container_exponentialExpansionSettings->setEnabled(checked);
 }
 
 // ----------------------------------------------------------------------------

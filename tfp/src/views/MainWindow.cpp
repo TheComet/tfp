@@ -50,29 +50,19 @@ MainWindow::MainWindow(QWidget *parent) :
     pluginManager_(new PluginManager(dataTree_))
 {
     ui->setupUi(this);
-    
+
     // Window icon and title
     setWindowIcon(QIcon(":/icons/icon.ico"));
     setWindowTitle(qtTrId(ID_APP_TITLE));
 
     loadPlugins();
-    
-    /*
-    tools1_ = new QComboBox;
-    tools2_ = new QComboBox;
-    QVector<ToolFactory*> toolsList = pluginManager_->getToolsList();
-    for (QVector<ToolFactory*>::const_iterator it = toolsList.begin(); it != toolsList.end(); ++it)
-    {
-        tools1_->addItem((*it)->name);
-        tools2_->addItem((*it)->name);
-    }*/
 
     QWidget* leftPane = new QWidget;
     leftPane->setLayout(new QVBoxLayout);
     leftPane->layout()->addWidget(dataTree_);
 
     activeSystem_ = newSystem("System");
-    
+
     QMainWindow* visualiserContainer = new QMainWindow;
     dockManager_ = new ads::CDockManager(visualiserContainer);
 
@@ -82,12 +72,15 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->addWidget(dockManager_);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
-    
-    dockManager_->addDockWidget(ads::LeftDockWidgetArea, newDockableTool(Plugin::GENERATOR));
-    dockManager_->addDockWidget(ads::RightDockWidgetArea, newDockableTool(Plugin::VISUALISER));
-    dockManager_->addDockWidget(ads::TopDockWidgetArea, newDockableTool(Plugin::VISUALISER));
-    dockManager_->addDockWidget(ads::BottomDockWidgetArea, newDockableTool(Plugin::VISUALISER));
-    dockManager_->addDockWidget(ads::RightDockWidgetArea, newDockableTool(Plugin::VISUALISER));
+
+    ads::CDockWidget* dpsfg   = newDockableTool(Plugin::GENERATOR, "DPSFG");
+    ads::CDockWidget* bode    = newDockableTool(Plugin::VISUALISER, "Bode Plot");
+    ads::CDockWidget* step    = newDockableTool(Plugin::VISUALISER, "Step Response");
+
+    dockManager_->addDockWidget(ads::TopDockWidgetArea, dpsfg);
+    dockManager_->addDockWidget(ads::RightDockWidgetArea, bode);
+    dockManager_->addDockWidget(ads::BottomDockWidgetArea, step);
+
 
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(onActionQuitTriggered()));
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(onActionSettingsTriggered()));
@@ -132,16 +125,17 @@ void MainWindow::deleteSystem(System* system)
 }
 
 // ----------------------------------------------------------------------------
-ads::CDockWidget* MainWindow::newDockableTool(Plugin::Category category)
+ads::CDockWidget* MainWindow::newDockableTool(Plugin::Category category, const char* toolName)
 {
     ToolContainer* toolContainer = new ToolContainer;
     toolContainer->setPluginManager(pluginManager_);
     toolContainer->setSystem(activeSystem_);
     toolContainer->populateToolsList(category);
-    
+    toolContainer->setTool(toolName);
+
     ads::CDockWidget* dockWidget = new ads::CDockWidget("Test");
     dockWidget->setWidget(toolContainer);
-    
+
     return dockWidget;
 }
 

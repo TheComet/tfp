@@ -16,7 +16,7 @@ ToolContainer::ToolContainer(QWidget* parent) :
 {
     toolBar_->addWidget(toolsList_);
     addToolBar(Qt::BottomToolBarArea, toolBar_);
-    
+
     connect(toolsList_, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onToolsListIndexChanged(const QString&)));
 }
 
@@ -45,6 +45,17 @@ void ToolContainer::populateToolsList(Plugin::Category category)
     for (QVector<ToolFactory*>::const_iterator it = toolsList.begin(); it != toolsList.end(); ++it)
         if ((*it)->category == category)
             toolsList_->addItem((*it)->name);
+}
+
+// ----------------------------------------------------------------------------
+void ToolContainer::setTool(const char* toolName)
+{
+    for (int i = 0; i != toolsList_->count(); ++i)
+        if (toolsList_->itemText(i) == toolName)
+        {
+            toolsList_->setCurrentIndex(i);
+            break;
+        }
 }
 
 // ----------------------------------------------------------------------------

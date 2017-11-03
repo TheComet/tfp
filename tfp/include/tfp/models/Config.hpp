@@ -19,6 +19,13 @@ public:
         bool exponentialExpansion;
         int expansionCount;
     } expressionSolver;
+
+    struct {
+        int dataPointMode;
+        int minDataPoints;
+        int fixedDataPoints;
+        int maxDataPoints;
+    } plot;
 };
 
 extern TFP_PUBLIC_API Config g_config;

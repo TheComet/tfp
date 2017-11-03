@@ -8,7 +8,7 @@ class QComboBox;
 class QToolBar;
 
 namespace tfp {
-    
+
 class PluginManager;
 class System;
 
@@ -19,22 +19,22 @@ class System;
 class ToolContainer : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     ToolContainer(QWidget* parent=NULL);
     ~ToolContainer();
-    
+
     /*!
      * @brief The container needs the plugin manager to be able to instantiate
      * tools.
      */
     void setPluginManager(PluginManager* pluginManager);
-    
+
     /*!
      * @brief The system the tools should modify or visualise.
      */
     void setSystem(System* system);
-    
+
     /*!
      * @brief Populates the dropdown with tools matching the specified category
      *
@@ -43,7 +43,9 @@ public:
      * instantiate "visualiser" or "manipulator".
      */
     void populateToolsList(Plugin::Category category);
-    
+
+    void setTool(const char* toolName);
+
 private slots:
     void onToolsListIndexChanged(const QString& text);
 

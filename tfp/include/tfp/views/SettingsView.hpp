@@ -34,7 +34,6 @@ private slots:
     void onPushButtonApplyReleased();
     void onPushButtonCancelReleased();
     void onTreeItemClicked(QTreeWidgetItem* item, int column);
-    void onCheckBoxExponentialExpansionToggled(bool checked);
 
 private:
     QStringList scanForLocales() const;
