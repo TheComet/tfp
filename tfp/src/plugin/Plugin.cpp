@@ -66,25 +66,6 @@ Plugin::Plugin(QString name) :
 // ----------------------------------------------------------------------------
 Plugin::~Plugin()
 {
-    /*
-     * All memory that was allocated by the plugin needs to be deallocated
-     * right now, before unloading the library.
-     *
-     * The widget decorator will clean up the tree of widgets that
-     * were allocated by the plugin (we notify it by dispatching an event to it)
-     *
-     * The factory objects were also allocated by the library, which we destroy
-     * by clearing the list of factories.
-     */
-    dispatcher.dispatch(&PluginListener::onPluginUnloading);
-    toolFactories_.clear();
-
-    if (stop != NULL)
-        stop(this);
-
-    std::cout << "Unloading plugin " << library_->fileName().toStdString() << std::endl;
-    library_->unload();
-    delete library_;
 }
 
 // ----------------------------------------------------------------------------

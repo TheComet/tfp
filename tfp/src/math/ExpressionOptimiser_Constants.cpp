@@ -57,7 +57,7 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
 
     if (e->isOperation(op::mul))
     {
-        // Travel up the chain of op::adds...
+        // Travel up the chain of op::muls...
         Expression* top = e->travelUpChain(op::mul);
         if (top == NULL)
             return false;

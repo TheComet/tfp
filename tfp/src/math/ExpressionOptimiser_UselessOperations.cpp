@@ -20,7 +20,7 @@ bool ExpressionOptimiser::removeUselessAdditions(Expression* e)
 {
     if (e->isOperation(op::add) == false)
         return false;
-    
+
     if (e->left()->type() == Expression::CONSTANT && e->left()->value() == 0.0)
     {
         e->right()->collapseIntoParent();
@@ -123,7 +123,7 @@ bool ExpressionOptimiser::removeUselessExponents(Expression* e)
 {
     if (e->isOperation(op::pow) == false)
         return false;
-    
+
     if (e->right()->type() == Expression::CONSTANT && e->right()->value() == 1.0)
     {
         e->left()->collapseIntoParent();
