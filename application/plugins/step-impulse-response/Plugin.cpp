@@ -4,7 +4,7 @@
 
 extern "C" {
 
-bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
+bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree)
 {
     if (plugin->registerTool<tfp::ImpulsePlot>(
         tfp::Plugin::VISUALISER,

@@ -5,7 +5,7 @@ using namespace tfp;
 
 extern "C" {
 
-bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
+bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree)
 {
     return plugin->registerTool<tfp::ComplexPlane3D>(
         tfp::Plugin::VISUALISER,

@@ -6,7 +6,7 @@
 
 namespace tfp {
 
-class DataTree;
+class DataTreeView;
 class Plugin;
 class Tool;
 class ToolFactory;
@@ -17,7 +17,7 @@ class ToolFactory;
 class PluginManager : public RefCounted
 {
 public:
-    PluginManager(DataTree* dataTree);
+    PluginManager(DataTreeView* dataTree);
     ~PluginManager();
 
     /*!
@@ -81,7 +81,7 @@ private:
     typedef QVector< Reference<Plugin> > Plugins;
     Plugins plugins_;
     // Stuff to pass to plugins in start()
-    DataTree* dataTree_;
+    DataTreeView* dataTree_;
 };
 
 }

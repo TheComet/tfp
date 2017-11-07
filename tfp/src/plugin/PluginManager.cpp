@@ -1,6 +1,6 @@
 #include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Plugin.hpp"
-#include "tfp/views/DataTree.hpp"
+#include "tfp/views/DataTreeView.hpp"
 #include "tfp/listeners/PluginListener.hpp"
 #include <QLibrary>
 #include <QDir>
@@ -9,7 +9,7 @@
 namespace tfp {
 
 // ----------------------------------------------------------------------------
-PluginManager::PluginManager(DataTree* dataTree) :
+PluginManager::PluginManager(DataTreeView* dataTree) :
     dataTree_(dataTree)
 {
 }

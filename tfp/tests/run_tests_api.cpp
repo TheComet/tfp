@@ -1,7 +1,7 @@
 #include "tfp/tfp.hpp"
 #include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Plugin.hpp"
-#include "tfp/views/DataTree.hpp"
+#include "tfp/views/DataTreeView.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <iostream>
@@ -20,7 +20,7 @@ int tfp_run_plugin_tests(int* argc, char** argv, const char* pluginName)
 {
     std::cout << "Running tests for plugin \"" << pluginName << "\" from tfp_run_all_tests() in tfp library\n";
 
-    PluginManager* pm = new PluginManager(new DataTree);
+    PluginManager* pm = new PluginManager(new DataTreeView);
     Plugin* plugin = pm->loadPlugin(pluginName);
     if (plugin == NULL)
     {
@@ -39,7 +39,7 @@ int tfp_run_all_tests(int* argc, char** argv)
     std::cout << "Running tests from tfp_run_all_tests() in tfp library\n";
     int thisResult = RUN_ALL_TESTS();
 
-    PluginManager* pm = new PluginManager(new DataTree);
+    PluginManager* pm = new PluginManager(new DataTreeView);
     QStringList failedPluginTests;
     QStringList pluginList = pm->listAvailablePlugins();
     for (QStringList::const_iterator it = pluginList.begin(); it != pluginList.end(); ++it)

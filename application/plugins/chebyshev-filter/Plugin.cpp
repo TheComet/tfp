@@ -3,7 +3,7 @@
 
 extern "C" {
 
-bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree)
+bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree)
 {
     return plugin->registerTool<tfp::ChebyshevFilter>(
         tfp::Plugin::GENERATOR,

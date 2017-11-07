@@ -1,10 +1,10 @@
-#include "tfp/views/DataTree.hpp"
+#include "tfp/views/DataTreeView.hpp"
 #include "tfp/models/System.hpp"
 
 namespace tfp {
 
 // ----------------------------------------------------------------------------
-DataTree::DataTree(QWidget* parent) :
+DataTreeView::DataTreeView(QWidget* parent) :
     QTreeWidget(parent)
 {
     setColumnCount(2);
@@ -13,7 +13,7 @@ DataTree::DataTree(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-void DataTree::addSystem(System* system)
+void DataTreeView::addSystem(System* system)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem;
     addTopLevelItem(item);
@@ -23,7 +23,7 @@ void DataTree::addSystem(System* system)
 }
 
 // ----------------------------------------------------------------------------
-void DataTree::removeSystem(System* system)
+void DataTreeView::removeSystem(System* system)
 {
     delete takeTopLevelItem(indexOfTopLevelItem(system->dataTree()));
 }

@@ -20,7 +20,7 @@ class QComboBox;
 
 namespace tfp {
 
-class DataTree;
+class DataTreeView;
 class PluginManager;
 class System;
 
@@ -51,7 +51,7 @@ private:
 
 private:
     Ui::MainWindow* ui;
-    DataTree* dataTree_;
+    DataTreeView* dataTree_;
     ads::CDockManager* dockManager_;
     Reference<PluginManager> pluginManager_;
     Reference<System> activeSystem_;

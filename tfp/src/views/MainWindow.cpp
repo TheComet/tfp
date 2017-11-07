@@ -4,7 +4,7 @@
 #include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Tool.hpp"
 #include "tfp/util/Util.hpp"
-#include "tfp/views/DataTree.hpp"
+#include "tfp/views/DataTreeView.hpp"
 #include "tfp/views/MainWindow.hpp"
 #include "tfp/views/SettingsView.hpp"
 #include "tfp/views/ToolContainer.hpp"
@@ -45,7 +45,7 @@ protected:
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    dataTree_(new DataTree),
+    dataTree_(new DataTreeView),
     dockManager_(NULL),
     pluginManager_(new PluginManager(dataTree_))
 {

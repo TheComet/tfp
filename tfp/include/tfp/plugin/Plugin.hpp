@@ -12,7 +12,7 @@ class QLibrary;
 
 namespace tfp {
 
-class DataTree;
+class DataTreeView;
 class PluginManager;
 class PluginListener;
 class Tool;
@@ -156,7 +156,7 @@ private:
     void unregisterTool(const QString& typeName);
 
 private:
-    typedef bool (*start_plugin_func)(Plugin*, DataTree*);
+    typedef bool (*start_plugin_func)(Plugin*, DataTreeView*);
     typedef void (*stop_plugin_func)(Plugin*);
     typedef int (*run_tests_func)(int*,char**);
     typedef QMap< QString, Reference<ToolFactory> > ToolFactories;
@@ -201,7 +201,7 @@ public:
 
 #if defined(PLUGIN_BUILDING)
 extern "C" {
-    Q_DECL_EXPORT bool start_plugin(tfp::Plugin* plugin, tfp::DataTree* dataTree);
+    Q_DECL_EXPORT bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree);
     Q_DECL_EXPORT void stop_plugin(tfp::Plugin* plugin);
     Q_DECL_EXPORT int run_tests(int argc, char** argv);
 }

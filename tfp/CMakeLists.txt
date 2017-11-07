@@ -74,7 +74,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTree.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTreeView.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
