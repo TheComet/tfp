@@ -44,6 +44,7 @@ set (tfp_HEADERS_MOC
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"
@@ -52,10 +53,12 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Constants.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Simplifications.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
@@ -101,6 +104,8 @@ if (TFP_BUILD_TESTS)
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp")
     add_executable (test_all
         "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_all.cpp")

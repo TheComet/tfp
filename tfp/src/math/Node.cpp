@@ -1,7 +1,7 @@
-#include "model/Connection.hpp"
-#include "model/Node.hpp"
+#include "tfp/math/Connection.hpp"
+#include "tfp/math/Node.hpp"
 
-using namespace dpsfg;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 Node::Node()
@@ -41,7 +41,7 @@ void Node::disconnectOutgoing(Node* other)
     // Take care of all outgoing connections
     for (ConnectionList::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
     {
-        if ((*it)->getTargetNode() == other)
+        if ((*it)->targetNode() == other)
             it = outgoingConnections_.erase(it);
         else
             ++it;

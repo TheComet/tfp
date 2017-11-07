@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace dpsfg {
+namespace tfp {
 
 class Connection;
 

@@ -1,4 +1,4 @@
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 #include <QTreeWidgetItem>
 
 namespace tfp {
@@ -18,7 +18,7 @@ System::~System()
 
 // ----------------------------------------------------------------------------
 void System::notifyParametersChanged()
-{
+{/*
     CoefficientPolynomial<double> coeffNumerator = numerator().poly();
     CoefficientPolynomial<double> coeffDenominator = denominator().poly();
     QString buf;
@@ -54,14 +54,14 @@ void System::notifyParametersChanged()
     UPDATE_CHILD_VALUES_COMPLEX(polesItem_, denominator());
     UPDATE_CHILD_VALUES_COMPLEX(zerosItem_, numerator());
     UPDATE_CHILD_VALUES_REAL(coeffBItem_, coeffNumerator);
-    UPDATE_CHILD_VALUES_REAL(coeffAItem_, coeffDenominator);
+    UPDATE_CHILD_VALUES_REAL(coeffAItem_, coeffDenominator);*/
 
     dispatcher.dispatch(&SystemListener::onSystemParametersChanged);
 }
 
 // ----------------------------------------------------------------------------
 void System::notifyStructureChanged()
-{
+{/*
     CoefficientPolynomial<double> coeffNumerator = numerator().poly();
     CoefficientPolynomial<double> coeffDenominator = denominator().poly();
 #define UPDATE_CHILD_COUNT(item, polynomial, name)                           \
@@ -72,7 +72,7 @@ void System::notifyStructureChanged()
     UPDATE_CHILD_COUNT(polesItem_, denominator(), "p");
     UPDATE_CHILD_COUNT(zerosItem_, numerator(), "z");
     UPDATE_CHILD_COUNT(coeffBItem_, coeffNumerator, "b");
-    UPDATE_CHILD_COUNT(coeffAItem_, coeffDenominator, "a");
+    UPDATE_CHILD_COUNT(coeffAItem_, coeffDenominator, "a");*/
 
     dispatcher.dispatch(&SystemListener::onSystemStructureChanged);
 }
@@ -83,9 +83,9 @@ void System::interestingFrequencyInterval(double* xStart, double* xEnd) const
     double minx = std::numeric_limits<double>::max();
     double maxx = 0;
 
-    for (int i = 0; i != denominator().size(); ++i)
+    for (int i = 0; i != tf().denominator().size(); ++i)
     {
-        double mag = std::abs(denominator().root(i));
+        double mag = std::abs(tf().denominator().root(i));
         if (maxx < mag)
             maxx = mag;
         if (minx > mag)
@@ -105,9 +105,9 @@ void System::interestingTimeInterval(double* xStart, double* xEnd) const
 {
     double closestpole = std::numeric_limits<double>::max();
 
-    for (int i = 0; i != denominator().size(); ++i)
+    for (int i = 0; i != tf().denominator().size(); ++i)
     {
-        double real = std::abs(denominator().root(i).real());
+        double real = std::abs(tf().denominator().root(i).real());
         if (closestpole > real)
             closestpole = real;
     }

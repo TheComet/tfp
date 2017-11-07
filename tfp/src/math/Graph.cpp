@@ -1,10 +1,10 @@
-#include "model/Connection.hpp"
-#include "model/Graph.hpp"
-#include "model/Node.hpp"
+#include "tfp/math/Connection.hpp"
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/Graph.hpp"
+#include "tfp/math/Node.hpp"
 #include "tfp/math/NChooseK.hpp"
 #include "tfp/math/VariableTable.hpp"
 
-using namespace dpsfg;
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
@@ -38,12 +38,6 @@ void Graph::setForwardPath(Node* in, Node* out)
 {
     input_ = in;
     output_ = out;
-}
-
-// ----------------------------------------------------------------------------
-tfp::TransferFunction<double> Graph::calculateTransferFunction() const
-{
-    return tfp::TransferFunction<double>();
 }
 
 // ----------------------------------------------------------------------------
@@ -87,7 +81,7 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
     const Node::ConnectionList& connections = current->getOutgoingConnections();
     for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
-        Node* child = (*it)->getTargetNode();
+        Node* child = (*it)->targetNode();
         findForwardPathsAndLoopsRecursive(paths, loops, child, list);
     }
 }
@@ -103,7 +97,7 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
 
         const Node::ConnectionList& connections = curr->getOutgoingConnections();
         for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
-            if ((*it)->getTargetNode() == next)
+            if ((*it)->targetNode() == next)
             {
                 PathSegment segment;
                 segment.connection_ = it->get();
@@ -132,10 +126,10 @@ Expression* Graph::mason() const
 Expression* Graph::calculateConnectionGain(const Path& path) const
 {
     // Multiply all path expressions together
-    Expression* e = path[0].connection_->getExpression();
+    Expression* e = path[0].connection_->expression();
     for (std::size_t i = 1; i < path.size(); ++i)
     {
-        e = Expression::make(op::mul, e, path[i].connection_->getExpression());
+        e = Expression::make(op::mul, e, path[i].connection_->expression());
     }
 
     return e;

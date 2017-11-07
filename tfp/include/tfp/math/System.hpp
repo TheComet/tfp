@@ -2,8 +2,7 @@
 
 #include "tfp/config.hpp"
 #include "tfp/listeners/SystemListener.hpp"
-#include "tfp/math/TransferFunction.hpp"
-#include "tfp/util/RefCounted.hpp"
+#include "tfp/util/Reference.hpp"
 #include "tfp/util/ListenerDispatcher.hpp"
 #include <QVector>
 
@@ -11,8 +10,10 @@ class QTreeWidgetItem;
 
 namespace tfp {
 
-class TFP_PUBLIC_API System : public RefCounted,
-                              public TransferFunction<double>
+template <class T> class TransferFunction;
+class Graph;
+
+class TFP_PUBLIC_API System : public RefCounted
 {
 public:
     System(const QString& name);
@@ -22,6 +23,9 @@ public:
     void notifyStructureChanged();
     void interestingFrequencyInterval(double* xStart, double* xEnd) const;
     void interestingTimeInterval(double* xStart, double* xEnd) const;
+
+    TransferFunction<double>& tf();
+    Graph& graph();
 
     const QString& name() const;
 

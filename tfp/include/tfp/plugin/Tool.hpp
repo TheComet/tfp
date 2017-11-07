@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 #include "tfp/util/Reference.hpp"
 #include <QWidget>
 
