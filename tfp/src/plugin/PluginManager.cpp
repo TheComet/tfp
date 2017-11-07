@@ -21,7 +21,31 @@ PluginManager::~PluginManager()
 }
 
 // ----------------------------------------------------------------------------
-bool PluginManager::loadPlugin(const QString& name)
+QStringList PluginManager::listAvailablePlugins() const
+{
+    QStringList result;
+    QDir pluginsDir("plugins");
+    QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
+
+    QStringList validExtensions;
+    validExtensions += ".dll";
+    validExtensions += ".so";
+    validExtensions += ".dylib";
+    validExtensions += ".dynlib";
+
+    for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
+        for (QStringList::const_iterator ext = validExtensions.begin(); ext != validExtensions.end(); ++ext)
+            if (it->endsWith(*ext, Qt::CaseInsensitive))
+            {
+                result.push_back(*it);
+                break;
+            }
+
+    return result;
+}
+
+// ----------------------------------------------------------------------------
+Plugin* PluginManager::loadPlugin(const QString& name)
 {
     /*
      * Because googletest stores all of the unit tests globally, we are forced
@@ -31,11 +55,11 @@ bool PluginManager::loadPlugin(const QString& name)
     CLEAR_ALL_TESTS();
 
     Reference<Plugin> plugin(new Plugin(name));
-    plugin->library_->setFileName(name);
+    plugin->library_->setFileName(QDir::toNativeSeparators("plugins/" + name));
     if (plugin->library_->load() == false)
     {
         std::cout << "Failed to load plugin: " << plugin->library_->errorString().toStdString() << std::endl;
-        return false;
+        return NULL;
     }
 
     /*
@@ -44,12 +68,12 @@ bool PluginManager::loadPlugin(const QString& name)
     if ((plugin->start = (Plugin::start_plugin_func)plugin->library_->resolve("start_plugin")) == NULL)
     {
         std::cout << "Failed to load plugin: " << "symbol start_plugin() not found" << std::endl;
-        return false;
+        return NULL;
     }
     if ((plugin->stop = (Plugin::stop_plugin_func)plugin->library_->resolve("stop_plugin")) == NULL)
     {
         std::cout << "Failed to load plugin: " << "symbol start_plugin() not found" << std::endl;
-        return false;
+        return NULL;
     }
     if ((plugin->run_tests = (Plugin::run_tests_func)plugin->library_->resolve("run_tests")) == NULL)
     {
@@ -62,51 +86,49 @@ bool PluginManager::loadPlugin(const QString& name)
     if (plugin->start(plugin, dataTree_) == false)
     {
         std::cout << "Failed to load plugin: " << "start_plugin() returned an error" << std::endl;
-        return false;
+        return NULL;
     }
 
     std::cout << "Loaded plugin " << name.toStdString() << std::endl;
     plugins_.push_back(plugin);
 
-    return true;
+    return plugin;
 }
 
 // ----------------------------------------------------------------------------
 bool PluginManager::loadAllPlugins()
 {
-    QDir pluginsDir("plugins");
-    QStringList allFiles = pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
-
-    QStringList validExtensions;
-    validExtensions += ".dll";
-    validExtensions += ".so";
-    validExtensions += ".dylib";
-    validExtensions += ".dynlib";
+    QStringList pluginList = listAvailablePlugins();
 
     bool success = true;
-    for (QStringList::const_iterator it = allFiles.begin(); it != allFiles.end(); ++it)
-        for (QStringList::const_iterator ext = validExtensions.begin(); ext != validExtensions.end(); ++ext)
-            if (it->endsWith(*ext, Qt::CaseInsensitive))
-            {
-                success &= loadPlugin(QDir::toNativeSeparators("plugins/" + *it));
-                break;
-            }
+    for (QStringList::const_iterator it = pluginList.begin(); it != pluginList.end(); ++it)
+        success &= (loadPlugin(*it) != NULL);
 
     return success;
 }
 
+// ----------------------------------------------------------------------------
+void PluginManager::unloadPlugin(Plugin* plugin)
+{
+    unloadPlugin(plugins_.indexOf(plugin));
+}
+
+// ----------------------------------------------------------------------------
 void PluginManager::unloadPlugin(const QString& fileName)
 {
-    Plugin* plugin = NULL;
     int i;
     for (i = 0; i != plugins_.size(); ++i)
-        if (plugins_[i]->getName() == fileName)
+        if (plugins_[i]->name() == fileName)
         {
-            plugin = plugins_[i];
-            break;
+            unloadPlugin(i);
+            return;
         }
-    if (plugin == NULL)
-        return;
+}
+
+// ----------------------------------------------------------------------------
+void PluginManager::unloadPlugin(int i)
+{
+    Plugin* plugin = plugins_[i];
 
     /*
      * All memory that was allocated by the plugin needs to be deallocated
@@ -142,7 +164,7 @@ void PluginManager::unloadPlugin(const QString& fileName)
 void PluginManager::unloadAllPlugins()
 {
     while (plugins_.size() > 0)
-        unloadPlugin(plugins_[0]->getName());
+        unloadPlugin(0);
 }
 
 // ----------------------------------------------------------------------------
@@ -162,16 +184,6 @@ Tool* PluginManager::createTool(const QString& name)
         if ((ret = (*it)->createTool(name)) != NULL)
             break;
     return ret;
-}
-
-// ----------------------------------------------------------------------------
-QVector<QString> PluginManager::runPluginTests(int argc, char** argv) const
-{
-    QVector<QString> failedPlugins;
-    for (Plugins::const_iterator it = plugins_.begin(); it != plugins_.end(); ++it)
-        if ((*it)->runTests(argc, argv) != 0)
-            failedPlugins.push_back((*it)->getName());
-    return failedPlugins;
 }
 
 }

@@ -24,7 +24,7 @@ public:
      * @brief Scans the plugins/ directory for shared libraries that could be
      * potentially loaded.
      */
-    QVector<QString> listLoadablePlugins() const;
+    QStringList listAvailablePlugins() const;
 
     /*!
      * @brief Loads a shared library and calls its plugin_start() function.
@@ -46,8 +46,15 @@ public:
     bool loadAllPlugins();
 
     /*!
+     * @brief Unloads the specified plugin.
+     * @note All associated tools need to have been destroyed before unloading.
+     */
+    void unloadPlugin(Plugin* plugin);
+
+    /*!
      * @brief Unloads the specified plugin. If the plugin does not exist, then
      * nothing happens.
+     * @note All associated tools need to have been destroyed before unloading.
      */
     void unloadPlugin(const QString& fileName);
 
@@ -66,6 +73,9 @@ public:
      * also be done over the factories returned by getToolsList().
      */
     Tool* createTool(const QString& name);
+
+private:
+    void unloadPlugin(int index);
 
 private:
     typedef QVector< Reference<Plugin> > Plugins;

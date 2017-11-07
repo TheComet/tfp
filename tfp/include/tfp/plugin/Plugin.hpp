@@ -134,7 +134,7 @@ public:
      * @note Due to googletest weirdness, this can only ever be called once
      * after loading the shared library.
      */
-    int runTests(int argc, char** argv);
+    int runTests(int* argc, char** argv);
 
     /*!
      * @brief PluginListener implementations can listen to plugin events (such
@@ -158,7 +158,7 @@ private:
 private:
     typedef bool (*start_plugin_func)(Plugin*, DataTree*);
     typedef void (*stop_plugin_func)(Plugin*);
-    typedef int (*run_tests_func)(int,char**);
+    typedef int (*run_tests_func)(int*,char**);
     typedef QMap< QString, Reference<ToolFactory> > ToolFactories;
 
     start_plugin_func start;

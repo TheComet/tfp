@@ -1,7 +1,7 @@
 function (add_plugin TARGET)
     set (multiValueArgs SOURCES INCLUDE_DIRS HEADERS TEST_SOURCES FORMS RESOURCES TRANSLATIONS)
     cmake_parse_arguments (add_plugin "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    
+
     option (TFP_ENABLE_${TARGET} "Whether or not to build the ${TARGET} plugin" ON)
     if (NOT TFP_ENABLE_${TARGET})
         return ()
@@ -77,7 +77,10 @@ function (add_plugin TARGET)
     target_link_libraries (${TARGET} tfp)
 
     if (TFP_BUILD_TESTS AND add_plugin_TEST_SOURCES)
-        target_link_libraries (${TARGET} gmock)
+        target_link_libraries (test_${TARGET} gmock)
         target_link_libraries (test_${TARGET} Qt5::Core)
+        target_link_libraries (test_${TARGET} Qt5::Widgets)
+        target_link_libraries (test_${TARGET} Qt5::Gui)
+        target_link_libraries (test_${TARGET} tfp)
     endif ()
 endfunction ()

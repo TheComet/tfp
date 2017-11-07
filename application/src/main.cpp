@@ -1,22 +1,21 @@
+#include "tfp/tfp.hpp"
 #include "tfp/views/MainWindow.hpp"
-#include "tfp/util/Logger.hpp"
-#include "tfp/models/Config.hpp"
-#include <iostream>
 #include <QApplication>
 
 
 // ----------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
-    if (tfp::Logger::openDefaultLog(argc, argv) == false)
-        tfp::Logger::openDefaultLog();
-
+    // QApplication must exist before tfp_init() call.
     QApplication application(argc, argv);
+
+    tfp_init(&argc, argv);
+
     tfp::MainWindow mainWindow;
     mainWindow.show();
+    int result = application.exec();
 
-    tfp::g_config.load();
+    tfp_deinit();
 
-    tfp::g_log.logNotice("Application initialised, entering main event loop");
-    return application.exec();
+    return result;
 }

@@ -69,7 +69,7 @@ Plugin::~Plugin()
 }
 
 // ----------------------------------------------------------------------------
-const QString& Plugin::getName() const
+const QString& Plugin::name() const
 {
     return name_;
 }
@@ -114,7 +114,7 @@ Tool* Plugin::createTool(const QString& name)
 }
 
 // ----------------------------------------------------------------------------
-int Plugin::runTests(int argc, char** argv)
+int Plugin::runTests(int* argc, char** argv)
 {
     if (run_tests == NULL)
         return 0;

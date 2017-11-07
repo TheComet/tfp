@@ -1,23 +1,13 @@
-#include <QLibrary>
-#include <iostream>
-
-typedef int (*run_tests_func)(int argc, char** argv);
+#include "tfp/tfp.hpp"
+#include <QApplication>
 
 int main(int argc, char** argv)
 {
-    QLibrary lib;
-    lib.setFileName("plugins/@TARGET@");
-    if (lib.load() == false)
-    {
-        std::cout << "Failed to load plugin \"" << "@TARGET@" << "\": File \"plugins/@TARGET@\" not found." << std::endl;
-        return -1;
-    }
-    
-    run_tests_func run_tests;
-    if ((run_tests = (run_tests_func)lib.resolve("run_tests")) == NULL)
-    {
-        std::cout << "Failed to load plugin \"" << "@TARGET@" << "\": symbol run_tests() not found" << std::endl;
-        return -1;
-    }
-    return run_tests(argc, argv);
+    QApplication application(argc, argv);
+
+    tfp_init(&argc, argv);
+    int result = tfp_run_plugin_tests(&argc, argv, "@TARGET@");
+    tfp_deinit();
+
+    return result;
 }

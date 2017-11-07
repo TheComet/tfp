@@ -43,6 +43,7 @@ set (tfp_HEADERS_MOC
         "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/ToolContainer.hpp")
 
 set (tfp_SOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"

@@ -1,38 +1,56 @@
-#include <iostream>
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "tfp/config.hpp"
+#include "tfp/tfp.hpp"
 #include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Plugin.hpp"
 #include "tfp/views/DataTree.hpp"
-#include <QApplication>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include <iostream>
 
-namespace tfp {
+using namespace tfp;
 
-TFP_PUBLIC_API int run_tests(int argc, char** argv)
+extern "C" {
+
+int tfp_run_tests(int* argc, char** argv)
 {
-    std::cout << "Running tests from run_tests() in tfp library\n";
-    // Since Google Mock depends on Google Test, InitGoogleMock() is
-    // also responsible for initializing Google Test.  Therefore there's
-    // no need for calling testing::InitGoogleTest() separately.
-    testing::InitGoogleMock(&argc, argv);
+    std::cout << "Running tests from tfp_run_tests() in tfp library\n";
     return RUN_ALL_TESTS();
 }
 
-TFP_PUBLIC_API int run_tests_all(int argc, char** argv)
+int tfp_run_plugin_tests(int* argc, char** argv, const char* pluginName)
 {
-    std::cout << "Running tests from run_tests() in tfp library\n";
-    // Since Google Mock depends on Google Test, InitGoogleMock() is
-    // also responsible for initializing Google Test.  Therefore there's
-    // no need for calling testing::InitGoogleTest() separately.
-    testing::InitGoogleMock(&argc, argv);
-    int thisResult = RUN_ALL_TESTS();
-    CLEAR_ALL_TESTS();
+    std::cout << "Running tests for plugin \"" << pluginName << "\" from tfp_run_all_tests() in tfp library\n";
 
-    QApplication app(argc, argv);
     PluginManager* pm = new PluginManager(new DataTree);
-    pm->loadAllPlugins();
-    QVector<QString> failedPluginTests = pm->runPluginTests(argc, argv);
+    Plugin* plugin = pm->loadPlugin(pluginName);
+    if (plugin == NULL)
+    {
+        std::cout << "Failed to load plugin" << std::endl;
+    }
+
+    int result = plugin->runTests(argc, argv);
+    pm->unloadPlugin(plugin);
+    delete pm;
+
+    return result;
+}
+
+int tfp_run_all_tests(int* argc, char** argv)
+{
+    std::cout << "Running tests from tfp_run_all_tests() in tfp library\n";
+    int thisResult = RUN_ALL_TESTS();
+
+    PluginManager* pm = new PluginManager(new DataTree);
+    QStringList failedPluginTests;
+    QStringList pluginList = pm->listAvailablePlugins();
+    for (QStringList::const_iterator it = pluginList.begin(); it != pluginList.end(); ++it)
+    {
+        Plugin* plugin = pm->loadPlugin(*it);
+        if (plugin == NULL)
+            continue;
+        if (plugin->runTests(argc, argv) != 0)
+            failedPluginTests.push_back(plugin->name());
+        pm->unloadPlugin(plugin);
+    }
     delete pm;
 
     std::cout << "----------------------------------------------------------" << std::endl;
@@ -40,7 +58,7 @@ TFP_PUBLIC_API int run_tests_all(int argc, char** argv)
         std::cout << "Unit tests failed in the following libraries!" << std::endl;
     else
         std::cout << "All unit tests passed!" << std::endl;
-    for (QVector<QString>::const_iterator it = failedPluginTests.begin(); it != failedPluginTests.end(); ++it)
+    for (QStringList::const_iterator it = failedPluginTests.begin(); it != failedPluginTests.end(); ++it)
         std::cout << "  - plugin \"" << it->toStdString() << "\"" << std::endl;
     if (thisResult != 0)
         std::cout << "  - tfp library" << std::endl;
