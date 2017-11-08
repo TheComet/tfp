@@ -11,6 +11,7 @@ class QTreeWidgetItem;
 namespace tfp {
 
 template <class T> class TransferFunction;
+class SymbolicTF;
 class Graph;
 
 class TFP_PUBLIC_API System : public RefCounted
@@ -24,8 +25,8 @@ public:
     void interestingFrequencyInterval(double* xStart, double* xEnd) const;
     void interestingTimeInterval(double* xStart, double* xEnd) const;
 
-    TransferFunction<double>& tf();
     Graph& graph();
+    SymbolicTF& symbolicTF();
 
     const QString& name() const;
 

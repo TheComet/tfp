@@ -1,5 +1,5 @@
 #include "tfp/ui_MainWindow.h"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 #include "tfp/plugin/Plugin.hpp"
 #include "tfp/plugin/PluginManager.hpp"
 #include "tfp/plugin/Tool.hpp"

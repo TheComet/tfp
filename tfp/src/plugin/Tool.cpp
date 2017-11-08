@@ -1,5 +1,5 @@
 #include "tfp/plugin/Tool.hpp"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 
 namespace tfp {
 

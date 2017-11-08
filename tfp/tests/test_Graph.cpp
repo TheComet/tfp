@@ -1,10 +1,10 @@
 #include "gmock/gmock.h"
-#include "model/Connection.hpp"
-#include "model/Graph.hpp"
-#include "model/Node.hpp"
+#include "tfp/math/Connection.hpp"
+#include "tfp/math/Graph.hpp"
+#include "tfp/math/Node.hpp"
 #include "tfp/math/Expression.hpp"
-#include "tfp/util/Reference.hpp"
 #include "tfp/math/VariableTable.hpp"
+#include "tfp/util/Reference.hpp"
 
 #define NAME dpsfg_Graph
 
