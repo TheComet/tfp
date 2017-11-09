@@ -14,13 +14,6 @@ class VariableTable;
 class TFP_PUBLIC_API ExpressionManipulator
 {
 public:
-    struct NonConstantExponentException : public std::logic_error
-    {
-        NonConstantExponentException(const char* msg) : std::logic_error(
-            std::string("Variable depends on a non-constant expression! ") + msg
-        ) {}
-    };
-
     bool recursivelyCall(bool (ExpressionManipulator::*optfunc)(Expression*,const char*),
                          Expression* e, const char* variable, bool* hasVariable=NULL);
 

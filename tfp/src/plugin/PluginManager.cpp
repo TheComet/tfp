@@ -4,7 +4,10 @@
 #include "tfp/listeners/PluginListener.hpp"
 #include <QLibrary>
 #include <QDir>
+
+#ifdef TFP_BUILD_TESTS
 #include <gmock/gmock.h>
+#endif
 
 namespace tfp {
 
@@ -47,12 +50,14 @@ QStringList PluginManager::listAvailablePlugins() const
 // ----------------------------------------------------------------------------
 Plugin* PluginManager::loadPlugin(const QString& name)
 {
+#ifdef TFP_BUILD_TESTS
     /*
      * Because googletest stores all of the unit tests globally, we are forced
      * to clear all unit tests every time a new plugin is loaded, so only the
      * unit tests that are in the plugin are registered.
      */
     CLEAR_ALL_TESTS();
+#endif
 
     Reference<Plugin> plugin(new Plugin(name));
     plugin->library_->setFileName(QDir::toNativeSeparators("plugins/" + name));
@@ -146,12 +151,14 @@ void PluginManager::unloadPlugin(int i)
     if (plugin->stop != NULL)
         plugin->stop(plugin);
 
+#ifdef TFP_BUILD_TESTS
     /*
      * Because googletest stores all of the unit tests globally, we are forced
      * to clear all unit tests every time a plugin is unloaded, so only the
      * unit tests that are in the plugin are registered.
      */
     CLEAR_ALL_TESTS();
+#endif
 
     std::cout << "Unloading plugin " << plugin->library_->fileName().toStdString() << std::endl;
     plugin->library_->unload();

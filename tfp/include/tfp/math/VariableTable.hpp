@@ -21,20 +21,6 @@ class TFP_PUBLIC_API VariableTable : public tfp::RefCounted
 public:
     typedef std::vector< std::pair<std::string, double> > ValueVariables;
     typedef std::vector< std::pair<std::string, std::string> > ExpressionVariables;
-    
-    struct MissingEntryException : public std::logic_error
-    {
-        MissingEntryException(const char* key) : std::logic_error(
-            std::string("Entry \"") + key + "\" does not exist in variable table"
-        ) {}
-    };
-    
-    struct CyclicDependencyException : public std::logic_error
-    {
-        CyclicDependencyException(const char* key) : std::logic_error(
-            std::string("Cyclic dependency of entries was detected while looking up key \"") + key + "\""
-        ) {}
-    };
 
     /*!
      * @brief Adds a new entry to the table that maps "name" to the constant of

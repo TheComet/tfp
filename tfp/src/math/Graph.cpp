@@ -17,8 +17,8 @@ Graph::Graph() :
 // ----------------------------------------------------------------------------
 Node* Graph::createNode(const char* name)
 {
-    std::pair< std::unordered_map< std::string, std::unique_ptr<Node> >::iterator, bool> ins
-        = nodes_.emplace(name, std::unique_ptr<Node>(new Node));
+    std::pair< std::unordered_map< std::string, Reference<Node> >::iterator, bool> ins
+        = nodes_.emplace(name, new Node);
     if (ins.second)
         return ins.first->second.get();
     return NULL;
@@ -27,7 +27,7 @@ Node* Graph::createNode(const char* name)
 // ----------------------------------------------------------------------------
 Node* Graph::findNode(const char* name)
 {
-    std::unordered_map< std::string, std::unique_ptr<Node> >::iterator it = nodes_.find(name);
+    std::unordered_map< std::string, Reference<Node> >::iterator it = nodes_.find(name);
     if (it != nodes_.end())
         return it->second.get();
     return NULL;

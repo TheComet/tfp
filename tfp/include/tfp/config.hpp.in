@@ -11,6 +11,8 @@ namespace tfp {
 	typedef @REAL_TYPE@ Real;
 }
 
+#cmakedefine TFP_BUILD_TESTS
+
 #	define HAVE_SINH @HAVE_SINH@
 #	define HAVE_COSH @HAVE_COSH@
 #	define HAVE_TANH @HAVE_TANH@

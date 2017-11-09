@@ -1,8 +1,8 @@
 #pragma once
 
 #include "tfp/util/Reference.hpp"
+#include <vector>
 #include <unordered_map>
-#include <memory>
 
 namespace tfp {
 
@@ -10,6 +10,10 @@ class Node;
 class Connection;
 class VariableTable;
 
+/*!
+ * @brief Manages the creation and manipulation of graph nodes and provides
+ * methods to calculate the graph's transfer function.
+ */
 class Graph : public RefCounted
 {
 public:
@@ -26,7 +30,11 @@ public:
 
     Graph();
 
+    /*!
+     * @brief Creates a new node with the given name.
+     */
     Node* createNode(const char* name);
+    void destroyNode(Node* node);
     Node* findNode(const char* name);
 
     void setForwardPath(Node* in, Node* out);
@@ -51,7 +59,7 @@ public:
 private:
     Node* input_;
     Node* output_;
-    std::unordered_map< std::string, std::unique_ptr<Node> > nodes_;
+    std::unordered_map< std::string, Reference<Node> > nodes_;
     Reference<VariableTable> variables_;
 };
 
