@@ -10,9 +10,9 @@ class QTreeWidgetItem;
 
 namespace tfp {
 
-template <class T> class TransferFunction;
-class SymbolicTF;
 class Graph;
+class TransferFunction;
+class SymbolicTransferFunction;
 
 class TFP_PUBLIC_API System : public RefCounted
 {
@@ -26,7 +26,8 @@ public:
     void interestingTimeInterval(double* xStart, double* xEnd) const;
 
     Graph& graph();
-    SymbolicTF& symbolicTF();
+    SymbolicTransferFunction& stf();
+    TransferFunction& tf();
 
     const QString& name() const;
 
@@ -36,6 +37,7 @@ public:
     ListenerDispatcher<SystemListener> dispatcher;
 
 private:
+    
     QTreeWidgetItem* dataTree_;
     QTreeWidgetItem* tfItem_;
     QTreeWidgetItem* factorItem_;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tfp/config.hpp"
+#include "tfp/ErrorCode.hpp"
 #include "tfp/util/Reference.hpp"
 #include "tfp/math/TransferFunction.hxx"
 #include <string>
@@ -14,18 +15,18 @@ class VariableTable;
 class TFP_PUBLIC_API ExpressionManipulator
 {
 public:
-    bool recursivelyCall(bool (ExpressionManipulator::*optfunc)(Expression*,const char*),
-                         Expression* e, const char* variable, bool* hasVariable=NULL);
+    ErrorCode recursivelyCall(ErrorCode (ExpressionManipulator::*optfunc)(Expression*,const char*),
+                              Expression* e, const char* variable, bool* hasVariable=NULL);
 
-    bool manipulateIntoRationalFunction(Expression* e, const char* variable);
-    bool enforceProductLHS(Expression* e, const char* variable);
-    bool enforceConstantExponent(Expression* e, const char* variable);
-    bool expandConstantExponentsIntoProducts(Expression* e, const char* variable);
-    bool factorNegativeExponents(Expression* e, const char* variable);
-    bool eliminateDivisionsAndSubtractions(Expression* e, const char* variable);
-    bool expand(Expression* e, const char* variable);
+    ErrorCode manipulateIntoRationalFunction(Expression* e, const char* variable);
+    ErrorCode enforceProductLHS(Expression* e, const char* variable);
+    ErrorCode enforceConstantExponent(Expression* e, const char* variable);
+    ErrorCode expandConstantExponentsIntoProducts(Expression* e, const char* variable);
+    ErrorCode factorNegativeExponents(Expression* e, const char* variable);
+    ErrorCode eliminateDivisionsAndSubtractions(Expression* e, const char* variable);
+    ErrorCode expand(Expression* e, const char* variable);
 
-    bool factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
+    ErrorCode factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
 private:
 };
 
@@ -41,8 +42,8 @@ public:
     };
 
     Expression* findOrAddLatestDivision(Expression* e);
-    bool manipulateIntoRationalFunction(Expression* e, const char* variable);
-    bool factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable);
+    ErrorCode manipulateIntoRationalFunction(Expression* e, const char* variable);
+    ErrorCode factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable);
 
     /*!
      * @brief Attempts to manipulate the expression into the standard "Transfer
