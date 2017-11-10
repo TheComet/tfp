@@ -9,10 +9,10 @@ namespace tfp {
 
 class Connection;
 
-class Node
+class Node : public RefCounted
 {
 public:
-    typedef std::vector< std::unique_ptr<Connection> > ConnectionList;
+    typedef std::vector< Reference<Connection> > ConnectionList;
     Node();
     Node(const std::string& name);
 
@@ -42,7 +42,7 @@ public:
      */
     void disconnectOutgoing(Node* node);
 
-    const ConnectionList& getOutgoingConnections() const;
+    const ConnectionList& outgoingConnections() const;
 
     std::string getName() const;
     void setName(std::string name);

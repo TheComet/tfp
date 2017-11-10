@@ -32,14 +32,22 @@ public:
 
     /*!
      * @brief Creates a new node with the given name.
+     * @note Even though the returned Node object is refcounted, the graph
+     * will always hold a reference to every created node, so if you can
+     * guarantee that the graph object will outlive whatever is calling this
+     * method, it won't be necessary for you to hold a reference to the
+     * returned node.
+     * @return Returns the new node object.
      */
     Node* createNode(const char* name);
     void destroyNode(Node* node);
     Node* findNode(const char* name);
+    void renameNode(Node* node, const char* name);
 
     void setForwardPath(Node* in, Node* out);
-    VariableTable* variables();
 
+    const PathList& paths() const;
+    const PathList& loops() const;
     Expression* mason() const;
 
     bool evaluatePhysicalUnitConsistencies() const;

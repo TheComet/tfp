@@ -49,7 +49,7 @@ void Node::disconnectOutgoing(Node* other)
 }
 
 // ----------------------------------------------------------------------------
-const Node::ConnectionList& Node::getOutgoingConnections() const
+const Node::ConnectionList& Node::outgoingConnections() const
 {
     return outgoingConnections_;
 }

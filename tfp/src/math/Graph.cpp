@@ -78,7 +78,7 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
         paths->push_back(path);
     }
 
-    const Node::ConnectionList& connections = current->getOutgoingConnections();
+    const Node::ConnectionList& connections = current->outgoingConnections();
     for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
         Node* child = (*it)->targetNode();
@@ -95,7 +95,7 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
         Node* curr = nodes[i];
         Node* next = i == nodes.size() - 1 ? nodes[0] : nodes[i+1];
 
-        const Node::ConnectionList& connections = curr->getOutgoingConnections();
+        const Node::ConnectionList& connections = curr->outgoingConnections();
         for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
             if ((*it)->targetNode() == next)
             {
