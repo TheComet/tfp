@@ -4,29 +4,35 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::recursivelyCall(bool (ExpressionManipulator::*optfunc)(Expression*,const char*),
-                                    Expression* e, const char* variable, bool* hasVariable)
+ErrorCode ExpressionManipulator::recursivelyCall(ErrorCode (ExpressionManipulator::*optfunc)(Expression*,const char*),
+                                                 Expression* e, const char* variable, bool* hasVariable)
 {
     /*
      * Only manipulate branches that are an ancestor of an expression with the
      * specified variable. Each recursive call returns true if the tree was
      * manipulated in some way.
      */
-    bool childWasMutated = false;
+    ErrorCode lhsResult, rhsResult;
     bool childHadVariable = false;
-    if (e->left())  childWasMutated |= recursivelyCall(optfunc, e->left(), variable, &childHadVariable);
-    if (e->right()) childWasMutated |= recursivelyCall(optfunc, e->right(), variable, &childHadVariable);
+    if (e->left())
+        if ((lhsResult = recursivelyCall(optfunc, e->left(), variable, &childHadVariable)).error())
+            return lhsResult;
+
+    if (e->right())
+        if ((rhsResult = recursivelyCall(optfunc, e->right(), variable, &childHadVariable)).error())
+            return rhsResult;
+
     if (hasVariable != NULL) *hasVariable |= childHadVariable;
 
     if (childHadVariable == false && e->hasVariable(variable) == false)
         return false;
 
     if (hasVariable != NULL) *hasVariable = true;
-    return (this->*optfunc)(e, variable) | childWasMutated;
+    return (this->*optfunc)(e, variable) | lhsResult | rhsResult;
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::enforceProductLHS(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::enforceProductLHS(Expression* e, const char* variable)
 {
     if (e->isOperation(op::mul))
     {
@@ -40,7 +46,7 @@ bool ExpressionManipulator::enforceProductLHS(Expression* e, const char* variabl
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::enforceConstantExponent(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::enforceConstantExponent(Expression* e, const char* variable)
 {
     /*
      * Performs the following transformations:
@@ -50,7 +56,7 @@ bool ExpressionManipulator::enforceConstantExponent(Expression* e, const char* v
     if (e->isOperation(op::pow))
     {
         if (e->right()->type() != Expression::CONSTANT)
-            throw NonConstantExponentException("");
+            return ERR_NON_CONSTANT_EXPONENT;
         return false;
     }
 
@@ -67,7 +73,7 @@ bool ExpressionManipulator::enforceConstantExponent(Expression* e, const char* v
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::expandConstantExponentsIntoProducts(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::expandConstantExponentsIntoProducts(Expression* e, const char* variable)
 {
     /*
      * Performs the following transformations:
@@ -78,8 +84,8 @@ bool ExpressionManipulator::expandConstantExponentsIntoProducts(Expression* e, c
         return false;
 
     if (e->right()->type() != Expression::CONSTANT ||
-        std::floor(e->right()->value()) != e->right()->value())
-        throw NonConstantExponentException("Can't expand exponent into products.");
+            std::floor(e->right()->value()) != e->right()->value())
+        return ERR_NON_CONSTANT_EXPONENT;
 
     int exponent = (int)e->right()->value();
 
@@ -111,7 +117,7 @@ bool ExpressionManipulator::expandConstantExponentsIntoProducts(Expression* e, c
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variable)
 {
     /*
      * Does the following manipulations:
@@ -120,7 +126,7 @@ bool ExpressionManipulator::factorNegativeExponents(Expression* e, const char* v
     if (e->isOperation(op::pow) == false)
         return false;
     if (e->right()->type() != Expression::CONSTANT)
-        throw NonConstantExponentException("Can't determine if exponent is negative or not. Can't factor negative exponents.");
+        return ERR_NON_CONSTANT_EXPONENT;
 
     // Nothing to do
     if (e->right()->value() >= 0)
@@ -165,7 +171,7 @@ bool ExpressionManipulator::factorNegativeExponents(Expression* e, const char* v
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::factorIn(Expression* e, Expression* toFactor, const Expression* ignore)
+ErrorCode ExpressionManipulator::factorIn(Expression* e, Expression* toFactor, const Expression* ignore)
 {
     if (e == ignore)
         return false;
@@ -185,7 +191,7 @@ bool ExpressionManipulator::factorIn(Expression* e, Expression* toFactor, const 
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::eliminateDivisionsAndSubtractions(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::eliminateDivisionsAndSubtractions(Expression* e, const char* variable)
 {
     /*
      * Performs the following transformations:
@@ -233,7 +239,7 @@ bool ExpressionManipulator::eliminateDivisionsAndSubtractions(Expression* e, con
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionManipulator::expand(Expression* e, const char* variable)
+ErrorCode ExpressionManipulator::expand(Expression* e, const char* variable)
 {
     /*
      * Performs manipulations such as

@@ -8,7 +8,6 @@ namespace tfp {
 
 class Node;
 class Connection;
-class VariableTable;
 
 /*!
  * @brief Manages the creation and manipulation of graph nodes and provides
@@ -38,12 +37,12 @@ public:
     Node* findNode(const char* name);
 
     void setForwardPath(Node* in, Node* out);
-    VariableTable* variables();
 
     Expression* mason() const;
 
-    bool evaluatePhysicalUnitConsistencies() const;
+    ErrorCode evaluatePhysicalUnitConsistencies() const;
 
+private:
     void findForwardPathsAndLoops(PathList* paths, PathList* loops) const;
     void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
                                            Node* current, NodeList list) const;
@@ -60,7 +59,6 @@ private:
     Node* input_;
     Node* output_;
     std::unordered_map< std::string, Reference<Node> > nodes_;
-    Reference<VariableTable> variables_;
 };
 
 } // namespace tfp

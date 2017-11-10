@@ -9,7 +9,7 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-bool TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable)
+ErrorCode TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable)
 {
     if (e->isOperation(op::mul))
     {
@@ -36,7 +36,7 @@ inline bool logically_equal(double a, double b, double error_factor=1.0)
     std::abs(a-b)<std::abs(std::min(a,b))*std::numeric_limits<double>::epsilon()*
                   error_factor;
 }
-bool TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
+ErrorCode TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
 {
     /*
      * Create the "split" operator, i.e. this is the expression that splits the
@@ -104,9 +104,9 @@ static void resizeCoefficientList(TFManipulator::TFCoefficients::Coefficients* c
         coeffs->push_back(Expression::make(0.0));
 }
 
-static void combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficients* coeffs,
-                                        const TFManipulator::TFCoefficients::Coefficients& sums,
-                                        const char* variable)
+static ErrorCode combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficients* coeffs,
+                                             const TFManipulator::TFCoefficients::Coefficients& sums,
+                                             const char* variable)
 {
     for (TFManipulator::TFCoefficients::Coefficients::const_iterator it = sums.begin(); it != sums.end(); ++it)
     {
@@ -119,7 +119,7 @@ static void combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficie
             if (var->parent() && var->parent()->isOperation(op::pow))
             {
                 if (var->parent()->right()->type() != Expression::CONSTANT)
-                    throw ExpressionManipulator::NonConstantExponentException("Can't calculate order.");
+                    return ERR_NON_CONSTANT_EXPONENT;
                 order = (int)var->parent()->right()->value();
                 
                 // Eliminate variable and power expression so we are left with the coefficient only
@@ -143,6 +143,8 @@ static void combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficie
         resizeCoefficientList(coeffs, order + 1);
         (*coeffs)[order] = Expression::make(op::add, (*coeffs)[order], *it);
     }
+    
+    return true;
 }
 
 TFManipulator::TFCoefficients

@@ -44,6 +44,7 @@ set (tfp_HEADERS_MOC
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/ErrorCode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"

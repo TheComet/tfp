@@ -9,7 +9,7 @@ namespace tfp {
 
 class Connection;
 
-class Node
+class Node : public RefCounted
 {
 public:
     typedef std::vector< std::unique_ptr<Connection> > ConnectionList;

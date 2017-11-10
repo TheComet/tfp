@@ -9,7 +9,7 @@ class Expression;
 class Node;
 class System;
 
-class Connection
+class Connection : public RefCounted
 {
 public:
     enum Type
