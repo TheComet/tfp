@@ -61,7 +61,7 @@ ChebyshevFilter::ChebyshevFilter(QWidget* parent) :
 
 // ----------------------------------------------------------------------------
 void ChebyshevFilter::updateParameters()
-{
+{/*TODO
     double reciFactor = 0.5;
     double a = -SINH(1.0/n_ * ASINH(1.0/epsilon_));
     double b = COSH(1.0/n_ * ASINH(1.0/epsilon_));
@@ -73,7 +73,7 @@ void ChebyshevFilter::updateParameters()
         ));
         reciFactor *= 2 / wc_;
     }
-    system_->numerator().setFactor(k_ / (reciFactor * epsilon_));
+    system_->numerator().setFactor(k_ / (reciFactor * epsilon_));*/
 
     system_->notifyParametersChanged();
 }
@@ -82,7 +82,7 @@ void ChebyshevFilter::updateParameters()
 void ChebyshevFilter::setOrder(int n)
 {
     n_ = n;
-    system_->denominator().resize(n_);
+    /*system_->denominator().resize(n_);*/
     system_->notifyStructureChanged();
     updateParameters();
 }
@@ -114,7 +114,7 @@ void ChebyshevFilter::onSetSystem()
     if (system_ == NULL)
         return;
 
-    system_->numerator().resize(0);
+    /*system_->numerator().resize(0);*/
     setOrder(n_);
     updateParameters();
 }

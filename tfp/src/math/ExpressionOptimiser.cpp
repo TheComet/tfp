@@ -63,7 +63,7 @@ bool ExpressionOptimiser::simplify(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-bool ExpressionOptimiser::recursivelyCall(bool (ExpressionOptimiser::*optfunc)(Expression*), Expression* e)
+bool ExpressionOptimiser::recursivelyCall(bool (*optfunc)(Expression*), Expression* e)
 {
     WeakReference<Expression> self(e);
 
@@ -80,5 +80,5 @@ bool ExpressionOptimiser::recursivelyCall(bool (ExpressionOptimiser::*optfunc)(E
         if (self.expired())
             return true;
     }
-    return mutated | (this->*optfunc)(e);
+    return mutated | (*optfunc)(e);
 }

@@ -1,6 +1,7 @@
 #include "ComplexPlane3D.hpp"
 #include "tfp/views/RealtimePlot3D.hpp"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
+#include "tfp/math/TransferFunction.hpp"
 #include "tfp/plugin/Tool.hpp"
 #include <qwt3d_function.h>
 #include <QVBoxLayout>
@@ -74,12 +75,12 @@ void ComplexPlane3D::onSystemParametersChanged()
     const double minz = -4;
     const double maxz = 4;
 
-    MagnitudeFunction func(system_);
+    /*TODO MagnitudeFunction func(system_);
     func.setMesh(100, 100);
     func.setDomain(minx, maxx, miny, maxy);
     func.setMinZ(minz);
     func.setMaxZ(maxz);
-    func.create(*plot_);
+    func.create(*plot_);*/
 
     plot_->createCoordinateSystem(Qwt3D::Triple(minx, miny, minz), Qwt3D::Triple(maxx, maxy, maxz));
     plot_->updateGL();
@@ -143,11 +144,11 @@ void ComplexPlane3D::onSystemStructureChanged()
     double largestAxis = dx;
     if (dy > largestAxis) largestAxis = dy;
     if (dz > largestAxis) largestAxis = dz;*/
-
+/* TODO
     MagnitudeFunction func(system_);
     func.setMesh(100, 100);
     func.setDomain(minx, maxx, miny, maxy);
     func.setMinZ(minz);
     func.setMaxZ(maxz);
-    func.create(*plot_);
+    func.create(*plot_);*/
 }

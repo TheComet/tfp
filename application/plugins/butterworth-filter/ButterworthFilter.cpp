@@ -53,23 +53,23 @@ ButterworthFilter::ButterworthFilter(QWidget* parent) :
 
 // ----------------------------------------------------------------------------
 void ButterworthFilter::updateParameters()
-{
+{/* TODO
     double factor = k_;
     for (int k = 0; k < n_; ++k)
     {
         system_->denominator().setRoot(k, wc_ * std::exp(Type<double>::Complex(0, ((2*k+n_+1)*M_PI) / (2*n_))));
         factor *= wc_;
     }
-    system_->numerator().setFactor(factor);
+    system_->numerator().setFactor(factor);*/
 
     system_->notifyParametersChanged();
 }
 
 // ----------------------------------------------------------------------------
 void ButterworthFilter::setOrder(int n)
-{
+{/*
     n_ = n;
-    system_->denominator().resize(n_);
+    system_->denominator().resize(n_);*/
     system_->notifyStructureChanged();
     updateParameters();
 }
@@ -93,8 +93,8 @@ void ButterworthFilter::onSetSystem()
 {
     if (system_ == NULL)
         return;
-
-    system_->numerator().resize(0);
+/*
+    system_->numerator().resize(0);*/
     setOrder(n_);
     updateParameters();
 }

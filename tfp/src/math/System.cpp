@@ -82,7 +82,7 @@ void System::interestingFrequencyInterval(double* xStart, double* xEnd) const
 {
     double minx = std::numeric_limits<double>::max();
     double maxx = 0;
-
+/*
     for (int i = 0; i != tf().denominator().size(); ++i)
     {
         double mag = std::abs(tf().denominator().root(i));
@@ -97,12 +97,12 @@ void System::interestingFrequencyInterval(double* xStart, double* xEnd) const
         minx = maxx;
 
     *xStart = minx * 0.01;
-    *xEnd   = maxx * 100;
+    *xEnd   = maxx * 100;*/
 }
 
 // ----------------------------------------------------------------------------
 void System::interestingTimeInterval(double* xStart, double* xEnd) const
-{
+{/*
     double closestpole = std::numeric_limits<double>::max();
 
     for (int i = 0; i != tf().denominator().size(); ++i)
@@ -113,7 +113,7 @@ void System::interestingTimeInterval(double* xStart, double* xEnd) const
     }
 
     *xStart = 0;
-    *xEnd   = 10 / closestpole;
+    *xEnd   = 10 / closestpole;*/
 }
 
 // ----------------------------------------------------------------------------

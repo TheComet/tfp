@@ -1,6 +1,6 @@
 #include "BodePlot.hpp"
 #include "tfp/views/RealtimePlot.hpp"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include "tfp/plugin/Plugin.hpp"
 #include <QVBoxLayout>
@@ -57,7 +57,8 @@ void BodePlot::onSystemParametersChanged()
     double xStart, xEnd;
 
     system_->interestingFrequencyInterval(&xStart, &xEnd);
-    system_->frequencyResponse(freqdata, ampdata, phasedata, xStart, xEnd, 1000);
+    /*TODO
+     *system_->frequencyResponse(freqdata, ampdata, phasedata, xStart, xEnd, 1000);*/
     amplitude_->setSamples(freqdata, ampdata, 1000);
     phase_->setSamples(freqdata, phasedata, 1000);
 

@@ -1,5 +1,7 @@
 #include "tfp/math/VariableTable.hpp"
 #include "tfp/math/Expression.hpp"
+#include "tfp/util/Tear.hpp"
+#include <limits>
 
 using namespace tfp;
 
@@ -58,8 +60,14 @@ double VariableTable::valueOf(std::string name, std::set<std::string>* visited) 
 {
     Expression* e = get(name);
     if (e == NULL)
-        throw MissingEntryException(name.c_str());
+    {
+        g_tears.cry(name.c_str());
+        return std::numeric_limits<double>::quiet_NaN();
+    }
     if (e->type() == Expression::VARIABLE && visited->insert(name).second == false)
-        throw CyclicDependencyException(name.c_str());
+    {
+        g_tears.cry(name.c_str());
+        return std::numeric_limits<double>::quiet_NaN();
+    }
     return e->evaluate(this, visited);
 }

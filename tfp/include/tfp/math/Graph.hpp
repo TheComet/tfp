@@ -49,7 +49,7 @@ public:
     const PathList& loops() const;
     Expression* mason() const;
 
-    ErrorCode evaluatePhysicalUnitConsistencies() const;
+    bool evaluatePhysicalUnitConsistencies() const;
 
 private:
     void findForwardPathsAndLoops(PathList* paths, PathList* loops) const;

@@ -1,6 +1,6 @@
 #include "PoleZeroPlot.hpp"
 #include "tfp/views/RealtimePlot.hpp"
-#include "tfp/models/System.hpp"
+#include "tfp/math/System.hpp"
 #include "tfp/math/TransferFunction.hpp"
 #include "tfp/math/Math.hpp"
 #include <QVBoxLayout>
@@ -55,7 +55,7 @@ void PoleZeroPlot::onSystemParametersChanged()
 
 // ----------------------------------------------------------------------------
 void PoleZeroPlot::onSystemStructureChanged()
-{
+{/*TODO
     while (system_->numerator().size() < zeros_.size())
     {
         zeros_.last()->detach();
@@ -77,7 +77,7 @@ void PoleZeroPlot::onSystemStructureChanged()
     {
         poles_.push_back(new QwtPlotShapeItem);
         poles_.back()->attach(plot_);
-    }
+    }*/
 
     autoScale();
 }
@@ -86,7 +86,7 @@ void PoleZeroPlot::onSystemStructureChanged()
 void PoleZeroPlot::onSystemChanged()
 {
     const double radius = 0.02;
-
+/*
     for (int i = 0; i < system_->numerator().size(); ++i)
     {
         const Type<double>::Complex& root = system_->numerator().root(i);
@@ -106,7 +106,7 @@ void PoleZeroPlot::onSystemChanged()
         path.moveTo(root.real()-radius, root.imag()-radius);
         path.lineTo(root.real()+radius, root.imag()+radius);
         poles_[i]->setShape(path);
-    }
+    }*/
 
     replot();
     if (plot_->lastScaleWasAutomatic())

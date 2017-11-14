@@ -10,30 +10,30 @@ class Expression;
 class TFP_PUBLIC_API ExpressionOptimiser
 {
 public:
-    bool everything(Expression* e);
-    bool constants(Expression* e);
-    bool uselessOperations(Expression* e);
-    bool simplify(Expression* e);
+    static bool everything(Expression* e);
+    static bool constants(Expression* e);
+    static bool uselessOperations(Expression* e);
+    static bool simplify(Expression* e);
 
 private:
-    bool recursivelyCall(bool (ExpressionOptimiser::*optfunc)(Expression*), Expression* e);
+    static bool recursivelyCall(bool (*optfunc)(Expression*), Expression* e);
 
     // UselessOperations
-    bool removeMultipleNegates(Expression* e);
-    bool removeUselessAdditions(Expression* e);
-    bool removeUselessSubtractions(Expression* e);
-    bool removeUselessProducts(Expression* e);
-    bool removeUselessDivisions(Expression* e);
-    bool removeUselessExponents(Expression* e);
+    static bool removeMultipleNegates(Expression* e);
+    static bool removeUselessAdditions(Expression* e);
+    static bool removeUselessSubtractions(Expression* e);
+    static bool removeUselessProducts(Expression* e);
+    static bool removeUselessDivisions(Expression* e);
+    static bool removeUselessExponents(Expression* e);
 
     // Simplifications
-    bool simplifySums(Expression* e);
-    bool simplifyProducts(Expression* e);
-    bool simplifyExponents(Expression* e);
+    static bool simplifySums(Expression* e);
+    static bool simplifyProducts(Expression* e);
+    static bool simplifyExponents(Expression* e);
 
     // Constants
-    bool evaluateConstantExpressions(Expression* e);
-    bool combineConstants(Expression* e);
+    static bool evaluateConstantExpressions(Expression* e);
+    static bool combineConstants(Expression* e);
 };
 
 }

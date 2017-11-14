@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/ErrorCode.hpp"
 #include "tfp/util/Reference.hpp"
 #include "tfp/math/TransferFunction.hxx"
 #include <string>
@@ -15,25 +14,35 @@ class VariableTable;
 class TFP_PUBLIC_API ExpressionManipulator
 {
 public:
-    ErrorCode recursivelyCall(ErrorCode (ExpressionManipulator::*optfunc)(Expression*,const char*),
-                              Expression* e, const char* variable, bool* hasVariable=NULL);
+    enum Result
+    {
+        UNMODIFIED,
+        MODIFIED,
+        ERROR
+    };
 
-    ErrorCode manipulateIntoRationalFunction(Expression* e, const char* variable);
-    ErrorCode enforceProductLHS(Expression* e, const char* variable);
-    ErrorCode enforceConstantExponent(Expression* e, const char* variable);
-    ErrorCode expandConstantExponentsIntoProducts(Expression* e, const char* variable);
-    ErrorCode factorNegativeExponents(Expression* e, const char* variable);
-    ErrorCode eliminateDivisionsAndSubtractions(Expression* e, const char* variable);
-    ErrorCode expand(Expression* e, const char* variable);
+    static Result makeError(const char* fmt, ...);
+    static Result combineResults(Result a, Result b);
 
-    ErrorCode factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
+    static Result keepCalling(Result (*optfunc)(Expression*,const char*),
+                                  Expression* e, const char* variable);
+    static Result recursivelyCall(Result (*optfunc)(Expression*,const char*),
+                                  Expression* e, const char* variable, bool* hasVariable=NULL);
+
+    static Result manipulateIntoRationalFunction(Expression* e, const char* variable);
+    static Result enforceProductLHS(Expression* e, const char* variable);
+    static Result enforceConstantExponent(Expression* e, const char* variable);
+    static Result expandConstantExponentsIntoProducts(Expression* e, const char* variable);
+    static Result factorNegativeExponents(Expression* e, const char* variable);
+    static Result eliminateDivisionsAndSubtractions(Expression* e, const char* variable);
+    static Result expand(Expression* e, const char* variable);
+    static Result factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
 private:
 };
 
 class TFP_PUBLIC_API TFManipulator : public ExpressionManipulator
 {
 public:
-
     struct TFCoefficients
     {
         typedef std::vector< tfp::Reference<Expression> > Coefficients;
@@ -41,9 +50,9 @@ public:
         Coefficients denominator;
     };
 
-    Expression* findOrAddLatestDivision(Expression* e);
-    ErrorCode manipulateIntoRationalFunction(Expression* e, const char* variable);
-    ErrorCode factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable);
+    static Expression* findOrAddLatestDivision(Expression* e);
+    static Result manipulateIntoRationalFunction(Expression* e, const char* variable);
+    static Result factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable);
 
     /*!
      * @brief Attempts to manipulate the expression into the standard "Transfer
@@ -75,14 +84,14 @@ public:
      * It is worth noting that DPSFGs will always produce expressions reducible
      * to polynomial expressions. User input may not.
      */
-    TFCoefficients calculateTransferFunctionCoefficients(Expression* e, const char* variable);
+    static TFCoefficients calculateTransferFunctionCoefficients(Expression* e, const char* variable);
 
     /*!
      * @brief Evaluates all coefficient expressions and constructs a transfer
      * function.
      */
-    tfp::TransferFunction<double> calculateTransferFunction(const TFCoefficients& tfe,
-                                                            const VariableTable* vt=NULL);
+    static TransferFunction<double>
+    calculateTransferFunction(const TFCoefficients& tfe, const VariableTable* vt=NULL);
 private:
 };
 

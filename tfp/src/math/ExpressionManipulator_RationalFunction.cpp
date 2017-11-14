@@ -9,24 +9,24 @@
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-ErrorCode TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable)
+ExpressionManipulator::Result TFManipulator::factorNegativeExponentsToNumerator(Expression* e, Expression* numerator, const char* variable)
 {
     if (e->isOperation(op::mul))
     {
-        return factorNegativeExponentsToNumerator(e->left(), numerator, variable) |
-               factorNegativeExponentsToNumerator(e->right(), numerator, variable);
+        return combineResults(factorNegativeExponentsToNumerator(e->left(), numerator, variable),
+                              factorNegativeExponentsToNumerator(e->right(), numerator, variable));
     }
 
     if (e->isOperation(op::pow) == false)
-        return false;
+        return UNMODIFIED;
 
     if (e->right()->type() != Expression::CONSTANT || e->right()->value() >= 0.0)
-        return false;
+        return UNMODIFIED;
 
     e->right()->set(-e->right()->value());
     factorIn(numerator, e);
     e->getOtherOperand()->collapseIntoParent();
-    return true;
+    return MODIFIED;
 }
 
 // ----------------------------------------------------------------------------
@@ -36,8 +36,10 @@ inline bool logically_equal(double a, double b, double error_factor=1.0)
     std::abs(a-b)<std::abs(std::min(a,b))*std::numeric_limits<double>::epsilon()*
                   error_factor;
 }
-ErrorCode TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
+ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
 {
+    Result result;
+
     /*
      * Create the "split" operator, i.e. this is the expression that splits the
      * numerator from the denominator. By default, use the last division
@@ -52,8 +54,10 @@ ErrorCode TFManipulator::manipulateIntoRationalFunction(Expression* e, const cha
      * can start shuffling terms back and forth between the numerator and
      * denominator without having to deal with lots of edge cases.
      */
-    recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->left(), variable);
-    recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->right(), variable);
+    result = combineResults(
+        recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->left(), variable),
+        recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->right(), variable)
+    );
 
     /*
      * All op::pow operations with our variable on the LHS need to have a
@@ -78,8 +82,6 @@ ErrorCode TFManipulator::manipulateIntoRationalFunction(Expression* e, const cha
            recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split, variable) |
            recursivelyCall(&TFManipulator::expand, split, variable))
     {}
-
-    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -104,14 +106,14 @@ static void resizeCoefficientList(TFManipulator::TFCoefficients::Coefficients* c
         coeffs->push_back(Expression::make(0.0));
 }
 
-static ErrorCode combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficients* coeffs,
+static ExpressionManipulator::Result combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coefficients* coeffs,
                                              const TFManipulator::TFCoefficients::Coefficients& sums,
                                              const char* variable)
 {
     for (TFManipulator::TFCoefficients::Coefficients::const_iterator it = sums.begin(); it != sums.end(); ++it)
     {
         int order = 0;
-        
+
         // Determine coefficient order by finding the variable we're a function of and checking its exponent.
         Expression* var = (*it)->find(variable);
         if (var != NULL)
@@ -119,9 +121,9 @@ static ErrorCode combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coef
             if (var->parent() && var->parent()->isOperation(op::pow))
             {
                 if (var->parent()->right()->type() != Expression::CONSTANT)
-                    return ERR_NON_CONSTANT_EXPONENT;
+                    return ExpressionManipulator::makeError("Variable needs to be raised to a constant exponent expression.");
                 order = (int)var->parent()->right()->value();
-                
+
                 // Eliminate variable and power expression so we are left with the coefficient only
                 if (var->parent()->parent())
                     var->parent()->getOtherOperand()->collapseIntoParent();
@@ -143,8 +145,8 @@ static ErrorCode combineSumsIntoCoefficients(TFManipulator::TFCoefficients::Coef
         resizeCoefficientList(coeffs, order + 1);
         (*coeffs)[order] = Expression::make(op::add, (*coeffs)[order], *it);
     }
-    
-    return true;
+
+    return ExpressionManipulator::MODIFIED;
 }
 
 TFManipulator::TFCoefficients

@@ -20,6 +20,7 @@
 #include <QSplitter>
 #include <QDir>
 #include <qwt_text.h>
+#include <iostream>
 
 namespace tfp {
 
