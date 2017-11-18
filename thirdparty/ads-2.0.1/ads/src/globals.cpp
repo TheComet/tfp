@@ -62,12 +62,12 @@ CDockInsertParam dockAreaInsertParameters(DockWidgetArea Area)
 {
 	switch (Area)
     {
-	case TopDockWidgetArea: return QPair<Qt::Orientation, bool>(Qt::Vertical, false);
-	case RightDockWidgetArea: return QPair<Qt::Orientation, bool>(Qt::Horizontal, true);
+	case TopDockWidgetArea: return CDockInsertParam(Qt::Vertical, false);
+	case RightDockWidgetArea: return CDockInsertParam(Qt::Horizontal, true);
 	case CenterDockWidgetArea:
-	case BottomDockWidgetArea: return QPair<Qt::Orientation, bool>(Qt::Vertical, true);
-	case LeftDockWidgetArea: return QPair<Qt::Orientation, bool>(Qt::Horizontal, false);
-	default: QPair<Qt::Orientation, bool>(Qt::Vertical, false);
+	case BottomDockWidgetArea: return CDockInsertParam(Qt::Vertical, true);
+	case LeftDockWidgetArea: return CDockInsertParam(Qt::Horizontal, false);
+	default: CDockInsertParam(Qt::Vertical, false);
     } // switch (Area)
 
 	return CDockInsertParam(Qt::Vertical, false);
