@@ -64,14 +64,13 @@ set (ADS_RESOURCES
     "res/ads.qrc")
 set (ADS_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}/include")
+    "${CMAKE_CURRENT_BINARY_DIR}/include"
+    CACHE STRING "Advanced Docking System include directories" FORCE)
 
 find_package (Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 qt5_wrap_cpp (ADS_MOC_SOURCES ${ADS_MOC_HEADERS})
 qt5_add_resources (ADS_RESOURCES_GEN ${ADS_RESOURCES})
 
-unset (ADS_INCLUDE_DIRS CACHE)
-set (ADS_INCLUDE_DIRS ${ADS_INCLUDE_DIRS} CACHE STRING "ADS include directories")
 include_directories (${ADS_INCLUDE_DIRS})
 
 add_library (ads ${BUILD_TYPE}
@@ -80,8 +79,7 @@ add_library (ads ${BUILD_TYPE}
     ${ADS_MOC_SOURCES}
     ${ADS_RESOURCES_GEN}
 )
-unset (ADS_LIBRARIES CACHE)
-set (ADS_LIBRARIES ads CACHE STRING "ADS libraries")
+set (ADS_LIBRARIES ads CACHE STRING "ADS libraries" FORCE)
 
 # generates the correct project files for visual studio, setting the correct
 # debug working directory and other stuff

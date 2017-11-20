@@ -33,15 +33,13 @@ add_definitions (-DPUGIXML_BUILDING)
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/include/pugiexport.hpp")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/include/pugiconfig.hpp")
 
-unset (PUGIXML_INCLUDE_DIRS CACHE)
 set (PUGIXML_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-    CACHE STRING "pugiXML include directories")
+    CACHE STRING "pugiXML include directories" FORCE)
 include_directories (${PUGIXML_INCLUDE_DIRS})
 
-unset (PUGIXML_LIBRARIES CACHE)
-set (PUGIXML_LIBRARIES pugixml CACHE STRING "PugiXML library")
+set (PUGIXML_LIBRARIES pugixml CACHE STRING "PugiXML library" FORCE)
 
 add_library(pugixml ${BUILD_TYPE} ${SOURCES})
 

@@ -35,9 +35,9 @@ endif ()
 set (kiss_fft_scalar ${KISS_FFT_DATATYPE})
 
 if (${PLATFORM} MATCHES "WINDOWS")
-	option (KISS_FFT_USE_ALLOCA "Use alloca() instead of malloc()" OFF)
+    option (KISS_FFT_USE_ALLOCA "Use alloca() instead of malloc()" OFF)
 else ()
-	option (KISS_FFT_USE_ALLOCA "Use alloca() instead of malloc()" ON)
+    option (KISS_FFT_USE_ALLOCA "Use alloca() instead of malloc()" ON)
 endif ()
 if (KISS_FFT_USE_ALLOCA)
     set (KISS_FFT_USE_ALLOCA "1")
@@ -59,9 +59,10 @@ option (KISS_DUMPHDR "" OFF)
 set (KISS_FFT_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-    CACHE STRING "kiss_fft include directories"
+    CACHE STRING "Include directories for KISS FFT library" FORCE
 )
 
+message (STATUS ${KISS_FFT_INCLUDE_DIRS})
 include_directories (${KISS_FFT_INCLUDE_DIRS})
 
 add_definitions (-DKISS_FFT_BUILDING)
@@ -69,8 +70,8 @@ add_definitions (-DKISS_FFT_BUILDING)
 if (KISS_FFT)
     add_library (kiss_fft "src/kiss_fft.c" "src/kiss_fftr.c")
     create_vcproj_userfile (kiss_fft)
+    set (KISS_FFT_LIBRARIES kiss_fft CACHE STRING "KISS FFT libraries" FORCE)
 endif ()
-
 
 ###############################################################################
 # install targets
@@ -84,5 +85,5 @@ if (INSTALL_LIBS)
         RUNTIME DESTINATION "bin"
     )
     install (DIRECTORY "include" DESTINATION ".")
-	install (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include" DESTINATION ".")
+    install (DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include" DESTINATION ".")
 endif ()

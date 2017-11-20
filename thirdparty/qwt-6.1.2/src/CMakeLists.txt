@@ -40,7 +40,7 @@ set (QWT_MOC_HEADERS
     "core/include/qwt_panner.h"
     "core/include/qwt_picker.h"
     "core/include/qwt_text_label.h")
-set (QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/core/include")
+set (_QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/core/include")
 
 if (QWT_PLOT)
     file (GLOB QWT_PLOT_HEADERS "plot/include/*.h")
@@ -60,14 +60,14 @@ if (QWT_PLOT)
         "plot/include/qwt_plot_magnifier.h"
         "plot/include/qwt_sampling_thread.h"
         "plot/include/qwt_scale_widget.h")
-    list (APPEND QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/plot/include")
+    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/plot/include")
 endif ()
 if (QWT_SVG)
     file (GLOB QWT_SVG_HEADERS "svg/include/*.h")
     file (GLOB QWT_SVG_SOURCES "svg/src/*.cpp")
     list (APPEND QWT_HEADERS ${QWT_SVG_HEADERS})
     list (APPEND QWT_SOURCES ${QWT_SVG_SOURCES})
-    list (APPEND QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/svg/include")
+    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/svg/include")
 endif ()
 if (QWT_OPENGL)
     file (GLOB QWT_OPENGL_HEADERS "opengl/include/*.h")
@@ -75,7 +75,7 @@ if (QWT_OPENGL)
     list (APPEND QWT_HEADERS ${QWT_OPENGL_HEADERS})
     list (APPEND QWT_SOURCES ${QWT_OPENGL_SOURCES})
     list (APPEND QWT_MOC_HEADERS "opengl/include/qwt_plot_glcanvas.h")
-    list (APPEND QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/opengl/include")
+    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/opengl/include")
 endif ()
 if (QWT_WIDGETS)
     file (GLOB QWT_WIDGETS_HEADERS "widgets/include/*.h")
@@ -93,7 +93,7 @@ if (QWT_WIDGETS)
         "widgets/include/qwt_slider.h"
         "widgets/include/qwt_thermo.h"
         "widgets/include/qwt_wheel.h")
-    list (APPEND QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/widgets/include")
+    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/widgets/include")
 endif ()
 
 find_package (Qt5 COMPONENTS Core Concurrent PrintSupport REQUIRED)
@@ -106,18 +106,16 @@ else ()
     set (BUILD_TYPE STATIC)
 endif ()
 configure_file (${TEMPLATE_EXPORT_H} "include/qwt_export.h")
-list (APPEND QWT_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/include")
+list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/include")
 
-unset (QWT_INCLUDE_DIRS CACHE)
-set (QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIRS} CACHE STRING "Qwt include directories")
+set (QWT_INCLUDE_DIRS ${_QWT_INCLUDE_DIRS} CACHE STRING "Qwt include directories" FORCE)
 include_directories (${QWT_INCLUDE_DIRS})
 
 add_library (qwtinternal ${BUILD_TYPE}
     ${QWT_SOURCES}
     ${QWT_MOC_SOURCES}
 )
-unset (QWT_LIBRARIES CACHE)
-set (QWT_LIBRARIES qwtinternal CACHE STRING "Qwt libraries")
+set (QWT_LIBRARIES qwtinternal CACHE STRING "Qwt libraries" FORCE)
 
 # generates the correct project files for visual studio, setting the correct
 # debug working directory and other stuff
