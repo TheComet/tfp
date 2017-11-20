@@ -16,7 +16,7 @@ TEST(NAME, single_node_forward_path_returns_identity_TF)
     Graph graph;
     Node* n = graph.createNode("n");
     graph.setForwardPath(n, n);
-    tfp::TransferFunction<double> tf = graph.calculateTransferFunction();
+    tfp::TransferFunction tf = graph.calculateTransferFunction();
 
     EXPECT_THAT(tf.numerator().size(), Eq(0));
     EXPECT_THAT(tf.denominator().size(), Eq(0));
@@ -33,7 +33,7 @@ TEST(NAME, default_connections_are_identity_TF)
     n2->connectTo(n3);
     graph.setForwardPath(n1, n3);
 
-    TransferFunction<double> tf = graph.calculateTransferFunction();
+    TransferFunction tf = graph.calculateTransferFunction();
     EXPECT_THAT(tf.numerator().size(), Eq(0));
     EXPECT_THAT(tf.denominator().size(), Eq(0));
     EXPECT_THAT(tf.factor(), Eq(1));

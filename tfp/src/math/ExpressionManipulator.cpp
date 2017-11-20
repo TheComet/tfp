@@ -1,6 +1,6 @@
 #include "tfp/math/ExpressionManipulators.hpp"
 #include "tfp/math/Expression.hpp"
-#include "tfp/util/Tear.hpp"
+#include "tfp/util/Tears.hpp"
 #include <stdarg.h>
 
 using namespace tfp;

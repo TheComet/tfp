@@ -1,11 +1,11 @@
-#include "tfp/util/Tear.hpp"
+#include "tfp/util/Tears.hpp"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-using namespace tfp;
+tfp::Tears tfp::g_tears;
 
-Tears g_tears;
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 void Tears::cry(const char* fmt, ...)

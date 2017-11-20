@@ -1,6 +1,6 @@
 #include "tfp/math/VariableTable.hpp"
 #include "tfp/math/Expression.hpp"
-#include "tfp/util/Tear.hpp"
+#include "tfp/util/Tears.hpp"
 #include <limits>
 
 using namespace tfp;

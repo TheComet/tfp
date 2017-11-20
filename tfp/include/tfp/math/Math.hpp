@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tfp/config.hpp"
-#include "tfp/util/Type.hpp"
 #include "kiss_fft/kiss_fft.h"
 
 #include <string>
@@ -30,15 +29,15 @@ template <typename T> int sign(T val) {
 
 #if !HAVE_ASINH
 TFP_PUBLIC_API double asinh(const double d);
-TFP_PUBLIC_API Type<Real>::Complex asinh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API Complex asinh(const Complex& c);
 #endif
 #if !HAVE_ACOSH
 TFP_PUBLIC_API double acosh(const double d);
-TFP_PUBLIC_API Type<Real>::Complex acosh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API Complex acosh(const Complex& c);
 #endif
 #if !HAVE_ATANH
 TFP_PUBLIC_API double atanh(const double d);
-TFP_PUBLIC_API Type<Real>::Complex atanh(const Type<Real>::Complex& c);
+TFP_PUBLIC_API Complex atanh(const Complex& c);
 #endif
 
 TFP_PUBLIC_API void complexMagnitude(double* magnitude, const kiss_fft_cpx* transformedSignal, unsigned len);

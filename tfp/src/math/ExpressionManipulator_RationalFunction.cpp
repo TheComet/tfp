@@ -177,12 +177,12 @@ TFManipulator::calculateTransferFunctionCoefficients(Expression* e, const char* 
 }
 
 // ----------------------------------------------------------------------------
-tfp::TransferFunction<double>
+TransferFunction
 TFManipulator::calculateTransferFunction(const TFCoefficients& tfe,
                                          const VariableTable* vt)
 {
-    tfp::CoefficientPolynomial<double> numerator(tfe.numerator.size());
-    tfp::CoefficientPolynomial<double> denominator(tfe.denominator.size());
+    CoefficientPolynomial numerator(tfe.numerator.size());
+    CoefficientPolynomial denominator(tfe.denominator.size());
 
     for (std::size_t i = 0; i != tfe.numerator.size(); ++i)
     {
@@ -196,5 +196,5 @@ TFManipulator::calculateTransferFunction(const TFCoefficients& tfe,
         denominator.setCoefficient(i, value);
     }
 
-    return tfp::TransferFunction<double>(numerator, denominator);
+    return TransferFunction(numerator, denominator);
 }

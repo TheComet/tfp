@@ -19,9 +19,9 @@ double asinh(const double d)
 {
     return std::log(d + std::sqrt(d*d + 1));
 }
-Type<Real>::Complex asinh(const Type<Real>::Complex& c)
+Complex asinh(const Complex& c)
 {
-    return std::log(c + std::sqrt(c*c + Type<Real>::Complex(1, 0)));
+    return std::log(c + std::sqrt(c*c + Complex(1, 0)));
 }
 #endif
 
@@ -31,9 +31,9 @@ double acosh(const double d)
 {
     return std::log(d + std::sqrt(d*d - 1));
 }
-Type<Real>::Complex acosh(const Type<Real>::Complex& c)
+Complex acosh(const Complex& c)
 {
-    return std::log(c + std::sqrt(c*c - Type<Real>::Complex(1, 0)));
+    return std::log(c + std::sqrt(c*c - Complex(1, 0)));
 }
 #endif
 
@@ -43,9 +43,9 @@ double atanh(const double d)
 {
     return (std::log(1+d) - std::log(1-d)) / 2;
 }
-Type<Real>::Complex atanh(const Type<Real>::Complex& c)
+Complex atanh(const Complex& c)
 {
-    return (std::log(Type<Real>::Complex(1, 0)+c) - std::log(Type<Real>::Complex(1, 0)-c)) / Type<Real>::Complex(2, 0);
+    return (std::log(Complex(1, 0)+c) - std::log(Complex(1, 0)-c)) / Complex(2, 0);
 }
 #endif
 

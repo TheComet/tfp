@@ -22,8 +22,10 @@ public:
     Connection();
     ~Connection();
 
-    void reset();
+    void setTargetNode(Node* node);
+    Node* targetNode() const;
 
+    void reset();
     Type type() const;
 
     void setExpression(Expression* expression);
@@ -32,11 +34,8 @@ public:
     void setSystem(System* system);
     System* system() const;
 
-    void setTargetNode(Node* node);
-    Node* targetNode() const;
-
 private:
-    Node* outgoingNode_;
+    Node* targetNode_;
     union {
         Expression* expression_;
         System*     system_;

@@ -17,6 +17,24 @@ Connection::~Connection()
 }
 
 // ----------------------------------------------------------------------------
+void Connection::setTargetNode(Node* node)
+{
+    targetNode_ = node;
+}
+
+// ----------------------------------------------------------------------------
+Node* Connection::targetNode() const
+{
+    return targetNode_;
+}
+
+// ----------------------------------------------------------------------------
+Connection::Type Connection::type() const
+{
+    return type_;
+}
+
+// ----------------------------------------------------------------------------
 void Connection::reset()
 {
     if (type() == SYSTEM)
@@ -57,16 +75,4 @@ System* Connection::system() const
 {
     assert (type() == SYSTEM);
     return data_.system_;
-}
-
-// ----------------------------------------------------------------------------
-void Connection::setTargetNode(Node* node)
-{
-    outgoingNode_ = node;
-}
-
-// ----------------------------------------------------------------------------
-Node* Connection::targetNode() const
-{
-    return outgoingNode_;
 }

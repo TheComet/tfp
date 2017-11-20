@@ -11,7 +11,7 @@ class QTreeWidgetItem;
 namespace tfp {
 
 class Graph;
-template <class T> class TransferFunction;
+class TransferFunction;
 class SymbolicTransferFunction;
 
 class TFP_PUBLIC_API System : public RefCounted
@@ -27,7 +27,7 @@ public:
 
     Graph& graph();
     SymbolicTransferFunction& stf();
-    TransferFunction<double>& tf();
+    TransferFunction& tf();
 
     const QString& name() const;
 

@@ -44,6 +44,7 @@ set (tfp_HEADERS_MOC
 
 set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/CoefficientPolynomial.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
@@ -56,7 +57,9 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/RootPolynomial.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
@@ -75,7 +78,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Tear.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/util/Tears.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTreeView.cpp"

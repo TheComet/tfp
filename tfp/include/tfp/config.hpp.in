@@ -7,24 +7,32 @@
 
 #   include "tfp/export.hpp"
 
+#   include <Eigen/Dense>
+#   include <complex>
+
 namespace tfp {
-	typedef @REAL_TYPE@ Real;
+   typedef @REAL_TYPE@ Real;
+   typedef std::complex<Real> Complex;
+   typedef Eigen::Array<Real, Eigen::Dynamic, 1> RealArray;
+   typedef Eigen::Array<Complex, Eigen::Dynamic, 1> ComplexArray;
+   typedef Eigen::Matrix<Real, Eigen::Dynamic, 1> RealVector;
+   typedef Eigen::Matrix<Complex, Eigen::Dynamic, 1> ComplexVector;
 }
 
 #cmakedefine TFP_BUILD_TESTS
 
-#	define HAVE_SINH @HAVE_SINH@
-#	define HAVE_COSH @HAVE_COSH@
-#	define HAVE_TANH @HAVE_TANH@
-#	define HAVE_ASINH @HAVE_ASINH@
-#	define HAVE_ACOSH @HAVE_ACOSH@
-#	define HAVE_ATANH @HAVE_ATANH@
+#   define HAVE_SINH @HAVE_SINH@
+#   define HAVE_COSH @HAVE_COSH@
+#   define HAVE_TANH @HAVE_TANH@
+#   define HAVE_ASINH @HAVE_ASINH@
+#   define HAVE_ACOSH @HAVE_ACOSH@
+#   define HAVE_ATANH @HAVE_ATANH@
 
-#	define SINH @SINH_SYMBOL@
-#	define COSH @COSH_SYMBOL@
-#	define TANH @TANH_SYMBOL@
-#	define ASINH @ASINH_SYMBOL@
-#	define ACOSH @ACOSH_SYMBOL@
-#	define ATANH @ATANH_SYMBOL@
+#   define SINH @SINH_SYMBOL@
+#   define COSH @COSH_SYMBOL@
+#   define TANH @TANH_SYMBOL@
+#   define ASINH @ASINH_SYMBOL@
+#   define ACOSH @ACOSH_SYMBOL@
+#   define ATANH @ATANH_SYMBOL@
 
 #endif /* TFP_CONFIG_HPP */

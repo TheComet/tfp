@@ -2,13 +2,13 @@
 
 #include "tfp/config.hpp"
 #include "tfp/util/Reference.hpp"
-#include "tfp/math/TransferFunction.hxx"
-#include <string>
+#include "tfp/math/TransferFunction.hpp"
 #include <vector>
 
 namespace tfp {
 
 class Expression;
+class TransferFunction;
 class VariableTable;
 
 class TFP_PUBLIC_API ExpressionManipulator
@@ -38,6 +38,7 @@ public:
     static Result expand(Expression* e, const char* variable);
     static Result factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
 private:
+    ExpressionManipulator();
 };
 
 class TFP_PUBLIC_API TFManipulator : public ExpressionManipulator
@@ -90,9 +91,10 @@ public:
      * @brief Evaluates all coefficient expressions and constructs a transfer
      * function.
      */
-    static TransferFunction<double>
+    static TransferFunction
     calculateTransferFunction(const TFCoefficients& tfe, const VariableTable* vt=NULL);
 private:
+    TFManipulator();
 };
 
 }

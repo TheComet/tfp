@@ -1,235 +1,97 @@
 #pragma once
 
-#include "tfp/math/RootPolynomial.hxx"
-#include "tfp/math/CoefficientPolynomial.hpp"
+#include "tfp/config.hpp"
+#include "Eigen/Eigenvalues"
+#include <vector>
 
 namespace tfp {
 
-// ----------------------------------------------------------------------------
-template <class T>
-UniqueRootIterator<T>::UniqueRootIterator(const RootPolynomial<T>* rootPolynomial) :
-    rootPolynomial_(rootPolynomial),
-    index_(0)
+class CoefficientPolynomial;
+class RootPolynomial;
+
+class UniqueRootIterator
 {
-}
+public:
+    const Complex& get() const;
+    bool hasNext();
+    void next();
 
-// ----------------------------------------------------------------------------
-template <class T>
-const typename Type<T>::Complex& UniqueRootIterator<T>::get() const
+private:
+    friend class RootPolynomial;
+
+    UniqueRootIterator(const RootPolynomial* rootPolynomial);
+
+    const RootPolynomial* rootPolynomial_;
+    int index_;
+};
+
+/*!
+ * @brief A polynomial function consisting of roots (as opposed to
+ * coefficients, see CoefficientPolynomial).
+ */
+class RootPolynomial
 {
-    return rootPolynomial_->roots_[index_];
-}
+public:
+    RootPolynomial();
+    RootPolynomial(int size);
+    RootPolynomial(const ComplexVector& roots, Real factor);
+    RootPolynomial(const CoefficientPolynomial& coeffs);
 
-// ----------------------------------------------------------------------------
-template <class T>
-bool UniqueRootIterator<T>::hasNext()
-{
-    return index_ < rootPolynomial_->roots_.size();
-}
+    /*!
+     * @brief Resizes the internal storage of roots. If expanding, the new
+     * slots remain unintialised, so you must set them by calling root().
+     */
+    void resize(int size);
 
-// ----------------------------------------------------------------------------
-template <class T>
-void UniqueRootIterator<T>::next()
-{
-    while (true)
-    {
-        ++index_;
-        if (hasNext() == false)
-            break;
+    //! Returns the number of roots (**including** multiple roots)
+    int size() const;
+    //! Sets the value of a root at the specified index
+    void setRoot(int index, const Complex& root);
+    //! Sets the real part of the root at the specified index
+    void setRoot(int index, Real real);
+    //! Retrieves a root at the specified index.
+    const Complex& root(int index) const;
 
-        if (rootPolynomial_->roots_[index_].first >= 1)
-            break;
-    }
-}
+    /*!
+     * @brief Returns the multiplicity of the specified root. When setting the
+     * value of a root, it is checked against the existing roots. If an
+     * identical root is found, then its multiplicity is increased.
+     */
+    int multiplicity(int index);
 
-// ----------------------------------------------------------------------------
-template <class T>
-RootPolynomial<T>::RootPolynomial() :
-    factor_(1),
-    multiplicityDirty_(true)
-{
-}
+    UniqueRootIterator uniqueRoots();
 
-// ----------------------------------------------------------------------------
-template <class T>
-RootPolynomial<T>::RootPolynomial(int size) :
-    roots_(size, 1),
-    factor_(1),
-    multiplicityDirty_(true)
-{
-}
+    void setFactor(Real factor);
 
-// ----------------------------------------------------------------------------
-template <class T>
-RootPolynomial<T>::RootPolynomial(const typename Type<T>::ComplexVector& roots, T factor) :
-    roots_(roots),
-    factor_(factor),
-    multiplicityDirty_(true)
-{
-}
+    /*!
+     * @brief  Returns the constant factor which was factored out when
+     * calculating the monic polynomial. E.g.
+     *
+     * 2s + 4  -->  2(s+2)    factor=2
+     */
+    Real factor() const;
 
-// ----------------------------------------------------------------------------
-template <class T>
-RootPolynomial<T>::RootPolynomial(const CoefficientPolynomial<T>& polynomial) :
-    roots_(polynomial.roots().roots_),
-    factor_(polynomial.coefficients_(0)),
-    multiplicityDirty_(true)
-{
-}
+    /*!
+     * Computes the polynomial coefficients with the specified roots.
+     * This was ported from matlab's poly() function
+     * Type ">> edit poly" and scroll to line 35.
+     * @param roots Roots.
+     * @return Polynomial coefficients.
+     */
+    CoefficientPolynomial poly() const;
 
-// ----------------------------------------------------------------------------
-template <class T>
-void RootPolynomial<T>::resize(int size)
-{
-    roots_.resize(size, Eigen::NoChange);
-}
+    Complex evaluate(const Complex& value) const;
 
-// ----------------------------------------------------------------------------
-template <class T>
-int RootPolynomial<T>::size() const
-{
-    return roots_.size();
-}
+    friend std::ostream& operator<<(std::ostream& os, const RootPolynomial& polynomial);
+    friend class UniqueRootIterator;
 
-// ----------------------------------------------------------------------------
-template <class T>
-void RootPolynomial<T>::setRoot(int index, const typename Type<T>::Complex& root)
-{
-    multiplicityDirty_ = true;
-    roots_[index] = root;
-}
+private:
+    void updateMultiplicities();
 
-// ----------------------------------------------------------------------------
-template <class T>
-void RootPolynomial<T>::setRoot(int index, T root)
-{
-    multiplicityDirty_ = true;
-    roots_[index] = typename Type<T>::Complex(root, 0);
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-const typename Type<T>::Complex& RootPolynomial<T>::root(int index) const
-{
-    return roots_[index];
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-int RootPolynomial<T>::multiplicity(int index)
-{
-    updateMultiplicities();
-
-    int multiplicity = multiplicities_[index];
-    if (multiplicity < 1)
-        multiplicity = multiplicities_[-multiplicity];
-    return multiplicity;
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-void RootPolynomial<T>::updateMultiplicities()
-{
-    if (multiplicityDirty_)
-    {
-        multiplicities_.resize(roots_.size());
-        for (int i = 0; i != multiplicities_.size(); ++i)
-            multiplicities_[i] = 1;
-
-        for (int i = 0; i != roots_.size(); ++i)
-        {
-            for (int j = i + 1; j < roots_.size(); ++j)
-            {
-                if (roots_[i] == roots_[j])
-                {
-                    if (multiplicities_[i] >= 1)
-                    {
-                        multiplicities_[i]++;
-                        multiplicities_[j] = -i;
-                    }
-                }
-            }
-        }
-
-        multiplicityDirty_ = false;
-    }
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-UniqueRootIterator<T> RootPolynomial<T>::uniqueRoots()
-{
-    updateMultiplicities();
-    return UniqueRootIterator<T>(this);
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-void RootPolynomial<T>::setFactor(T factor)
-{
-    factor_ = factor;
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-T RootPolynomial<T>::factor() const
-{
-    return factor_;
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-CoefficientPolynomial<T> RootPolynomial<T>::poly() const
-{
-    // Need complex buffers for the computation, even though the resulting
-    // coefficients are real (since we're only dealing with complex-conjugate)
-    // roots (real functions)
-    typename Type<T>::ComplexVector coeffs = Type<T>::ComplexVector::Zero(roots_.size() + 1);
-    typename Type<T>::ComplexVector temp(roots_.size() + 1);
-    coeffs(0) = typename Type<T>::Complex(1, 0);
-
-    for (int i = 0; i < roots_.size(); ++i)
-    {
-        // multiply coefficients with current root and store in temp buffer
-        for (int j = 0; j < coeffs.size(); ++j) {
-            temp(j) = roots_(i) * coeffs(j);
-        }
-        // subtract temp buffer from coefficients
-        for (int j = 1; j < coeffs.size(); ++j) {
-            coeffs(j) -= temp(j - 1);
-        }
-    }
-
-    // There should be no more complex values.
-    CoefficientPolynomial<T> ret;
-    ret.resize(coeffs.size());
-    for (int i = 0; i < coeffs.size(); ++i)
-        ret.setCoefficient(i, coeffs(i).real() * factor_);
-
-    return ret;
-}
-
-// ----------------------------------------------------------------------------
-template <class T>
-typename Type<T>::Complex RootPolynomial<T>::evaluate(const typename Type<T>::Complex& value) const
-{
-    if (roots_.size() == 0)
-        return typename Type<T>::Complex(factor_, 0);
-
-    typename Type<T>::ComplexArray factors(roots_.size(), 1);
-    factors = value - typename Type<T>::ComplexArray(roots_);
-    typename Type<T>::Complex ret = factors(0);
-    for (int i = 1; i < factors.size(); ++i)
-        ret *= factors(i);
-    return ret * factor_;
-}
-
-// ----------------------------------------------------------------------------
-template <class U>
-std::ostream& operator<<(std::ostream& os, const RootPolynomial<U>& polynomial)
-{
-    os << polynomial.roots_;
-    return os;
-}
+    ComplexVector roots_;
+    std::vector<Real> multiplicities_;
+    Real factor_;
+    bool multiplicityDirty_;
+};
 
 } // namespace tfp
