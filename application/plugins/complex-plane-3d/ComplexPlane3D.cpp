@@ -11,18 +11,18 @@ using namespace tfp;
 class MagnitudeFunction : public Qwt3D::Function
 {
 public:
-    MagnitudeFunction(TransferFunction<double>* tf) :
+    MagnitudeFunction(TransferFunction* tf) :
         tf_(tf)
     {
     }
 
     double operator()(double x, double y)
     {
-        return std::log10(20 * std::abs(tf_->evaluate(Type<double>::Complex(x, y))));
+        return std::log10(20 * std::abs(tf_->evaluate(Complex(x, y))));
     }
 
 private:
-    TransferFunction<double>* tf_;
+    TransferFunction* tf_;
 };
 
 // ----------------------------------------------------------------------------
@@ -75,12 +75,12 @@ void ComplexPlane3D::onSystemParametersChanged()
     const double minz = -4;
     const double maxz = 4;
 
-    /*TODO MagnitudeFunction func(system_);
+    MagnitudeFunction func(system_);
     func.setMesh(100, 100);
     func.setDomain(minx, maxx, miny, maxy);
     func.setMinZ(minz);
     func.setMaxZ(maxz);
-    func.create(*plot_);*/
+    func.create(*plot_);
 
     plot_->createCoordinateSystem(Qwt3D::Triple(minx, miny, minz), Qwt3D::Triple(maxx, maxy, maxz));
     plot_->updateGL();
@@ -96,7 +96,6 @@ void ComplexPlane3D::onSystemStructureChanged()
     const double minz = -4;
     const double maxz = 4;
 
-    /*
     double minx = std::numeric_limits<double>::max();
     double maxx = -std::numeric_limits<double>::max();
     double miny = std::numeric_limits<double>::max();
@@ -143,12 +142,12 @@ void ComplexPlane3D::onSystemStructureChanged()
 
     double largestAxis = dx;
     if (dy > largestAxis) largestAxis = dy;
-    if (dz > largestAxis) largestAxis = dz;*/
-/* TODO
+    if (dz > largestAxis) largestAxis = dz;
+
     MagnitudeFunction func(system_);
     func.setMesh(100, 100);
     func.setDomain(minx, maxx, miny, maxy);
     func.setMinZ(minz);
     func.setMaxZ(maxz);
-    func.create(*plot_);*/
+    func.create(*plot_);
 }

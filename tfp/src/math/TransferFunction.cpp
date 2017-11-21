@@ -27,27 +27,53 @@ TransferFunction::TransferFunction(const RootPolynomial& numerator,
 }
 
 // ----------------------------------------------------------------------------
-RootPolynomial& TransferFunction::numerator()
+void TransferFunction::resize(int numRoots, int numPoles)
 {
-    return numerator_;
+    numerator_.resize(numRoots);
+    denominator_.resize(numPoles);
 }
 
 // ----------------------------------------------------------------------------
-RootPolynomial& TransferFunction::denominator()
+int TransferFunction::roots() const
 {
-    return denominator_;
+    return numerator_.size();
 }
 
 // ----------------------------------------------------------------------------
-const RootPolynomial& TransferFunction::numerator() const
+int TransferFunction::poles() const
 {
-    return numerator_;
+    return denominator_.size();
 }
 
 // ----------------------------------------------------------------------------
-const RootPolynomial& TransferFunction::denominator() const
+void TransferFunction::setRoot(int index, Complex value)
 {
-    return denominator_;
+    numerator_.setRoot(index, value);
+}
+
+// ----------------------------------------------------------------------------
+void TransferFunction::setPole(int index, Complex value)
+{
+    denominator_.setRoot(index, value);
+}
+
+// ----------------------------------------------------------------------------
+void TransferFunction::setFactor(Real factor)
+{
+    numerator_.setFactor(factor);
+    denominator_.setFactor(1.0);
+}
+
+// ----------------------------------------------------------------------------
+Complex TransferFunction::root(int index) const
+{
+    return numerator_.root(index);
+}
+
+// ----------------------------------------------------------------------------
+Complex TransferFunction::pole(int index) const
+{
+    return denominator_.root(index);
 }
 
 // ----------------------------------------------------------------------------
@@ -57,7 +83,7 @@ Real TransferFunction::factor() const
 }
 
 // ----------------------------------------------------------------------------
-Complex TransferFunction::evaluate(const Complex& value) const
+Complex TransferFunction::evaluate(Complex value) const
 {
     return numerator_.evaluate(value) / denominator_.evaluate(value);
 }

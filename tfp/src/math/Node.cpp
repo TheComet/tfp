@@ -1,16 +1,13 @@
 #include "tfp/math/Connection.hpp"
 #include "tfp/math/Node.hpp"
+#include "tfp/math/Graph.hpp"
 
 using namespace tfp;
 
 // ----------------------------------------------------------------------------
-Node::Node()
-{
-}
-
-// ----------------------------------------------------------------------------
-Node::Node(const std::string& name) :
-    name_(name)
+Node::Node(Graph* owner, const std::string& name) :
+    name_(name),
+    graph_(owner)
 {
 }
 
@@ -19,6 +16,7 @@ Connection* Node::connectTo(Node* other)
 {
     outgoingConnections_.emplace_back(new Connection);
     outgoingConnections_.back()->setTargetNode(other);
+    graph_->markDirty();
     return outgoingConnections_.back().get();
 }
 
@@ -42,7 +40,10 @@ void Node::disconnectOutgoing(Node* other)
     for (ConnectionList::iterator it = outgoingConnections_.begin(); it != outgoingConnections_.end();)
     {
         if ((*it)->targetNode() == other)
+        {
             it = outgoingConnections_.erase(it);
+            graph_->markDirty();
+        }
         else
             ++it;
     }
@@ -55,7 +56,7 @@ const Node::ConnectionList& Node::outgoingConnections() const
 }
 
 // ----------------------------------------------------------------------------
-std::string Node::getName() const
+std::string Node::name() const
 {
     return name_;
 }
@@ -77,4 +78,3 @@ void Node::setPhysicalUnit(std::string unit)
 {
     physicalUnit_ = unit;
 }
-

@@ -81,21 +81,14 @@ int RootPolynomial::size() const
 }
 
 // ----------------------------------------------------------------------------
-void RootPolynomial::setRoot(int index, const Complex& root)
+void RootPolynomial::setRoot(int index, Complex root)
 {
     multiplicityDirty_ = true;
     roots_[index] = root;
 }
 
 // ----------------------------------------------------------------------------
-void RootPolynomial::setRoot(int index, Real root)
-{
-    multiplicityDirty_ = true;
-    roots_[index] = Complex(root, 0);
-}
-
-// ----------------------------------------------------------------------------
-const Complex& RootPolynomial::root(int index) const
+Complex RootPolynomial::root(int index) const
 {
     return roots_[index];
 }
@@ -190,7 +183,7 @@ CoefficientPolynomial RootPolynomial::poly() const
 }
 
 // ----------------------------------------------------------------------------
-Complex RootPolynomial::evaluate(const Complex& value) const
+Complex RootPolynomial::evaluate(Complex value) const
 {
     if (roots_.size() == 0)
         return Complex(factor_, 0);

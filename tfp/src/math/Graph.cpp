@@ -10,7 +10,8 @@ using namespace tfp;
 // ----------------------------------------------------------------------------
 Graph::Graph() :
     input_(NULL),
-    output_(NULL)
+    output_(NULL),
+    dirty_(false)
 {
 }
 
@@ -18,10 +19,15 @@ Graph::Graph() :
 Node* Graph::createNode(const char* name)
 {
     std::pair< std::unordered_map< std::string, Reference<Node> >::iterator, bool> ins
-        = nodes_.emplace(name, new Node);
+        = nodes_.emplace(name, new Node(this, name));
     if (ins.second)
         return ins.first->second.get();
     return NULL;
+}
+
+// ----------------------------------------------------------------------------
+void Graph::destroyNode(Node* node)
+{
 }
 
 // ----------------------------------------------------------------------------
@@ -38,6 +44,7 @@ void Graph::setForwardPath(Node* in, Node* out)
 {
     input_ = in;
     output_ = out;
+    markDirty();
 }
 
 // ----------------------------------------------------------------------------
@@ -110,7 +117,7 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
 }
 
 // ----------------------------------------------------------------------------
-Expression* Graph::mason() const
+void Graph::doMason()
 {
     PathList paths;
     PathList loops;
@@ -119,7 +126,7 @@ Expression* Graph::mason() const
     Expression* graphDeterminant = calculateDeterminant(loops);
     Expression* forwardGain = calculateCofactorsAndPathGains(paths, loops);
 
-    return Expression::make(op::div, forwardGain, graphDeterminant);
+    graphExpression_ = Expression::make(op::div, forwardGain, graphDeterminant);
 }
 
 // ----------------------------------------------------------------------------

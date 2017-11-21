@@ -3,7 +3,8 @@
 namespace tfp {
 
 // ----------------------------------------------------------------------------
-CoefficientPolynomial::CoefficientPolynomial()
+CoefficientPolynomial::CoefficientPolynomial() :
+    coefficients_(Eigen::Array<Real, 1, 1>::Zero())
 {
 }
 
@@ -52,25 +53,30 @@ Real CoefficientPolynomial::coefficient(int index) const
 // ----------------------------------------------------------------------------
 RootPolynomial CoefficientPolynomial::roots() const
 {
-    // Companion matrix is a square m x m matrix, where m = polynomial order
+    /*
+     * Companion matrix is a square m x m matrix, where m = polynomial order.
+     * NOTE: The size should never be less than 1.
+     */
+    assert(coefficients_.rows() > 0);
     int size = coefficients_.rows() - 1;
-    if (size < 0)
-        return RootPolynomial();
 
-    // Each coefficient is divided by this factor to make it a monic polynomial
-    Real factor = coefficients_(size);
+    /*
+     * Divide each coefficient by the highest order coefficient, making it a
+     * monic polynomial. This is important for the companion matrix to work.
+     */
+    Real cn = coefficients_(size);
+    RealVector monicCoeffs = coefficients_ / cn;
 
-    // Zero-order polynomial has no roots, but it still has a factor equal to
-    // the largest coefficient
+    /*
+     * Zero-order polynomial has no roots, but it still has a factor equal to
+     * the largest coefficient.
+     */
     if (size == 0)
-        return RootPolynomial(ComplexVector(), factor);
+        return RootPolynomial(ComplexVector(), cn);
 
+    // Build the companion matrix
     if (companionMatrix_.rows() != coefficients_.rows())
         companionMatrix_ = CompanionMatrixType::Zero(size, size);
-
-    // Has to be a monic polynomial (this is also why we pass by value instead of by const reference)
-    RealVector monicCoeffs = coefficients_ / factor;
-
     for (int row = 1; row < size; ++row)
     {
         int column = row - 1;
@@ -79,14 +85,19 @@ RootPolynomial CoefficientPolynomial::roots() const
     }
     companionMatrix_(0, size-1) = -monicCoeffs(size);
 
+    /*
+     * Solve eigenvalues of companion matrix, which should be the roots of the
+     * polynomial.
+     */
     EigensolverType solver;
     solver.compute(companionMatrix_, false);
-    return RootPolynomial(solver.eigenvalues(), factor);
+    return RootPolynomial(solver.eigenvalues(), cn);
 }
 
 // ----------------------------------------------------------------------------
-Complex CoefficientPolynomial::evaluate(const Complex& value) const
+Complex CoefficientPolynomial::evaluate(Complex value) const
 {
+    assert(0);
     return 0;
 }
 

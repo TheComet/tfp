@@ -575,8 +575,8 @@ TEST(NAME, compute_transfer_function)
     Reference<VariableTable> vt = new VariableTable;
     vt->set("a", 7.2);
     TransferFunction tf = TFManipulator::calculateTransferFunction(tfc, vt);
-    ASSERT_THAT(tf.numerator().size(), Eq(5));
-    ASSERT_THAT(tf.denominator().size(), Eq(5));
+    ASSERT_THAT(tf.roots(), Eq(5));
+    ASSERT_THAT(tf.poles(), Eq(5));
 }
 
 TEST(NAME, active_lowpass_filter)
@@ -632,6 +632,6 @@ TEST(NAME, active_lowpass_filter)
 
 
     TransferFunction tf = TFManipulator::calculateTransferFunction(tfc, vt);
-    ASSERT_THAT(tf.numerator().size(), Eq(5));
-    ASSERT_THAT(tf.denominator().size(), Eq(5));
+    ASSERT_THAT(tf.roots(), Eq(5));
+    ASSERT_THAT(tf.poles(), Eq(5));
 }

@@ -8,13 +8,13 @@
 namespace tfp {
 
 class Connection;
+class Graph;
 
 class Node : public RefCounted
 {
 public:
     typedef std::vector< Reference<Connection> > ConnectionList;
-    Node();
-    Node(const std::string& name);
+    Node(Graph* owner, const std::string& name);
 
     /*!
      * Creates a new connection between this node and another node. The connection
@@ -44,7 +44,7 @@ public:
 
     const ConnectionList& outgoingConnections() const;
 
-    std::string getName() const;
+    std::string name() const;
     void setName(std::string name);
 
     std::string getPhysicalUnit() const;
@@ -54,6 +54,7 @@ private:
     std::string name_;
     std::string physicalUnit_;
     ConnectionList outgoingConnections_;
+    Graph* graph_;
 };
 
 }

@@ -22,13 +22,18 @@ public:
     TransferFunction(const CoefficientPolynomial& numerator, const CoefficientPolynomial& denominator);
     TransferFunction(const RootPolynomial& numerator, const RootPolynomial& denominator);
 
-    RootPolynomial& numerator();
-    RootPolynomial& denominator();
-    const RootPolynomial& numerator() const;
-    const RootPolynomial& denominator() const;
+    void resize(int numRoots, int numPoles);
+    int roots() const;
+    int poles() const;
+
+    void setRoot(int index, Complex value);
+    void setPole(int index, Complex value);
+    void setFactor(Real factor);
+    Complex root(int index) const;
+    Complex pole(int index) const;
     Real factor() const;
 
-    Complex evaluate(const Complex& value) const;
+    Complex evaluate(Complex value) const;
 
     PFEResultData partialFractionExpansion(int numZeroPoles=0) const;
     void inverseLaplaceTransform(const PFEResultData& pfe, Real* outRealime, Real* outAmp, Real timeBegin, Real timeEnd, int numPoints) const;

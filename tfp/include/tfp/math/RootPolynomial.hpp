@@ -46,11 +46,9 @@ public:
     //! Returns the number of roots (**including** multiple roots)
     int size() const;
     //! Sets the value of a root at the specified index
-    void setRoot(int index, const Complex& root);
-    //! Sets the real part of the root at the specified index
-    void setRoot(int index, Real real);
+    void setRoot(int index, Complex value);
     //! Retrieves a root at the specified index.
-    const Complex& root(int index) const;
+    Complex root(int index) const;
 
     /*!
      * @brief Returns the multiplicity of the specified root. When setting the
@@ -80,7 +78,7 @@ public:
      */
     CoefficientPolynomial poly() const;
 
-    Complex evaluate(const Complex& value) const;
+    Complex evaluate(Complex value) const;
 
     friend std::ostream& operator<<(std::ostream& os, const RootPolynomial& polynomial);
     friend class UniqueRootIterator;

@@ -4,14 +4,14 @@
 #include "tfp/listeners/SystemListener.hpp"
 #include "tfp/util/Reference.hpp"
 #include "tfp/util/ListenerDispatcher.hpp"
+#include "tfp/math/Graph.hpp"
+#include "tfp/math/TransferFunction.hpp"
 #include <QVector>
 
 class QTreeWidgetItem;
 
 namespace tfp {
 
-class Graph;
-class TransferFunction;
 class SymbolicTransferFunction;
 
 class TFP_PUBLIC_API System : public RefCounted
@@ -25,9 +25,9 @@ public:
     void interestingFrequencyInterval(double* xStart, double* xEnd) const;
     void interestingTimeInterval(double* xStart, double* xEnd) const;
 
-    Graph& graph();
-    SymbolicTransferFunction& stf();
-    TransferFunction& tf();
+    const Graph& graph() const;
+    const SymbolicTransferFunction& stf() const;
+    const TransferFunction& tf() const;
 
     const QString& name() const;
 
@@ -37,6 +37,8 @@ public:
     ListenerDispatcher<SystemListener> dispatcher;
 
 private:
+    Graph graph_;
+    TransferFunction tf_;
 
     QTreeWidgetItem* dataTree_;
     QTreeWidgetItem* tfItem_;

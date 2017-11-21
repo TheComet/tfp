@@ -2,7 +2,7 @@
 
 #include "tfp/util/Reference.hpp"
 #include <vector>
-#include <unordered_map>
+#include <set>
 
 namespace tfp {
 
@@ -39,6 +39,10 @@ public:
      * @return Returns the new node object.
      */
     Node* createNode(const char* name);
+
+    /*!
+     * @brief Destroys the specified node
+     */
     void destroyNode(Node* node);
     Node* findNode(const char* name);
     void renameNode(Node* node, const char* name);
@@ -47,11 +51,15 @@ public:
 
     const PathList& paths() const;
     const PathList& loops() const;
-    Expression* mason() const;
 
+    void markDirty();
+    bool dirty() const;
+    void update();
     bool evaluatePhysicalUnitConsistencies() const;
+    Expression* expression() const;
 
 private:
+    Expression* doMason();
     void findForwardPathsAndLoops(PathList* paths, PathList* loops) const;
     void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
                                            Node* current, NodeList list) const;
@@ -67,7 +75,9 @@ private:
 private:
     Node* input_;
     Node* output_;
-    std::unordered_map< std::string, Reference<Node> > nodes_;
+    Reference<Expression> graphExpression_;
+    std::set< Reference<Node> > nodes_;
+    bool dirty_;
 };
 
 } // namespace tfp
