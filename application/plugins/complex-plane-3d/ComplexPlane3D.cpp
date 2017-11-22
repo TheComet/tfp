@@ -11,18 +11,18 @@ using namespace tfp;
 class MagnitudeFunction : public Qwt3D::Function
 {
 public:
-    MagnitudeFunction(TransferFunction* tf) :
-        tf_(tf)
+    MagnitudeFunction(System* system) :
+        system_(system)
     {
     }
 
     double operator()(double x, double y)
     {
-        return std::log10(20 * std::abs(tf_->evaluate(Complex(x, y))));
+        return std::log10(20 * std::abs(system_->tf().evaluate(Complex(x, y))));
     }
 
 private:
-    TransferFunction* tf_;
+    System* system_;
 };
 
 // ----------------------------------------------------------------------------
@@ -88,11 +88,11 @@ void ComplexPlane3D::onSystemParametersChanged()
 
 // ----------------------------------------------------------------------------
 void ComplexPlane3D::onSystemStructureChanged()
-{
-    const double minx = -5.5;
-    const double maxx = 0.5;
-    const double miny = -3;
-    const double maxy = 3;
+{/*
+    double minx = -5.5;
+    double maxx = 0.5;
+    double miny = -3;
+    double maxy = 3;*/
     const double minz = -4;
     const double maxz = 4;
 
@@ -101,18 +101,18 @@ void ComplexPlane3D::onSystemStructureChanged()
     double miny = std::numeric_limits<double>::max();
     double maxy = -std::numeric_limits<double>::max();
 
-    for (int i = 0; i != system_->numerator_.size(); ++i)
+    for (int i = 0; i != system_->tf().roots(); ++i)
     {
-        const typename Type<double>::Complex& c = system_->numerator_.root(i);
+        Complex c = system_->tf().root(i);
         if (maxx < c.real()) maxx = c.real();
         if (minx > c.real()) minx = c.real();
         if (maxy < c.imag()) maxy = c.imag();
         if (miny > c.imag()) miny = c.imag();
     }
 
-    for (int i = 0; i != system_->denominator_.size(); ++i)
+    for (int i = 0; i != system_->tf().poles(); ++i)
     {
-        const typename Type<double>::Complex& c = system_->denominator_.root(i);
+        Complex c = system_->tf().pole(i);
         if (maxx < c.real()) maxx = c.real();
         if (minx > c.real()) minx = c.real();
         if (maxy < c.imag()) maxy = c.imag();

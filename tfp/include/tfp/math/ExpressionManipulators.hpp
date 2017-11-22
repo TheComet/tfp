@@ -24,7 +24,7 @@ public:
     static Result makeError(const char* fmt, ...);
     static Result combineResults(Result a, Result b);
 
-    static Result keepCalling(Result (*optfunc)(Expression*,const char*),
+    static Result runUntilUnmodified(Result (*optfunc)(Expression*,const char*),
                                   Expression* e, const char* variable);
     static Result recursivelyCall(Result (*optfunc)(Expression*,const char*),
                                   Expression* e, const char* variable, bool* hasVariable=NULL);

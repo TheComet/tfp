@@ -1,7 +1,5 @@
 #include "tfp/math/Connection.hpp"
-#include "tfp/math/Expression.hpp"
 #include "tfp/math/Graph.hpp"
-#include "tfp/math/Node.hpp"
 #include "tfp/math/NChooseK.hpp"
 #include "tfp/math/VariableTable.hpp"
 
@@ -18,24 +16,27 @@ Graph::Graph() :
 // ----------------------------------------------------------------------------
 Node* Graph::createNode(const char* name)
 {
-    std::pair< std::unordered_map< std::string, Reference<Node> >::iterator, bool> ins
-        = nodes_.emplace(name, new Node(this, name));
-    if (ins.second)
-        return ins.first->second.get();
-    return NULL;
+    nodes_.push_back(Reference<Node>(new Node(this, name)));
+    return nodes_.back();
 }
 
 // ----------------------------------------------------------------------------
 void Graph::destroyNode(Node* node)
 {
+    for (std::vector<Reference<Node>>::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+        if (it->get() == node)
+        {
+            nodes_.erase(it);
+            return;
+        }
 }
 
 // ----------------------------------------------------------------------------
 Node* Graph::findNode(const char* name)
 {
-    std::unordered_map< std::string, Reference<Node> >::iterator it = nodes_.find(name);
-    if (it != nodes_.end())
-        return it->second.get();
+    for (std::vector<Reference<Node>>::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+        if (it->get()->name() == name)
+            return it->get();
     return NULL;
 }
 
@@ -48,20 +49,45 @@ void Graph::setForwardPath(Node* in, Node* out)
 }
 
 // ----------------------------------------------------------------------------
+const Graph::PathList& Graph::paths() const
+{
+    return paths_;
+}
+
+// ----------------------------------------------------------------------------
+const Graph::PathList& Graph::loops() const
+{
+    return loops_;
+}
+
+// ----------------------------------------------------------------------------
+void Graph::markDirty()
+{
+    dirty_ = true;
+}
+
+// ----------------------------------------------------------------------------
+bool Graph::dirty() const
+{
+    return dirty_;
+}
+
+// ----------------------------------------------------------------------------
+void Graph::update()
+{
+    updatePathsAndLoops();
+    updateGraphExpression();
+    dirty_ = false;
+}
+
+// ----------------------------------------------------------------------------
 bool Graph::evaluatePhysicalUnitConsistencies() const
 {
     return false;
 }
 
 // ----------------------------------------------------------------------------
-void Graph::findForwardPathsAndLoops(PathList* paths, PathList* loops) const
-{
-    findForwardPathsAndLoopsRecursive(paths, loops, input_, NodeList());
-}
-
-// ----------------------------------------------------------------------------
-void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
-                                              Node* current, NodeList list) const
+void Graph::findForwardPathsAndLoopsRecursive(Node* current, NodeList list)
 {
     // Reaching a node we've already passed means we've found a loop
     for (NodeList::iterator it = list.begin(); it != list.end(); ++it)
@@ -70,7 +96,7 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
             list.erase(list.begin(), it); // all nodes preceeding the one we hit aren't part of the loop
             Path path;
             nodeListToPath(&path, list);
-            loops->push_back(path);
+            loops_.push_back(path);
             return;
         }
 
@@ -82,14 +108,14 @@ void Graph::findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
     {
         Path path;
         nodeListToPath(&path, list);
-        paths->push_back(path);
+        paths_.push_back(path);
     }
 
     const Node::ConnectionList& connections = current->outgoingConnections();
     for (Node::ConnectionList::const_iterator it = connections.begin(); it != connections.end(); ++it)
     {
         Node* child = (*it)->targetNode();
-        findForwardPathsAndLoopsRecursive(paths, loops, child, list);
+        findForwardPathsAndLoopsRecursive(child, list);
     }
 }
 
@@ -117,14 +143,19 @@ void Graph::nodeListToPath(Path* path, const NodeList& nodes) const
 }
 
 // ----------------------------------------------------------------------------
-void Graph::doMason()
+void Graph::updatePathsAndLoops()
 {
-    PathList paths;
-    PathList loops;
-    findForwardPathsAndLoops(&paths, &loops);
+    paths_.clear();
+    loops_.clear();
 
-    Expression* graphDeterminant = calculateDeterminant(loops);
-    Expression* forwardGain = calculateCofactorsAndPathGains(paths, loops);
+    findForwardPathsAndLoopsRecursive(input_, NodeList());
+}
+
+// ----------------------------------------------------------------------------
+void Graph::updateGraphExpression()
+{
+    Expression* graphDeterminant = calculateDeterminant(loops_);
+    Expression* forwardGain = calculateCofactorsAndPathGains(paths_, loops_);
 
     graphExpression_ = Expression::make(op::div, forwardGain, graphDeterminant);
 }

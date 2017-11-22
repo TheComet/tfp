@@ -1,12 +1,12 @@
 #pragma once
 
+#include "tfp/math/Expression.hpp"
+#include "tfp/math/Node.hpp"
 #include "tfp/util/Reference.hpp"
 #include <vector>
-#include <set>
 
 namespace tfp {
 
-class Node;
 class Connection;
 
 /*!
@@ -45,7 +45,6 @@ public:
      */
     void destroyNode(Node* node);
     Node* findNode(const char* name);
-    void renameNode(Node* node, const char* name);
 
     void setForwardPath(Node* in, Node* out);
 
@@ -54,15 +53,20 @@ public:
 
     void markDirty();
     bool dirty() const;
+    /*!
+     * @brief Computes the graph's transfer function expression and stores it
+     * in graphExpression_. The graph is no longer dirty if this operation
+     * succeeds.
+     */
     void update();
     bool evaluatePhysicalUnitConsistencies() const;
     Expression* expression() const;
 
 private:
-    Expression* doMason();
-    void findForwardPathsAndLoops(PathList* paths, PathList* loops) const;
-    void findForwardPathsAndLoopsRecursive(PathList* paths, PathList* loops,
-                                           Node* current, NodeList list) const;
+    void updatePathsAndLoops();
+    void updateGraphExpression();
+
+    void findForwardPathsAndLoopsRecursive(Node* current, NodeList list);
     void nodeListToPath(Path* path, const NodeList& nodes) const;
     Expression* calculateConnectionGain(const Path& path) const;
     Expression* calculateDeterminant(const PathList& loops) const;
@@ -76,7 +80,9 @@ private:
     Node* input_;
     Node* output_;
     Reference<Expression> graphExpression_;
-    std::set< Reference<Node> > nodes_;
+    std::vector< Reference<Node> > nodes_;
+    PathList paths_;
+    PathList loops_;
     bool dirty_;
 };
 

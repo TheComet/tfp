@@ -24,8 +24,8 @@ ExpressionManipulator::Result ExpressionManipulator::combineResults(Result a, Re
 
 // ----------------------------------------------------------------------------
 ExpressionManipulator::Result
-ExpressionManipulator::keepCalling(Result (*optfunc)(Expression*,const char*),
-                                   Expression* e, const char* variable)
+ExpressionManipulator::runUntilUnmodified(Result (*optfunc)(Expression*,const char*),
+                                          Expression* e, const char* variable)
 {
     Result result = recursivelyCall(optfunc, e, variable);
 

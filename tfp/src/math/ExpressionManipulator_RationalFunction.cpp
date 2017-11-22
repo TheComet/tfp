@@ -13,8 +13,13 @@ ExpressionManipulator::Result TFManipulator::factorNegativeExponentsToNumerator(
 {
     if (e->isOperation(op::mul))
     {
-        return combineResults(factorNegativeExponentsToNumerator(e->left(), numerator, variable),
-                              factorNegativeExponentsToNumerator(e->right(), numerator, variable));
+        // Return if an error occurred, or if a branch was modified
+        Result lhsResult, rhsResult;
+        if ((lhsResult = factorNegativeExponentsToNumerator(e->left(), numerator, variable)) != UNMODIFIED)
+            return lhsResult;
+        if ((rhsResult = factorNegativeExponentsToNumerator(e->right(), numerator, variable)) != UNMODIFIED)
+            return rhsResult;
+        return combineResults(lhsResult, rhsResult);
     }
 
     if (e->isOperation(op::pow) == false)
@@ -39,6 +44,7 @@ inline bool logically_equal(double a, double b, double error_factor=1.0)
 ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expression* e, const char* variable)
 {
     Result result;
+    e->dump("wtf.dot");
 
     /*
      * Create the "split" operator, i.e. this is the expression that splits the
@@ -55,8 +61,8 @@ ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expr
      * denominator without having to deal with lots of edge cases.
      */
     result = combineResults(
-        recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->left(), variable),
-        recursivelyCall(&TFManipulator::eliminateDivisionsAndSubtractions, split->right(), variable)
+        runUntilUnmodified(&eliminateDivisionsAndSubtractions, split->left(), variable),
+        runUntilUnmodified(&eliminateDivisionsAndSubtractions, split->right(), variable)
     );
 
     /*
@@ -64,24 +70,31 @@ ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expr
      * constant RHS. If not, error out, because such an expression cannot be
      * reduced to a rational function.
      */
-    ExpressionOptimiser optimise;
     while (true)
     {
-        while (recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split->right(), variable)) {}
-        while (recursivelyCall(&TFManipulator::expand, split->right(), variable)) {}
-        optimise.constants(split->right());
-        optimise.uselessOperations(split->right());
+        e->dump("wtf.dot", true);
+        runUntilUnmodified(&expandConstantExponentsIntoProducts, split->right(), variable);
+        e->dump("wtf.dot", true);
+        runUntilUnmodified(&expand, split->right(), variable);
+        e->dump("wtf.dot", true);
+        ExpressionOptimiser::constants(split->right());
+        ExpressionOptimiser::uselessOperations(split->right());
 
-        while (recursivelyCall(&TFManipulator::factorNegativeExponents, split->right(), variable)) {}
+        runUntilUnmodified(&factorNegativeExponents, split->right(), variable);
+        e->dump("wtf.dot", true);
 
-        if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == false)
-            break;
+        if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == MODIFIED)
+            continue;
+
+        break;
     }
 
-    while (optimise.uselessOperations(split->left()) |
-           recursivelyCall(&TFManipulator::expandConstantExponentsIntoProducts, split, variable) |
-           recursivelyCall(&TFManipulator::expand, split, variable))
+    while (ExpressionOptimiser::uselessOperations(split->left()) |
+           runUntilUnmodified(&expandConstantExponentsIntoProducts, split, variable) |
+           runUntilUnmodified(&expand, split, variable))
     {}
+
+    return result;
 }
 
 // ----------------------------------------------------------------------------
