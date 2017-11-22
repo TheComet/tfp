@@ -83,7 +83,12 @@ ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expr
         runUntilUnmodified(&factorNegativeExponents, split->right(), variable);
         e->dump("wtf.dot", true);
 
-        if (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == MODIFIED)
+        bool needToContinue = false;
+        while (factorNegativeExponentsToNumerator(split->right(), split->left(), variable) == MODIFIED)
+        {
+            needToContinue = true;
+        }
+        if (needToContinue)
             continue;
 
         break;

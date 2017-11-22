@@ -19,6 +19,15 @@ ExpressionManipulator::Result ExpressionManipulator::makeError(const char* fmt, 
 // ----------------------------------------------------------------------------
 ExpressionManipulator::Result ExpressionManipulator::combineResults(Result a, Result b)
 {
+    /*
+     * Same as writing:
+     *
+     *   if (a == MODIFIED || b == MODIFIED)
+     *       return MODIFIED;
+     *   if (a == ERROR || b == ERROR)
+     *       return ERROR;
+     *   return UNMODIFIED;
+     */
     return a == b ? a : UNMODIFIED;
 }
 
@@ -27,11 +36,13 @@ ExpressionManipulator::Result
 ExpressionManipulator::runUntilUnmodified(Result (*optfunc)(Expression*,const char*),
                                           Expression* e, const char* variable)
 {
-    Result result = recursivelyCall(optfunc, e, variable);
+    Result result, newResult;
 
-    while (result == MODIFIED)
+    result = newResult = recursivelyCall(optfunc, e, variable);
+    while (newResult == MODIFIED)
     {
-        result = combineResults(result, recursivelyCall(optfunc, e, variable));
+        result = combineResults(result, newResult);
+        newResult = recursivelyCall(optfunc, e, variable);
     }
 
     return result;
@@ -46,12 +57,20 @@ ExpressionManipulator::recursivelyCall(Result (*optfunc)(Expression*,const char*
     bool childHadVariable = false;
 
     if (e->left())
+    {
         if ((lhsResult = recursivelyCall(optfunc, e->left(), variable, &childHadVariable)) == ERROR)
             return ERROR;
+    }
+    else
+        lhsResult = UNMODIFIED;
 
     if (e->right())
+    {
         if ((rhsResult = recursivelyCall(optfunc, e->right(), variable, &childHadVariable)) == ERROR)
             return ERROR;
+    }
+    else
+        rhsResult = UNMODIFIED;
 
     /*
      * Only manipulate branches that are an ancestor of an expression with the
@@ -219,14 +238,10 @@ ExpressionManipulator::Result ExpressionManipulator::factorIn(Expression* e, Exp
 
     if (e->isOperation(op::add))
     {
-
-        Result leftResult  = factorIn(e->left(), toFactor, ignore);
-        Result rightResult = factorIn(e->right(), toFactor, ignore);
-        if (leftResult == ERROR || rightResult == ERROR)
-            return ERROR;
-        if (leftResult == MODIFIED || rightResult == MODIFIED)
-            return MODIFIED;
-        return UNMODIFIED;
+        return combineResults(
+            factorIn(e->left(), toFactor, ignore),
+            factorIn(e->right(), toFactor, ignore)
+        );
     }
     else
     {
@@ -303,8 +318,8 @@ ExpressionManipulator::Result ExpressionManipulator::expand(Expression* e, const
     e->parent()->set(op::add, e, Expression::make(op::mul, factorInOther, e->right()));
     e->set(op::mul, factorInThis, e->left());
 
-    recursivelyCall(&ExpressionManipulator::expand, factorInThis, variable);
-    recursivelyCall(&ExpressionManipulator::expand, factorInOther, variable);
-
-    return MODIFIED;
+    return combineResults(MODIFIED, combineResults(
+        recursivelyCall(&expand, factorInOther, variable),
+        recursivelyCall(&expand, factorInThis, variable)
+    ));
 }
