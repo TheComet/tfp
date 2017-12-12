@@ -62,8 +62,9 @@ enum eDragState
 /**
  * Private data class of CDockWidgetTitleBar class (pimpl)
  */
-struct DockWidgetTitleBarPrivate
+class DockWidgetTitleBarPrivate
 {
+public:
 	CDockWidgetTitleBar* _this;
 	CDockWidget* DockWidget;
 	QLabel* IconLabel;

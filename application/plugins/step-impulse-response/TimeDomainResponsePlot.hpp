@@ -2,15 +2,15 @@
 
 #include "tfp/config.hpp"
 #include "tfp/plugin/Tool.hpp"
-#include "tfp/math/TransferFunction.hxx"
+#include "tfp/math/TransferFunction.hpp"
 
 class QwtPlotCurve;
 
 namespace tfp {
+    class RealtimePlot;
+}
 
-class RealtimePlot;
-
-class TimeDomainResponsePlot : public Tool
+class TimeDomainResponsePlot : public tfp::Tool
 {
 public:
     explicit TimeDomainResponsePlot(QWidget* parent=NULL);
@@ -19,14 +19,12 @@ public:
     virtual void autoScale() OVERRIDE;
 
 protected:
-    virtual TransferFunction<double>::PFEResultData doPartialFractionExpansion() = 0;
+    virtual tfp::TransferFunction::PFEResultData doPartialFractionExpansion() = 0;
     virtual void onSetSystem() OVERRIDE {}
     virtual void onSystemParametersChanged() OVERRIDE;
     virtual void onSystemStructureChanged() OVERRIDE;
 
 private:
-    RealtimePlot* plot_;
+    tfp::RealtimePlot* plot_;
     QwtPlotCurve* curve_;
 };
-
-}

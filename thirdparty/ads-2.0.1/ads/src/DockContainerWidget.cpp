@@ -69,8 +69,9 @@ static void insertWidgetIntoSplitter(QSplitter* Splitter, QWidget* widget, bool 
 /**
  * Private data class of CDockContainerWidget class (pimpl)
  */
-struct DockContainerWidgetPrivate
+class DockContainerWidgetPrivate
 {
+public:
 	CDockContainerWidget* _this;
 	QPointer<CDockManager> DockManager;
 	unsigned int zOrderIndex = 0;

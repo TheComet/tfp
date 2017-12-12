@@ -94,9 +94,9 @@ ExpressionManipulator::Result TFManipulator::manipulateIntoRationalFunction(Expr
         break;
     }
 
-    while (ExpressionOptimiser::uselessOperations(split->left()) |
-           runUntilUnmodified(&expandConstantExponentsIntoProducts, split, variable) |
-           runUntilUnmodified(&expand, split, variable))
+    while (ExpressionOptimiser::uselessOperations(split->left()) == true ||
+           recursivelyCall(&expandConstantExponentsIntoProducts, split, variable) == MODIFIED ||
+           recursivelyCall(&expand, split, variable) == MODIFIED)
     {}
 
     return result;

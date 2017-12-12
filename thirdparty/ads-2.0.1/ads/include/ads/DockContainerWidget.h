@@ -37,7 +37,7 @@
 
 namespace ads
 {
-struct DockContainerWidgetPrivate;
+class DockContainerWidgetPrivate;
 class CDockAreaWidget;
 class CDockWidget;
 class CDockManager;

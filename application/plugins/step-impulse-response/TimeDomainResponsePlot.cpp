@@ -5,12 +5,12 @@
 #include <qwt_plot_curve.h>
 #include <QVBoxLayout>
 
-namespace tfp {
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 TimeDomainResponsePlot::TimeDomainResponsePlot(QWidget* parent) :
     Tool(parent),
-    plot_(new RealtimePlot),
+    plot_(new tfp::RealtimePlot),
     curve_(new QwtPlotCurve)
 {
     setLayout(new QVBoxLayout);
@@ -55,6 +55,4 @@ void TimeDomainResponsePlot::onSystemParametersChanged()
 void TimeDomainResponsePlot::onSystemStructureChanged()
 {
     autoScale();
-}
-
 }

@@ -53,8 +53,9 @@ namespace ads
 /**
  * Private data class of CDockWidget class (pimpl)
  */
-struct DockWidgetPrivate
+class DockWidgetPrivate
 {
+public:
 	CDockWidget* _this;
 	QBoxLayout* Layout;
 	QWidget* Widget = nullptr;

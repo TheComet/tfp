@@ -36,7 +36,7 @@ namespace ads
 {
 class CDockWidget;
 class CDockAreaWidget;
-struct DockWidgetTitleBarPrivate;
+class DockWidgetTitleBarPrivate;
 
 /**
  * A dock widget title bar that shows a title and an icon

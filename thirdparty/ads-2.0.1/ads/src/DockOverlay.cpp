@@ -191,8 +191,9 @@ QWidget* createDropIndicatorWidget(DockWidgetArea DockWidgetArea,
 /**
  * Private data class of CDockOverlay
  */
-struct DockOverlayPrivate
+class DockOverlayPrivate
 {
+public:
 	CDockOverlay* _this;
 	DockWidgetAreas AllowedAreas = InvalidDockWidgetArea;
 	CDockOverlayCross* Cross;
@@ -212,8 +213,9 @@ struct DockOverlayPrivate
 /**
  * Private data of CDockOverlayCross class
  */
-struct DockOverlayCrossPrivate
+class DockOverlayCrossPrivate
 {
+public:
 	CDockOverlayCross* _this;
 	CDockOverlay::eMode Mode = CDockOverlay::ModeDockAreaOverlay;
 	CDockOverlay* DockOverlay;

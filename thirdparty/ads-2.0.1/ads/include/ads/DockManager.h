@@ -35,7 +35,7 @@
 
 namespace ads
 {
-struct DockManagerPrivate;
+class DockManagerPrivate;
 class CFloatingDockContainer;
 class CDockContainerWidget;
 class CDockOverlay;

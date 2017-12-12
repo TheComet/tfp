@@ -41,12 +41,12 @@ target_link_libraries (tfp_application tfp)
 # plugins
 ###############################################################################
 
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/bode-plot")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/butterworth-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/chebyshev-filter")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/complex-plane-3d")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/bode-plot")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/butterworth-filter")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/chebyshev-filter")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/complex-plane-3d")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/dpsfg")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/elliptic-filter")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/elliptic-filter")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/pole-zero-plot")
-add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/std-low-order-filters")
+#add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/std-low-order-filters")
 add_subdirectory ("${CMAKE_CURRENT_LIST_DIR}/plugins/step-impulse-response")

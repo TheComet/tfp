@@ -193,8 +193,9 @@ protected:
 /**
  * Private data class of CDockAreaWidget class (pimpl)
  */
-struct DockAreaWidgetPrivate
+class DockAreaWidgetPrivate
 {
+public:
 	CDockAreaWidget* _this;
 	QBoxLayout* Layout;
 	QFrame* TitleBar;

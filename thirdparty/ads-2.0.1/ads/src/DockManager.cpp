@@ -53,8 +53,9 @@ namespace ads
 /**
  * Private data class of CDockManager class (pimpl)
  */
-struct DockManagerPrivate
+class DockManagerPrivate
 {
+public:
 	CDockManager* _this;
 	QList<CFloatingDockContainer*> FloatingWidgets;
 	QList<CDockContainerWidget*> Containers;

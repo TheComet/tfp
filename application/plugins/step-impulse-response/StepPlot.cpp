@@ -1,7 +1,7 @@
 #include "StepPlot.hpp"
 #include "tfp/math/System.hpp"
 
-namespace tfp {
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 StepPlot::StepPlot(QWidget* parent) :
@@ -10,9 +10,7 @@ StepPlot::StepPlot(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-TransferFunction<double>::PFEResultData StepPlot::doPartialFractionExpansion()
+TransferFunction::PFEResultData StepPlot::doPartialFractionExpansion()
 {
-    return system_->partialFractionExpansion(1);
-}
-
+    return system_->tf().partialFractionExpansion(1);
 }

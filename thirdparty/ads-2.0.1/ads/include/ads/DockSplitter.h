@@ -33,7 +33,7 @@
 
 namespace ads
 {
-struct DockSplitterPrivate;
+class DockSplitterPrivate;
 
 /**
  * Splitter used internally instead of QSplitter

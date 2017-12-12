@@ -62,6 +62,7 @@ public:
     static Expression* make(double value);
     static Expression* make(op::Op1 func, Expression* rhs);
     static Expression* make(op::Op2 func, Expression* lhs, Expression* rhs);
+    static Expression* makeInfinity();
 
     void copyDataFrom(const Expression* other);
     void stealDataFrom(Expression* other);

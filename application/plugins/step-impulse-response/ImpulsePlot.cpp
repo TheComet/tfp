@@ -1,7 +1,7 @@
 #include "ImpulsePlot.hpp"
 #include "tfp/math/System.hpp"
 
-namespace tfp {
+using namespace tfp;
 
 // ----------------------------------------------------------------------------
 ImpulsePlot::ImpulsePlot(QWidget* parent) :
@@ -10,9 +10,7 @@ ImpulsePlot::ImpulsePlot(QWidget* parent) :
 }
 
 // ----------------------------------------------------------------------------
-TransferFunction<double>::PFEResultData ImpulsePlot::doPartialFractionExpansion()
+tfp::TransferFunction::PFEResultData ImpulsePlot::doPartialFractionExpansion()
 {
-    return system_->partialFractionExpansion(0);
-}
-
+    return system_->tf().partialFractionExpansion(0);
 }

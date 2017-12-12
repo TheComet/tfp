@@ -33,7 +33,7 @@
 
 namespace ads
 {
-struct FloatingDockContainerPrivate;
+class FloatingDockContainerPrivate;
 class CDockAreaWidget;
 class CDockContainerWidget;
 class CDockWidget;

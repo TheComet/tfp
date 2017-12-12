@@ -52,8 +52,9 @@ static unsigned int zOrderCounter = 0;
 /**
  * Private data class of CFloatingDockContainer class (pimpl)
  */
-struct FloatingDockContainerPrivate
+class FloatingDockContainerPrivate
 {
+public:
 	CFloatingDockContainer* _this;
 	CDockContainerWidget* DockContainer;
 	unsigned int zOrderIndex = ++zOrderCounter;

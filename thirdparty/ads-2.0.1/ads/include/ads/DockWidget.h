@@ -35,12 +35,12 @@
 
 namespace ads
 {
-struct DockWidgetPrivate;
+class DockWidgetPrivate;
 class CDockWidgetTitleBar;
 class CDockManager;
 class CDockContainerWidget;
 class CDockAreaWidget;
-struct DockContainerWidgetPrivate;
+class DockContainerWidgetPrivate;
 
 /**
  * The QDockWidget class provides a widget that can be docked inside a

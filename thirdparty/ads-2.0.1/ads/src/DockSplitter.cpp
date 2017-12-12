@@ -39,8 +39,9 @@ namespace ads
 /**
  * Private dock splitter data
  */
-struct DockSplitterPrivate
+class DockSplitterPrivate
 {
+public:
 	CDockSplitter* _this;
 	int VisibleContentCount = 0;
 

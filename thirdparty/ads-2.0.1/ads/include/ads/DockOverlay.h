@@ -32,7 +32,7 @@ class QGridLayout;
 
 namespace ads
 {
-struct DockOverlayPrivate;
+class DockOverlayPrivate;
 class CDockOverlayCross;
 
 /*!
@@ -107,7 +107,7 @@ protected:
 };
 
 
-struct DockOverlayCrossPrivate;
+class DockOverlayCrossPrivate;
 /*!
  * DockOverlayCross shows a cross with 5 different drop area possibilities.
  * I could have handled everything inside DockOverlay, but because of some

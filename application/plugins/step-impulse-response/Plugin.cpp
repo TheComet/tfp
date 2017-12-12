@@ -6,7 +6,7 @@ extern "C" {
 
 bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree)
 {
-    if (plugin->registerTool<tfp::ImpulsePlot>(
+    if (plugin->registerTool<ImpulsePlot>(
         tfp::Plugin::VISUALISER,
         tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
         "Impulse Response",
@@ -16,7 +16,7 @@ bool start_plugin(tfp::Plugin* plugin, tfp::DataTreeView* dataTree)
 
     ) == false) return false;
 
-    if (plugin->registerTool<tfp::StepPlot>(
+    if (plugin->registerTool<StepPlot>(
         tfp::Plugin::VISUALISER,
         tfp::Plugin::LTI_SYSTEM_CONTINUOUS,
         "Step Response",

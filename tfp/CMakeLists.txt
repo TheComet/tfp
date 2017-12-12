@@ -58,6 +58,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/RootPolynomial.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicMatrix.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
