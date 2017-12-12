@@ -12,7 +12,7 @@ class VariableTable;
 /*!
  * @brief Provides a method to perform matrix/vector math symbolically.
  */
-class const SymbolicMatrix&
+class SymbolicMatrix
 {
 public:
     typedef std::vector< Reference<Expression> > ExpressionList;
@@ -22,7 +22,14 @@ public:
     SymbolicMatrix(const SymbolicMatrix& other);
 
     SymbolicMatrix& operator=(SymbolicMatrix other);
-    friend void swap(SymbolicMatrix& a, SymbolicMatrix& b);
+    friend void swap(SymbolicMatrix& a, SymbolicMatrix& b)
+    {
+        using std::swap;
+
+        swap(a.rows_, b.rows_);
+        swap(a.columns_, b.columns_);
+        swap(a.entries_, b.entries_);
+    }
 
     /*!
      * @brief Resizes the matrix. Existing entries are unchanged, so long as
@@ -63,18 +70,18 @@ public:
      * @brief Calculates the determinant of the matrix symbolically.
      */
     Expression* determinant() const;
-    SymboliMatrix inverse() const;
+    SymbolicMatrix inverse() const;
     SymbolicMatrix transpose() const;
 
 private:
-    void applyOperationToEveryEntry(Op::op2, Expression* e);
+    SymbolicMatrix applyOperationToEveryEntry(op::Op2, Expression* e);
     Expression* determinantNoOptimisation() const;
     Expression* determinant2x2() const;
     Expression* determinant3x3() const;
     Expression* determinantNxN() const;
-    SymbolicMatrix invert2x2() const;
-    SymbolicMatrix invert3x3() const;
-    SymbolicMatrix invertNxN() const;
+    SymbolicMatrix inverse2x2() const;
+    SymbolicMatrix inverse3x3() const;
+    SymbolicMatrix inverseNxN() const;
 
     int rows_;
     int columns_;
