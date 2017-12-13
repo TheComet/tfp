@@ -33,12 +33,12 @@ SymbolicMatrix::SymbolicMatrix() :
 }
 
 // ----------------------------------------------------------------------------
-SymbolicMatrix::SymbolicMatrix(int rows, int columns) :
-    rows_(rows),
-    columns_(columns),
-    entries_(rows * columns)
-{
-}
+//SymbolicMatrix::SymbolicMatrix(int rows, int columns) :
+//    rows_(rows),
+//    columns_(columns),
+//    entries_(rows * columns)
+//{
+//}
 
 // ----------------------------------------------------------------------------
 SymbolicMatrix::SymbolicMatrix(const SymbolicMatrix& other) :
@@ -68,7 +68,7 @@ void SymbolicMatrix::resize(int rows, int columns)
         {
             if (row >= rows || column >= columns)
                 continue;
-            target[row*rows+column] = entries_[row*rows_+column];
+            target[row*columns+column] = entries_[row*columns_+column];
         }
 
     entries_ = target;
@@ -102,28 +102,28 @@ void SymbolicMatrix::fillIdentity()
         for (int column = 0; column != columns_; ++column)
         {
             if (row == column)
-                entries_[row*rows_+column] = Expression::make(1.0);
+                entries_[row*columns_+column] = Expression::make(1.0);
             else
-                entries_[row*rows_+column] = Expression::make(0.0);
+                entries_[row*columns_+column] = Expression::make(0.0);
         }
 }
 
 // ----------------------------------------------------------------------------
 void SymbolicMatrix::setEntry(int row, int column, const char* expression)
 {
-    entries_[row*rows_+column] = Expression::parse(expression);
+    entries_[row*columns_+column] = Expression::parse(expression);
 }
 
 // ----------------------------------------------------------------------------
 void SymbolicMatrix::setEntry(int row, int column, Expression* e)
 {
-    entries_[row*rows_+column] = e;
+    entries_[row*columns_+column] = e;
 }
 
 // ----------------------------------------------------------------------------
 Expression* SymbolicMatrix::entry(int row, int column)
 {
-    return entries_[row*rows_+column];
+    return entries_[row*columns_+column];
 }
 
 // ----------------------------------------------------------------------------
@@ -177,20 +177,20 @@ SymbolicMatrix SymbolicMatrix::mul(const SymbolicMatrix& other)
     for (int row = 0; row != rows_; ++row)
         for (int column = 0; column != other.columns_; ++column)
         {
-            ret.entries_[row*rows_+column] = Expression::make(op::mul,
-                    entries_[row*rows_]->clone(),
+            ret.entries_[row*other.columns_+column] = Expression::make(op::mul,
+                    entries_[row*columns_]->clone(),
                     other.entries_[column]->clone());
 
             for (int off = 1; off < columns_; ++off)
             {
-                ret.entries_[row*rows_+column] = Expression::make(op::add,
-                        ret.entries_[row*rows_+column],
+                ret.entries_[row*other.columns_+column] = Expression::make(op::add,
+                        ret.entries_[row*other.columns_+column],
                         Expression::make(op::mul,
-                                entries_[row*rows_+off]->clone(),
-                                other.entries_[other.rows_*off+column]->clone()));
+                                entries_[row*columns_+off]->clone(),
+                                other.entries_[off*other.columns_+column]->clone()));
             }
 
-            ExpressionOptimiser::everything(ret.entries_[row*rows_+column]);
+            ExpressionOptimiser::everything(ret.entries_[row*other.columns_+column]);
         }
 
     return ret;
@@ -233,7 +233,7 @@ Expression* SymbolicMatrix::determinantNoOptimisation() const
         case 1 : return entries_[0]->clone(); break;
         case 2 : return determinant2x2();     break;
         case 3 : return determinant3x3();     break;
-        default: return determinantNxN();      break;
+        default: return determinantNxN();     break;
     }
 }
 
@@ -305,7 +305,47 @@ Expression* SymbolicMatrix::determinant3x3() const
 // ----------------------------------------------------------------------------
 Expression* SymbolicMatrix::determinantNxN() const
 {
-    return NULL;
+    // Reached the end of recursion
+    if (rows_ == 3)
+        return determinant3x3();
+    if (rows_ == 2)
+        return determinant2x2();
+
+    Expression* result = NULL;
+    SymbolicMatrix minorM(rows_ - 1, columns_ - 1);
+    op::Op2 toggleOp = op::add;
+    for (int skip = 0; skip != columns_; ++skip)
+    {
+        /*
+         * Copy the correct expressions into the minor matrix (skipping the
+         * current column and row 0. See Wikipedia on determinants if this
+         * makes no sense.
+         */
+        int minorIdx = 0;
+        for (int column = 0; column != columns_; ++column)
+        {
+            if (column == skip)
+                continue;
+            for (int row = 1; row != rows_; ++row)
+                minorM.entries_[minorIdx++] = entries_[row*columns_+column];
+        }
+
+        /*
+         * By multiplying the skipped entry in row 0 with the determinant of
+         * the minor matrix and summing all of those results together, we
+         * obtain the determinant of the entire matrix.
+         */
+        if (result == NULL)
+            result = Expression::make(op::mul, entries_[skip], minorM.determinantNxN());
+        else
+            result = Expression::make(toggleOp, result,
+                Expression::make(op::mul, entries_[skip], minorM.determinantNxN()));
+
+        // Subdeterminants alternates between adding and subtracting
+        toggleOp = toggleOp == op::add ? op::sub : op::add;
+    }
+
+    return result;
 }
 
 // ----------------------------------------------------------------------------

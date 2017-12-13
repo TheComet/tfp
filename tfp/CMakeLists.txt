@@ -111,6 +111,7 @@ if (TFP_BUILD_TESTS)
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp")
     add_executable (test_all
         "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_all.cpp")

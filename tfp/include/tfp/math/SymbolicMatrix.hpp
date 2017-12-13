@@ -18,8 +18,23 @@ public:
     typedef std::vector< Reference<Expression> > ExpressionList;
 
     SymbolicMatrix();
-    SymbolicMatrix(int rows, int columns);
     SymbolicMatrix(const SymbolicMatrix& other);
+
+    template <class... T>
+    SymbolicMatrix(int rows, int columns, T&&... entries) :
+        rows_(rows),
+        columns_(columns),
+        entries_(rows*columns)
+    {
+        setEntry(std::forward<T>(entries)...);
+    }
+
+    SymbolicMatrix(int rows, int columns) :
+        rows_(rows),
+        columns_(columns),
+        entries_(rows*columns)
+    {
+    }
 
     SymbolicMatrix& operator=(SymbolicMatrix other);
     friend void swap(SymbolicMatrix& a, SymbolicMatrix& b)
@@ -52,8 +67,22 @@ public:
      */
     void fillIdentity();
 
+    template <class A, class... B>
+    void setEntry(A&& arg, B&&... args)
+    {
+        entries_[rows_*columns_ - sizeof...(B) - 1] = Expression::make(arg);
+        setEntry(std::forward<B>(args)...);
+    }
+
+    template <class A>
+    void setEntry(A&& arg)
+    {
+        entries_[rows_*columns_ - 1] = Expression::make(arg);
+    }
+
     void setEntry(int row, int column, const char* expression);
     void setEntry(int row, int column, Expression* e);
+    void setEntry(int row, int column, double value);
     Expression* entry(int row, int column);
 
     SymbolicMatrix add(const SymbolicMatrix& other);
