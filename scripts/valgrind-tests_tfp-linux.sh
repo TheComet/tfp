@@ -8,5 +8,5 @@ valgrind --num-callers=50 \
 	--track-origins=yes \
 	--time-stamp=yes \
 	--suppressions=../../scripts/valgrind-suppressions.supp \
-	./test_tfp --gtest_filter="SymbolicMatrix.determinant_of_8x8" 2>&1 | tee ../../tfp_tests_grind.out
+	./tfp-application 2>&1 | tee ../../app_grind.out
 cd .. && cd ..

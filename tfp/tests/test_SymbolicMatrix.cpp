@@ -16,6 +16,79 @@ struct MockTearListener : public TearListener
     MOCK_METHOD1(onTears, void(const char*));
 };
 
+static SymbolicMatrix generateSym8x8()
+{
+    SymbolicMatrix m(8, 8);
+    static const char* syms = "abcdefgh";
+    char buf[3] = {0};
+    for (int r = 0; r != 8; ++r)
+        for (int c = 0; c != 8; ++c)
+        {
+            buf[0] = syms[r];
+            buf[1] = syms[c];
+            m.setEntry(r, c, buf);
+        }
+
+    return m;
+}
+
+static VariableTable* generate8x8VariableTable()
+{
+    static const char* syms = "abcdefgh";
+    char buf[3] = {0};
+    VariableTable* vt = new VariableTable;
+
+    /*
+     * These values were chosen such that
+     *    det(m) = 0.0607754383633464
+     */
+    double value1 = 1;
+    double value2 = 1;
+    for (int r = 0; r != 8; ++r)
+        for (int c = 0; c != 8; ++c)
+        {
+            buf[0] = syms[r];
+            buf[1] = syms[c];
+
+            if (r == c)
+            {
+                vt->set(buf, value1);
+                value1 += (value1 * 0.02) + 0.01;
+            }
+            else
+            {
+                vt->set(buf, value2);
+                value2 -= (value2 * 0.02) + 0.01;
+            }
+        }
+
+    return vt;
+}
+
+static void substitute8x8WithValues(SymbolicMatrix* m)
+{
+    Reference<VariableTable> vt = generate8x8VariableTable();
+    for (int r = 0; r != 8; ++r)
+        for (int c = 0; c != 8; ++c)
+        {
+            m->entry(r, c)->insertSubstitutions(vt);
+            m->entry(r, c)->optimise();
+        }
+}
+
+static SymbolicMatrix generateValue8x8()
+{
+    /*
+     * These values were chosen such that
+     *    det(m) = 0.0607754383633464
+     */
+    SymbolicMatrix m = generateSym8x8();
+    substitute8x8WithValues(&m);
+    return m;
+
+    return m;
+}
+
 TEST(NAME, construct_with_size)
 {
     SymbolicMatrix m(4, 7);
@@ -67,9 +140,9 @@ TEST(NAME, change_entry)
 
 TEST(NAME, set_entries_variadic)
 {
-    SymbolicMatrix m1(2, 2);
-    m1.setEntry(1, 2,
-                3, 4);
+    SymbolicMatrix m1(2, 2,
+        1, 2,
+        3, 4);
     ASSERT_THAT(m1.entry(0, 0)->value(), DoubleEq(1));
     ASSERT_THAT(m1.entry(0, 1)->value(), DoubleEq(2));
     ASSERT_THAT(m1.entry(1, 0)->value(), DoubleEq(3));
@@ -259,15 +332,12 @@ TEST(NAME, determinant_of_3x3)
     ASSERT_THAT(e->value(), DoubleEq(-306));
 }
 
-TEST(NAME, determinant_of_4x4)
+TEST(NAME, determinant_of_8x8)
 {
-    Reference<Expression> e = SymbolicMatrix(4, 4,
-        3,  2, -1,  4,
-        2,  1,  5,  7,
-        0,  5,  2, -6,
-       -1,  2,  1,  0
-    ).determinant();
-    ASSERT_THAT(e->value(), DoubleEq(-418));
+    SymbolicMatrix m = generateValue8x8();
+
+    Reference<Expression> e = generateValue8x8().determinant();
+    ASSERT_THAT(e->value(), DoubleNear(0.0607754383633464, std::numeric_limits<double>::epsilon()));
 }
 
 TEST(NAME, determinant_of_non_square_matrix_fails)
@@ -311,4 +381,29 @@ TEST(NAME, inverse_of_3x3)
             else
                 EXPECT_THAT(m.entry(r, c)->value(), DoubleNear(0, std::numeric_limits<double>::epsilon()));
         }
+}
+
+TEST(NAME, inverse_of_8x8)
+{
+    SymbolicMatrix m = generateValue8x8();
+
+    m = m.inverse().mul(m);
+    for (int r = 0; r != 8; ++r)
+        for (int c = 0; c != 8; ++c)
+        {
+            const double absError = std::numeric_limits<double>::epsilon() * 20;
+            if (r == c)
+                EXPECT_THAT(m.entry(r, c)->value(), DoubleNear(1, absError));
+            else
+                EXPECT_THAT(m.entry(r, c)->value(), DoubleNear(0, absError));
+        }
+}
+
+TEST(NAME, inverse_accuracy_symbolic)
+{
+    SymbolicMatrix m = generateSym8x8();
+    m = m.inverse().mul(m);
+    m.entry(0, 0)->dump("wtf.dot");
+    substitute8x8WithValues(&m);
+    std::cout << m << std::endl;
 }

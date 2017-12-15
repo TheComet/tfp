@@ -2,6 +2,39 @@
 #include "tfp/util/Tears.hpp"
 #include "tfp/math/ExpressionOptimiser.hpp"
 
+#include <iostream>
+
+namespace tfp {
+
+// ----------------------------------------------------------------------------
+void swap(tfp::SymbolicMatrix& a, tfp::SymbolicMatrix& b)
+{
+    using std::swap;
+
+    swap(a.rows_, b.rows_);
+    swap(a.columns_, b.columns_);
+    swap(a.entries_, b.entries_);
+}
+
+// ----------------------------------------------------------------------------
+std::ostream& operator<<(std::ostream& stream, const tfp::SymbolicMatrix& m)
+{
+    for (int c = 0; c != m.columns(); ++c)
+    {
+        for (int r = 0; r != m.rows(); ++r)
+        {
+            stream << m.entry(r, c)->evaluate();
+            if (r < m.rows() - 1)
+                stream << " ";
+        }
+        if (c < m.columns() - 1)
+            stream << "\n";
+    }
+    return stream;
+}
+
+}
+
 using namespace tfp;
 
 #define REQUIRE_SAME_SIZE(OTHER, RET) do { \
@@ -33,12 +66,12 @@ SymbolicMatrix::SymbolicMatrix() :
 }
 
 // ----------------------------------------------------------------------------
-//SymbolicMatrix::SymbolicMatrix(int rows, int columns) :
-//    rows_(rows),
-//    columns_(columns),
-//    entries_(rows * columns)
-//{
-//}
+SymbolicMatrix::SymbolicMatrix(int rows, int columns) :
+    rows_(rows),
+    columns_(columns),
+    entries_(rows * columns)
+{
+}
 
 // ----------------------------------------------------------------------------
 SymbolicMatrix::SymbolicMatrix(const SymbolicMatrix& other) :
@@ -121,7 +154,7 @@ void SymbolicMatrix::setEntry(int row, int column, Expression* e)
 }
 
 // ----------------------------------------------------------------------------
-Expression* SymbolicMatrix::entry(int row, int column)
+Expression* SymbolicMatrix::entry(int row, int column) const
 {
     return entries_[row*columns_+column];
 }
@@ -135,7 +168,7 @@ SymbolicMatrix SymbolicMatrix::add(const SymbolicMatrix& other)
     for (int i = 0; i != rows_*columns_; ++i)
     {
         ret.entries_[i] = Expression::make(op::add, entries_[i]->clone(), other.entries_[i]->clone());
-        ExpressionOptimiser::everything(ret.entries_[i]);
+        ret.entries_[i]->optimise();
     }
 
     return ret;
@@ -156,7 +189,7 @@ SymbolicMatrix SymbolicMatrix::sub(const SymbolicMatrix& other)
     for (int i = 0; i != rows_*columns_; ++i)
     {
         ret.entries_[i] = Expression::make(op::sub, entries_[i]->clone(), other.entries_[i]->clone());
-        ExpressionOptimiser::everything(ret.entries_[i]);
+        ret.entries_[i]->optimise();
     }
 
     return ret;
@@ -190,7 +223,7 @@ SymbolicMatrix SymbolicMatrix::mul(const SymbolicMatrix& other)
                                 other.entries_[off*other.columns_+column]->clone()));
             }
 
-            ExpressionOptimiser::everything(ret.entries_[row*other.columns_+column]);
+            ret.entries_[row*other.columns_+column]->optimise();
         }
 
     return ret;
@@ -215,12 +248,50 @@ SymbolicMatrix SymbolicMatrix::div(Expression* e)
 }
 
 // ----------------------------------------------------------------------------
+SymbolicMatrix SymbolicMatrix::minorBlock(int row, int column) const
+{
+    SymbolicMatrix ret(rows_ - 1, columns_ - 1);
+
+    /*
+     * Copy the correct expressions into the minor matrix (skipping the
+     * current column and row.
+     */
+    int i = 0;
+    for (int r = 0; r != rows_; ++r)
+    {
+        if (r == row)
+            continue;
+        for (int c = 0; c != columns_; ++c)
+        {
+            if (c == column)
+                continue;
+            ret.entries_[i++] = entries_[r*columns_+c];
+        }
+    }
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
+SymbolicMatrix SymbolicMatrix::minorMatrix() const
+{
+    SymbolicMatrix ret(rows_, columns_);
+
+    int i = 0;
+    for (int r = 0; r != rows_; ++r)
+        for (int c = 0; c != columns_; ++c)
+            ret.entries_[i++] = minorBlock(r, c).determinant();
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
 Expression* SymbolicMatrix::determinant() const
 {
     REQUIRE_SQUARE(Expression::make(0.0));
 
     Expression* result = determinantNoOptimisation();
-    ExpressionOptimiser::everything(result);
+    result->optimise();
     return result;
 }
 
@@ -305,47 +376,67 @@ Expression* SymbolicMatrix::determinant3x3() const
 // ----------------------------------------------------------------------------
 Expression* SymbolicMatrix::determinantNxN() const
 {
-    // Reached the end of recursion
-    if (rows_ == 3)
-        return determinant3x3();
-    if (rows_ == 2)
-        return determinant2x2();
-
-    Expression* result = NULL;
+    Expression* det = Expression::make(op::mul,
+            entry(0, 0),
+            minorBlock(0, 0).determinantNoOptimisation());
     SymbolicMatrix minorM(rows_ - 1, columns_ - 1);
-    op::Op2 toggleOp = op::add;
-    for (int skip = 0; skip != columns_; ++skip)
+    op::Op2 toggleOp = op::sub;
+    for (int column = 1; column != columns_; ++column)
     {
-        /*
-         * Copy the correct expressions into the minor matrix (skipping the
-         * current column and row 0. See Wikipedia on determinants if this
-         * makes no sense.
-         */
-        int minorIdx = 0;
-        for (int column = 0; column != columns_; ++column)
-        {
-            if (column == skip)
-                continue;
-            for (int row = 1; row != rows_; ++row)
-                minorM.entries_[minorIdx++] = entries_[row*columns_+column];
-        }
-
         /*
          * By multiplying the skipped entry in row 0 with the determinant of
          * the minor matrix and summing all of those results together, we
          * obtain the determinant of the entire matrix.
          */
-        if (result == NULL)
-            result = Expression::make(op::mul, entries_[skip], minorM.determinantNxN());
-        else
-            result = Expression::make(toggleOp, result,
-                Expression::make(op::mul, entries_[skip], minorM.determinantNxN()));
+        det = Expression::make(toggleOp,
+                det,
+                Expression::make(op::mul,
+                                 entry(0, column),
+                                 minorBlock(0, column).determinantNoOptimisation()));
 
         // Subdeterminants alternates between adding and subtracting
         toggleOp = toggleOp == op::add ? op::sub : op::add;
     }
 
-    return result;
+    det->optimise();
+    return det;
+}
+
+// ----------------------------------------------------------------------------
+SymbolicMatrix SymbolicMatrix::transpose() const
+{
+    if (rows_ == 1 || columns_ == 1)
+    {
+        SymbolicMatrix ret = *this;
+        std::swap(ret.rows_, ret.columns_);
+        return ret;
+    }
+
+    SymbolicMatrix ret(rows_, columns_);
+    for (int r = 0; r != rows_; ++r)
+        for (int c = 0; c != columns_; ++c)
+            ret.entries_[r*columns_+c] = entries_[c*columns_+r]->clone();
+
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
+SymbolicMatrix SymbolicMatrix::adjugate() const
+{
+    SymbolicMatrix ret = minorMatrix().transpose();
+
+    /*
+     * Need to apply "checkerboard" pattern of additions and subtractions to
+     * get the matrix of cofactors. This can be done after transposing, since
+     * transposing doesn't change the checkerpattern.
+     */
+    for (int r = 0; r < ret.rows_; ++r)
+        for (int c = (r+1)%2; c < ret.rows_; c += 2)
+            ret.entries_[r*ret.columns_+c] = Expression::make(
+                    op::negate, ret.entries_[r*ret.columns_+c]);
+
+    return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -366,7 +457,7 @@ SymbolicMatrix SymbolicMatrix::inverse() const
     }
 
     for (int i = 0; i != rows_*columns_; ++i)
-        ExpressionOptimiser::everything(result.entries_[i]);
+        result.entries_[i]->optimise();
 
     return result;
 }
@@ -381,7 +472,6 @@ SymbolicMatrix SymbolicMatrix::inverse2x2() const
     ret.entries_[1] = Expression::make(op::div, Expression::make(op::negate, entries_[1]->clone()), det->clone());
     ret.entries_[2] = Expression::make(op::div, Expression::make(op::negate, entries_[2]->clone()), det->clone());
     ret.entries_[3] = Expression::make(op::div, entries_[0]->clone(), det->clone());
-
     return ret;
 }
 
@@ -412,7 +502,7 @@ SymbolicMatrix SymbolicMatrix::inverse3x3() const
     ret.entries_[8] = Expression::make(op::div, ENTRY_EXPR(0, 4, 3, 1), det->clone());
 
     for (int i = 0; i != 9; ++i)
-        ExpressionOptimiser::everything(ret.entries_[i]);
+        ret.entries_[i]->optimise();
 
     return ret;
 }
@@ -420,22 +510,36 @@ SymbolicMatrix SymbolicMatrix::inverse3x3() const
 // ----------------------------------------------------------------------------
 SymbolicMatrix SymbolicMatrix::inverseNxN() const
 {
-    assert(false);
-    return SymbolicMatrix();
-}
+    SymbolicMatrix mm = minorMatrix();
+    SymbolicMatrix ret = mm.transpose();
 
-// ----------------------------------------------------------------------------
-SymbolicMatrix SymbolicMatrix::transpose() const
-{
-    SymbolicMatrix ret;
-    if (rows_ == 1 || columns_ == 1)
+    /*
+     * Need to apply "checkerboard" pattern of additions and subtractions to
+     * get the matrix of cofactors. This can be done after transposing, since
+     * transposing doesn't change the checkerpattern.
+     */
+    for (int r = 0; r < ret.rows_; ++r)
+        for (int c = (r+1)%2; c < ret.rows_; c += 2)
+            ret.entries_[r*ret.columns_+c] = Expression::make(
+                    op::negate, ret.entries_[r*ret.columns_+c]);
+
+    /*
+     * Determinant can be calculated from the minor matrix to save some time.
+     */
+    Reference<Expression> det = Expression::make(op::mul, entry(0, 0), mm.entry(0, 0));
+    op::Op2 toggleOp = op::sub;
+    for (int column = 1; column != columns_; ++column)
     {
-        ret = *this;
-        std::swap(ret.rows_, ret.columns_);
-        return ret;
+        det = Expression::make(toggleOp,
+                               det,
+                               Expression::make(op::mul,
+                                                entry(0, column),
+                                                mm.entry(0, column)));
+        toggleOp = toggleOp == op::add ? op::sub : op::add;
     }
 
-    return SymbolicMatrix();
+    det->optimise();
+    return ret.div(det);
 }
 
 // ----------------------------------------------------------------------------
@@ -445,7 +549,7 @@ SymbolicMatrix SymbolicMatrix::applyOperationToEveryEntry(op::Op2 operation, Exp
     for (int i = 0; i != rows_*columns_; ++i)
     {
         ret.entries_[i] = Expression::make(operation, entries_[i]->clone(), e->clone());
-        ExpressionOptimiser::everything(ret.entries_[i]);
+        ret.entries_[i]->optimise();
     }
 
     return ret;

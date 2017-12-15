@@ -26,25 +26,12 @@ public:
         columns_(columns),
         entries_(rows*columns)
     {
-        setEntry(std::forward<T>(entries)...);
+        setEntries(std::forward<T>(entries)...);
     }
 
-    SymbolicMatrix(int rows, int columns) :
-        rows_(rows),
-        columns_(columns),
-        entries_(rows*columns)
-    {
-    }
+    SymbolicMatrix(int rows, int columns);
 
     SymbolicMatrix& operator=(SymbolicMatrix other);
-    friend void swap(SymbolicMatrix& a, SymbolicMatrix& b)
-    {
-        using std::swap;
-
-        swap(a.rows_, b.rows_);
-        swap(a.columns_, b.columns_);
-        swap(a.entries_, b.entries_);
-    }
 
     /*!
      * @brief Resizes the matrix. Existing entries are unchanged, so long as
@@ -68,14 +55,14 @@ public:
     void fillIdentity();
 
     template <class A, class... B>
-    void setEntry(A&& arg, B&&... args)
+    void setEntries(A&& arg, B&&... args)
     {
         entries_[rows_*columns_ - sizeof...(B) - 1] = Expression::make(arg);
-        setEntry(std::forward<B>(args)...);
+        setEntries(std::forward<B>(args)...);
     }
 
     template <class A>
-    void setEntry(A&& arg)
+    void setEntries(A&& arg)
     {
         entries_[rows_*columns_ - 1] = Expression::make(arg);
     }
@@ -83,7 +70,7 @@ public:
     void setEntry(int row, int column, const char* expression);
     void setEntry(int row, int column, Expression* e);
     void setEntry(int row, int column, double value);
-    Expression* entry(int row, int column);
+    Expression* entry(int row, int column) const;
 
     SymbolicMatrix add(const SymbolicMatrix& other);
     SymbolicMatrix add(Expression* e);
@@ -96,11 +83,40 @@ public:
     SymbolicMatrix div(Expression* e);
 
     /*!
+     * @brief Returns an n-1 by n-1 matrix omitting the specified row and
+     * column.
+     *
+     * Example for row=1 and column=1:
+     *
+     *  /a b c d\     /a | c d\
+     *  |e f g h|     |--+----|     /a c d\
+     *  |i j k l| --> |i | k l| --> |i k l|
+     *  \m n o p/     \m | o p/     \m o p/
+     *
+     * @warning This does **not** clone() the expressions. Changing any
+     * expression in the returned matrix will thus also change entries in the
+     * original matrix.
+     */
+    SymbolicMatrix minorBlock(int row, int column) const;
+
+    /*!
+     * @brief Computes the matrix of minors. That is, the resulting matrix will
+     * contain the determinant of every minor block.
+     */
+    SymbolicMatrix minorMatrix() const;
+
+    SymbolicMatrix transpose() const;
+
+    SymbolicMatrix adjugate() const;
+
+    /*!
      * @brief Calculates the determinant of the matrix symbolically.
      */
     Expression* determinant() const;
     SymbolicMatrix inverse() const;
-    SymbolicMatrix transpose() const;
+
+    friend void swap(SymbolicMatrix& a, SymbolicMatrix& b);
+    friend std::ostream& operator<<(std::ostream& stream, const SymbolicMatrix& m);
 
 private:
     SymbolicMatrix applyOperationToEveryEntry(op::Op2, Expression* e);
@@ -118,3 +134,4 @@ private:
 };
 
 }
+
