@@ -17,6 +17,7 @@ namespace tfp {
    typedef Eigen::Array<Complex, Eigen::Dynamic, 1> ComplexArray;
    typedef Eigen::Matrix<Real, Eigen::Dynamic, 1> RealVector;
    typedef Eigen::Matrix<Complex, Eigen::Dynamic, 1> ComplexVector;
+   typedef Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> RealMatrix;
 }
 
 #cmakedefine TFP_BUILD_TESTS

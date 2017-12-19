@@ -8,7 +8,7 @@ namespace tfp {
 
 class CoefficientPolynomial;
 
-class TransferFunction
+class TFP_PUBLIC_API TransferFunction
 {
 public:
     struct PFEResultData
