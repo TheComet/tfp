@@ -177,7 +177,8 @@ ExpressionManipulator::Result ExpressionManipulator::expandConstantExponentsInto
 }
 
 // ----------------------------------------------------------------------------
-ExpressionManipulator::Result ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variable)
+ExpressionManipulator::Result
+ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variable)
 {
     /*
      * Does the following manipulations:
@@ -225,7 +226,7 @@ ExpressionManipulator::Result ExpressionManipulator::factorNegativeExponents(Exp
     factorIn(add, toFactorIn, firstNonAddOpInChain);
 
     // We get moved out of the brackets and set to 1.0
-    add->set(op::mul, add, e->swapWith(Expression::make(1.0)));
+    add->set(op::mul, add, e->unlinkExchange(Expression::make(1.0)));
 
     return MODIFIED;
 }

@@ -142,7 +142,7 @@ Expression* ExpressionParser::factor()
 
     while (type_ == TOK_INFIX && (function_ == op::pow))
     {
-        double (*f)(double,double) = function_;
+        op::Op2 f = function_;
         nextToken();
         ret = Expression::make(f, ret, power());
     }
@@ -157,7 +157,7 @@ Expression* ExpressionParser::term()
 
     while (type_ == TOK_INFIX && (function_ == op::mul || function_ == op::div || function_ == op::mod))
     {
-        double (*f)(double,double) = function_;
+        op::Op2 f = function_;
         nextToken();
         ret = Expression::make(f, ret, factor());
     }
@@ -172,7 +172,7 @@ Expression* ExpressionParser::expr()
 
     while (type_ == TOK_INFIX && (function_ == op::add || function_ == op::sub))
     {
-        double (*f)(double,double) = function_;
+        op::Op2 f = function_;
         nextToken();
         ret = Expression::make(f, ret, term());
     }

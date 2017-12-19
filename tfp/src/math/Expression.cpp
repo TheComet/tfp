@@ -3,6 +3,7 @@
 #include "tfp/math/ExpressionOptimiser.hpp"
 #include "tfp/math/VariableTable.hpp"
 #include "tfp/util/Util.hpp"
+#include "tfp/util/Tears.hpp"
 #include <string.h>
 #include <cassert>
 #include <cmath>
@@ -84,9 +85,18 @@ Expression* Expression::make(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
+Expression* Expression::makeInfinity()
+{
+    Expression* e = new Expression;
+    e->setInfinity();
+    return e;
+}
+
+// ----------------------------------------------------------------------------
 void Expression::copyDataFrom(const Expression* other)
 {
     type_ = other->type();
+
     if (other->type() == VARIABLE)
     {
         data_.name_ = (char*)malloc((strlen(other->name()) + 1) * sizeof(char));
@@ -108,13 +118,14 @@ void Expression::stealDataFrom(Expression* other)
 }
 
 // ----------------------------------------------------------------------------
-Expression* Expression::swapWith(Expression* other)
+Expression* Expression::unlinkExchange(Expression* other)
 {
+    // Parent's reference to us
     Reference<Expression>& operand = parent()->left() == this ? parent()->left_ : parent()->right_;
     operand.detach();
-    operand = other;
-    other->parent_ = parent();
-    parent_ = NULL;
+    operand = other; // Replaces the parent's reference to us with "other"
+    other->parent_ = parent(); // Relink other's parent correctly
+    parent_ = NULL; // Since parent doesn't reference us anymore, we should do the same
     return this;
 }
 
@@ -139,7 +150,7 @@ Expression* Expression::unlinkFromTree()
     Reference<Expression>& operand = parent()->left() == this ? parent()->left_ : parent()->right_;
     operand.detach();
     parent_ = NULL;
-    
+
     return this;
 }
 
@@ -159,6 +170,7 @@ Expression* Expression::clone(Expression* parent) const
 // ----------------------------------------------------------------------------
 void Expression::swapOperands()
 {
+    assert(type() == FUNCTION2);
     Reference<Expression> tmp = right_;
     right_ = left_;
     left_ = tmp;
@@ -279,6 +291,16 @@ void Expression::set(op::Op2 func, Expression* lhs, Expression* rhs)
 }
 
 // ----------------------------------------------------------------------------
+void Expression::setInfinity()
+{
+    reset();
+
+    type_ = INF;
+    left_ = NULL;
+    right_ = NULL;
+}
+
+// ----------------------------------------------------------------------------
 void Expression::reset()
 {
     if (type_ == VARIABLE)
@@ -296,61 +318,31 @@ bool Expression::optimise()
 // ----------------------------------------------------------------------------
 Expression* Expression::find(const char* variableName)
 {
-    if (type() == VARIABLE && strcmp(name(), variableName) == 0)
-        return this;
-
-    Expression* e;
-    if (left() && (e = left()->find(variableName)) != NULL) return e;
-    if (right() && (e = right()->find(variableName)) != NULL) return e;
-    return NULL;
+    return find(MatchVariable(variableName));
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::find(double value)
 {
-    if (type() == CONSTANT && this->value() == value)
-        return this;
-
-    Expression* e;
-    if (left() && (e = left()->find(value)) != NULL) return e;
-    if (right() && (e = right()->find(value)) != NULL) return e;
-    return NULL;
+    return find(MatchValue(value));
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::find(op::Op1 func)
 {
-    if (type() == FUNCTION1 && op1() == func)
-        return this;
-
-    Expression* e;
-    if (left() && (e = left()->find(func)) != NULL) return e;
-    if (right() && (e = right()->find(func)) != NULL) return e;
-    return NULL;
+    return find(MatchOp1(func));
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::find(op::Op2 func)
 {
-    if (type() == FUNCTION2 && op2() == func)
-        return this;
-
-    Expression* e;
-    if (left() && (e = left()->find(func)) != NULL) return e;
-    if (right() && (e = right()->find(func)) != NULL) return e;
-    return NULL;
+    return find(MatchOp2(func));
 }
 
 // ----------------------------------------------------------------------------
 Expression* Expression::findSame(const Expression* match)
 {
-    if (this != match && isSameAs(match))
-        return this;
-
-    Expression* e;
-    if (left())  if ((e = left()->findSame(match)) != NULL) return e;
-    if (right()) if ((e = right()->findSame(match)) != NULL) return e;
-    return NULL;
+    return find(MatchSame(match), RecurseAll(), this);
 }
 
 // ----------------------------------------------------------------------------
@@ -440,31 +432,43 @@ VariableTable* Expression::generateVariableTable() const
 }
 
 // ----------------------------------------------------------------------------
-static void insertSubstitutionsRecursive(VariableTable* vt, Expression* e, std::set<std::size_t>* visited)
+static bool insertSubstitutionsRecursive(const VariableTable* vt,
+                                         Expression* e,
+                                         std::set<std::size_t>* visited)
 {
     if (e->left()) insertSubstitutionsRecursive(vt, e->left(), visited);
     if (e->right()) insertSubstitutionsRecursive(vt, e->right(), visited);
-    if (e->type() != Expression::VARIABLE)
-        return;
 
-    Expression* resolved = vt->get(e->name());
-    if (resolved == NULL)
-        return;
+    /*
+     * A resolved variable could lead to another variable that also exists in
+     * the variable table, so keep resolving into no more are found.
+     */
+    Expression* resolved;
+    while (e->type() == Expression::VARIABLE &&
+            (resolved = vt->get(e->name())) != NULL)
+    {
+        /*
+         * Keep track of which expression node was substituted with which
+         * resolved expression so we can detect cyclic substitutions. The
+         * easiest way to do this is to generate a "combined hash" from the
+         * expression and the resolved variable, and dump it into a set. If in
+         * the future the hash already exists in the set, then we know we're
+         * about to substitute the same variable a second time.
+         */
+        std::size_t hash = Util::combineHashes(std::size_t(e), std::size_t(resolved));
+        if (visited->insert(hash).second == false)
+            return false;
 
-    // Keep track of which expression node was substituted with which resolved
-    // expression
-    std::size_t hash = Util::combineHashes(std::size_t(e), std::size_t(resolved));
-    if (visited->insert(hash).second == false)
-        throw std::runtime_error("Error: cyclic expression dependency detected while substituting.");
+        // Clone resolved expression and replace variable with it
+        e->replaceWith(resolved->clone());
+    }
 
-    // Clone resolved expression and replace variable with it
-    e->replaceWith(resolved->clone());
-    insertSubstitutionsRecursive(vt, e, visited);
+    return true;
 }
-void Expression::insertSubstitutions(VariableTable* vt)
+bool Expression::insertSubstitutions(const VariableTable* vt)
 {
     std::set<std::size_t> visited;
-    insertSubstitutionsRecursive(vt, this, &visited);
+    return insertSubstitutionsRecursive(vt, this, &visited);
 }
 
 // ----------------------------------------------------------------------------
@@ -476,10 +480,12 @@ double Expression::evaluate(const VariableTable* vt, std::set<std::string>* visi
         case VARIABLE:  return vt->valueOf(name(), visited);
         case FUNCTION1: return op1()(right()->evaluate(vt, visited));
         case FUNCTION2: return op2()(
-            left()->evaluate(vt, visited),
-            right()->evaluate(vt, visited)
-        );
-        default: throw std::runtime_error("Error during evaluating expression: Found node marked with INVALID. Can't evaluate");
+                left()->evaluate(vt, visited),
+                right()->evaluate(vt, visited)
+            );
+        default:
+            g_tears.cry("Error during evaluating expression: Found node marked with INVALID. Can't evaluate");
+            return std::numeric_limits<double>::quiet_NaN();
     }
 }
 
@@ -531,6 +537,15 @@ bool Expression::hasRHSOperation(op::Op2 op) const
 bool Expression::hasVariable(const char* variable) const
 {
     return (type() == VARIABLE && strcmp(name(), variable) == 0);
+}
+
+// ----------------------------------------------------------------------------
+int Expression::size() const
+{
+    int count = 1;
+    if (left()) count += left()->size();
+    if (right()) count += right()->size();
+    return count;
 }
 
 // ----------------------------------------------------------------------------

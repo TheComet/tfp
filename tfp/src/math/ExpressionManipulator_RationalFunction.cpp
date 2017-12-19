@@ -204,14 +204,12 @@ TFManipulator::calculateTransferFunction(const TFCoefficients& tfe,
 
     for (std::size_t i = 0; i != tfe.numerator.size(); ++i)
     {
-        double value = tfe.numerator[i]->evaluate(vt);
-        numerator.setCoefficient(i, value);
+        numerator.setCoefficient(i, tfe.numerator[i]->evaluate(vt));
     }
 
     for (std::size_t i = 0; i != tfe.denominator.size(); ++i)
     {
-        double value = tfe.denominator[i]->evaluate(vt);
-        denominator.setCoefficient(i, value);
+        denominator.setCoefficient(i, tfe.denominator[i]->evaluate(vt));
     }
 
     return TransferFunction(numerator, denominator);

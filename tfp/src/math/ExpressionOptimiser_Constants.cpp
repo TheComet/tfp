@@ -40,9 +40,10 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
             return false;
 
         // And search downwards again for any expression node that has a constant
-        Expression* same = top->find<
-            Expression::MatchOperandType<Expression::CONSTANT>,
-            Expression::RecurseOnOp2<op::add>>(e);
+        Expression* same = top->find(
+            Expression::MatchOperandType<Expression::CONSTANT>(),
+            Expression::RecurseOnOp2<op::add>(),
+            e);
         if (same == NULL)
             return false;
 
@@ -63,9 +64,10 @@ bool ExpressionOptimiser::combineConstants(Expression* e)
             return false;
 
         // And search downwards again for any expression node that has a constant
-        Expression* same = top->find<
-            Expression::MatchOperandType<Expression::CONSTANT>,
-            Expression::RecurseOnOp2<op::mul>>(e);
+        Expression* same = top->find(
+            Expression::MatchOperandType<Expression::CONSTANT>(),
+            Expression::RecurseOnOp2<op::mul>(),
+            e);
         if (same == NULL)
             return false;
 

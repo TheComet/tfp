@@ -74,3 +74,15 @@ TEST(NAME, substitute_with_cycles_fails)
     vt->set("d", "b");
     EXPECT_THROW(e1->insertSubstitutions(vt), std::runtime_error);
 }
+
+TEST(NAME, size_returns_correct_value)
+{
+    Reference<Expression> e1 = Expression::make("a");
+    Reference<Expression> e2 = Expression::parse("-a");
+    Reference<Expression> e3 = Expression::parse("a+b");
+    Reference<Expression> e4 = Expression::parse("a+b*c");
+    EXPECT_THAT(e1->size(), Eq(1));
+    EXPECT_THAT(e2->size(), Eq(2));
+    EXPECT_THAT(e3->size(), Eq(3));
+    EXPECT_THAT(e4->size(), Eq(5));
+}
