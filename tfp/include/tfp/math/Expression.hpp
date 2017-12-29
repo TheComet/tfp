@@ -14,10 +14,10 @@ namespace op {
 typedef double (*Op1)(double);
 typedef double (*Op2)(double,double);
 
-// Single operand functions
+// Unary operations
 TFP_PUBLIC_API double negate(double a);
 
-// Double operand functions
+// Binary operations
 TFP_PUBLIC_API double add(double a, double b);
 TFP_PUBLIC_API double sub(double a, double b);
 TFP_PUBLIC_API double mul(double a, double b);
@@ -364,6 +364,9 @@ public:
     Expression* findOpWithNegativeRHS(op::Op2 func);
     Expression* travelUpChain(op::Op2 func);
     Expression* findSameDownChain(op::Op2 func, const Expression* match);
+
+    Expression* travelUpComplementaryChain(op::Op2 func1, op::Op2 func2, double* negated);
+    Expression* findSameDownComplementaryChain(op::Op2 func1, op::Op2 func2, double* negated, Expression* match);
 
     /*!
      * @brief Collects all variables in the expression into a new variable

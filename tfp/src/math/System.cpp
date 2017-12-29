@@ -6,7 +6,8 @@ namespace tfp {
 // ----------------------------------------------------------------------------
 System::System(const QString& name) :
     dataTree_(NULL),
-    name_(name)
+    name_(name),
+    dirtyFlags_(ALL)
 {
 }
 
@@ -76,6 +77,23 @@ void System::notifyStructureChanged()
 
     dispatcher.dispatch(&SystemListener::onSystemStructureChanged);
 }
+
+// ----------------------------------------------------------------------------
+/*
+const SymbolicStateSpace& System::symbolicStateSpace() const
+{
+    return symbolicStateSpace_;
+}
+
+// ----------------------------------------------------------------------------
+SymbolicStateSpace& System::symbolicStateSpace()
+{
+    dirtyFlags_ |= SYMBOLIC_STATE_SPACE;
+    return symbolicStateSpace_;
+}*/
+
+// ----------------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 void System::interestingFrequencyInterval(double* xStart, double* xEnd) const

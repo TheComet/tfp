@@ -373,13 +373,9 @@ Expression* Expression::findOpWithNegativeRHS(op::Op2 func)
 // ----------------------------------------------------------------------------
 Expression* Expression::travelUpChain(op::Op2 func)
 {
-    Expression* top;
-    if (parent() == NULL)
-        return NULL;
-    for (top = this; top->parent() != NULL && top->parent()->isOperation(func);)
+    Expression* top = this;
+    while (top->parent() != NULL && top->parent()->isOperation(func))
         top = top->parent();
-    if (top == this)
-        return NULL;
     return top;
 }
 
@@ -395,6 +391,60 @@ Expression* Expression::findSameDownChain(op::Op2 func, const Expression* match)
     Expression* e;
     if ((e = left()->findSameDownChain(func, match)) != NULL) return e;
     if ((e = right()->findSameDownChain(func, match)) != NULL) return e;
+    return NULL;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::travelUpComplementaryChain(op::Op2 func1, op::Op2 func2, double* negated)
+{
+    Expression* top = this;
+    *negated = 1.0;
+
+    while (top->parent() != NULL)
+    {
+        if (top->parent()->isOperation(func1))
+        {
+            top = top->parent();
+            continue;
+        }
+        if (top->parent()->isOperation(func2))
+        {
+            top = top->parent();
+            *negated = -*negated;
+            continue;
+        }
+
+        break;  // No more parent operation found
+    }
+
+    return top;
+}
+
+// ----------------------------------------------------------------------------
+Expression* Expression::findSameDownComplementaryChain(op::Op2 func1, op::Op2 func2, double* negated, Expression* match)
+{
+    *negated = 1.0;
+    if (this != match && isSameAs(match))
+        return this;
+
+    if (isOperation(func1) == false && isOperation(func2) == false)
+        return NULL;
+
+    if (isOperation(func2))
+        *negated = -*negated;
+
+    Expression* e;
+    double childNegated;
+    if ((e = left()->findSameDownComplementaryChain(func1, func2, &childNegated, match)) != NULL)
+    {
+        *negated = *negated * childNegated;
+        return e;
+    }
+    if ((e = right()->findSameDownComplementaryChain(func1, func2, &childNegated, match)) != NULL)
+    {
+        *negated = *negated * childNegated;
+        return e;
+    }
     return NULL;
 }
 

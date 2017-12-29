@@ -401,7 +401,7 @@ TEST(NAME, inverse_of_8x8)
 TEST(NAME, inverse_accuracy_symbolic)
 {
     Reference<Expression>(Expression::make("0"))->dump("inverse_accuracy_symbolic.dot");
-    for (int i = 1; i != 20; ++i)
+    for (int i = 1; i != 6; ++i)
     {
         SymbolicMatrix m = generateSymMatrix(i, i);
         m = m.inverse().mul(m);

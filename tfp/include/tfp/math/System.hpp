@@ -82,10 +82,16 @@ public:
     void notifyStructureChanged();
     void interestingFrequencyInterval(double* xStart, double* xEnd) const;
     void interestingTimeInterval(double* xStart, double* xEnd) const;
+/*
+    const SymbolicStateSpace& SymbolicStateSpace() const;
+    const SymbolicMatrixTransferFunction& symbolicMatrixTransferFunction() const;
+    const MatrixTransferFunction& matrixTransferFunction() const;
+    const StateSpace& stateSpace() const;
 
-    const Graph& graph() const;
-    const SymbolicTransferFunction& stf() const;
-    const TransferFunction& tf() const;
+    SymbolicStateSpace& symbolicStateSpace();
+    SymbolicMatrixTransferFunction& symbolicMatrixTransferFunction();
+    MatrixTransferFunction& matrixTransferFunction();
+    StateSpace& stateSpace();*/
 
     const QString& name() const;
 
@@ -94,9 +100,22 @@ public:
 
     ListenerDispatcher<SystemListener> dispatcher;
 
-private:
-    Graph graph_;
-    TransferFunction tf_;
+private:/*
+    Graph                          graph_;
+    SymbolicStateSpace             symbolicStateSpace_;
+    SymbolicMatrixTransferFunction symbolicMatrixTF_;
+    MatrixTransferFunction         matrixTF_;
+    StateSpace                     stateSpace_;*/
+
+    enum {
+        GRAPH                = 0x01,
+        SYMBOLIC_STATE_SPACE = 0x02,
+        SYMBOLIC_MATRIX_TF   = 0x04,
+        MATRIX_TF            = 0x08,
+        STATE_SPACE          = 0x10,
+
+        ALL                  = 0xFF
+    } dirtyFlags_;
 
     QTreeWidgetItem* dataTree_;
     QTreeWidgetItem* tfItem_;

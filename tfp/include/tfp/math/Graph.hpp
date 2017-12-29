@@ -9,11 +9,22 @@ namespace tfp {
 
 class Connection;
 
+class Dirtyable
+{
+public:
+    Dirtyable() : dirty_(true) {}
+    void markDirty() { dirty_; }
+    bool dirty() const { return dirty_; }
+
+private:
+    bool dirty_;
+};
+
 /*!
  * @brief Manages the creation and manipulation of graph nodes and provides
  * methods to calculate the graph's transfer function.
  */
-class Graph : public RefCounted
+class Graph : public RefCounted, public Dirtyable
 {
 public:
     struct PathSegment
@@ -53,14 +64,16 @@ public:
 
     void markDirty();
     bool dirty() const;
+    void update();
+
     /*!
      * @brief Computes the graph's transfer function expression and stores it
      * in graphExpression_. The graph is no longer dirty if this operation
      * succeeds.
      */
-    void update();
+    //void update();
     bool evaluatePhysicalUnitConsistencies() const;
-    Expression* expression() const;
+    Expression* expression();
 
 private:
     void updatePathsAndLoops();

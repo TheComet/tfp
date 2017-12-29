@@ -19,8 +19,10 @@ class Expression;
 class TFP_PUBLIC_API VariableTable : public tfp::RefCounted
 {
 public:
-    typedef std::vector< std::pair<std::string, double> > ValueVariables;
-    typedef std::vector< std::pair<std::string, std::string> > ExpressionVariables;
+    typedef std::pair<std::string, double> MappedValue;
+    typedef std::pair<std::string, std::string> MappedVariable;
+    typedef std::vector<MappedValue> MappedValues;
+    typedef std::vector<MappedVariable> MappedVariables;
 
     /*!
      * @brief Adds a new entry to the table that maps "name" to the constant of
@@ -70,13 +72,13 @@ public:
      * @brief Generates an alphabetically sorted list of all entries that have
      * direct values.
      */
-    ValueVariables valueVariableList() const;
+    MappedValues mappedValues() const;
 
     /*!
      * @brief Generates an alphabetically sorted list of all entries that have
      * further expressions as their value.
      */
-    ExpressionVariables expressionVariableList() const;
+    MappedVariables mappedVariables() const;
 
 private:
     typedef std::unordered_map<std::string, tfp::Reference<Expression> > Table;

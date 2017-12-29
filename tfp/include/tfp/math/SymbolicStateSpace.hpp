@@ -20,6 +20,7 @@ class VariableTable;
  * http://lpsa.swarthmore.edu/Representations/SysRepTransformations/TF2SS.html#Transfer_Function
  * http://lpsa.swarthmore.edu/Transient/TransMethSS.html
  * https://en.wikipedia.org/wiki/Jordan_matrix
+ * https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-241j-dynamic-systems-and-control-spring-2011/readings/MIT6_241JS11_chap27.pdf
  *
  */
 class SymbolicStateSpace

@@ -2,6 +2,7 @@
 #include "tfp/math/Expression.hpp"
 #include "tfp/util/Tears.hpp"
 #include <limits>
+#include <algorithm>
 
 using namespace tfp;
 
@@ -71,3 +72,32 @@ double VariableTable::valueOf(std::string name, std::set<std::string>* visited) 
     }
     return e->evaluate(this, visited);
 }
+
+// ----------------------------------------------------------------------------
+VariableTable::MappedValues VariableTable::mappedValues() const
+{
+    MappedValues result;
+    for (Table::const_iterator it = table_.begin(); it != table_.end(); ++it)
+    {
+        if (it->second->type() == Expression::CONSTANT)
+            result.push_back(std::make_pair(it->first, it->second->value()));
+    }
+
+    std::sort(result.begin(), result.end());
+    return result;
+}
+
+// ----------------------------------------------------------------------------
+VariableTable::MappedVariables VariableTable::mappedVariables() const
+{
+    MappedVariables result;
+    for (Table::const_iterator it = table_.begin(); it != table_.end(); ++it)
+    {
+        if (it->second->type() == Expression::VARIABLE)
+            result.push_back(std::make_pair(it->first, it->second->name()));
+    }
+
+    std::sort(result.begin(), result.end());
+    return result;
+}
+
