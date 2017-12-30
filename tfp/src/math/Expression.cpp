@@ -111,6 +111,9 @@ void Expression::copyDataFrom(const Expression* other)
 // ----------------------------------------------------------------------------
 void Expression::stealDataFrom(Expression* other)
 {
+    if (type_ == VARIABLE)
+        free(data_.name_);
+
     type_ = other->type_;
     data_ = other->data_;
 
@@ -203,7 +206,7 @@ void Expression::set(const char* variableName)
     type_  = VARIABLE;
     left_  = NULL;
     right_ = NULL;
-    data_.name_ = (char*)malloc((sizeof(char) + 1) * strlen(variableName));
+    data_.name_ = (char*)malloc((strlen(variableName) + 1) * sizeof(char));
     strcpy(data_.name_, variableName);
 }
 
