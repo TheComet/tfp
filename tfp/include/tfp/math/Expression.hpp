@@ -155,7 +155,7 @@ public:
      * @brief Replaces our position in the tree with another node and unlinks
      * us from the tree.
      * @param[in] other The node to take our place.
-     * @return Returns this.
+     * @return Returns this (will be a dangling pointer)
      * @warning The returned node has a refcount of 0 but will not be deleted.
      * This function assumes you are going to re-use the unlinked node
      * again. If not, make sure to reference it briefly so it gets cleaned up

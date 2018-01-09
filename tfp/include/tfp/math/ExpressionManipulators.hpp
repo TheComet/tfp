@@ -36,7 +36,7 @@ public:
     static Result factorNegativeExponents(Expression* e, const char* variable);
     static Result eliminateDivisionsAndSubtractions(Expression* e, const char* variable);
     static Result expand(Expression* e, const char* variable);
-    static Result factorIn(Expression* e, Expression* toFactor, const Expression* ignore=NULL);
+    static Result factorIn(Expression* e, const Expression* toFactor, const Expression* ignore=NULL);
 private:
     ExpressionManipulator();
 };

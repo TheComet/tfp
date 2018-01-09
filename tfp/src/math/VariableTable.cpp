@@ -46,7 +46,10 @@ void VariableTable::clear()
 // ----------------------------------------------------------------------------
 void VariableTable::merge(const VariableTable& other)
 {
-    table_.insert(other.table_.begin(), other.table_.end());
+    for (Table::const_iterator it = other.table_.begin(); it != other.table_.end(); ++it)
+    {
+        table_[it->first] = it->second->clone();
+    }
 }
 
 // ----------------------------------------------------------------------------

@@ -217,7 +217,7 @@ ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variab
      * track of the first non-add operator. This is because factorIn would use
      * this to insert the factor, so we have to tell it to ignore that node.
      */
-    Expression* toFactorIn = e->clone();
+    Reference<Expression> toFactorIn = e->clone();
     if (toFactorIn->right()->type() == Expression::CONSTANT)
         toFactorIn->right()->set(-toFactorIn->right()->value());
     else
@@ -232,7 +232,7 @@ ExpressionManipulator::factorNegativeExponents(Expression* e, const char* variab
 }
 
 // ----------------------------------------------------------------------------
-ExpressionManipulator::Result ExpressionManipulator::factorIn(Expression* e, Expression* toFactor, const Expression* ignore)
+ExpressionManipulator::Result ExpressionManipulator::factorIn(Expression* e, const Expression* toFactor, const Expression* ignore)
 {
     if (e == ignore)
         return UNMODIFIED;

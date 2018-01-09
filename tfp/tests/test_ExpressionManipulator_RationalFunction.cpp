@@ -369,9 +369,10 @@ TEST(NAME, expand_binomial_exponent)
 
 TEST(NAME, factor_in_single_addition)
 {
+    Reference<Expression> factor = Expression::make("c");
     Reference<Expression> e = Expression::parse("a+b");
     e->dump("factor_in_single_addition.dot");
-    ASSERT_THAT(TFManipulator::factorIn(e, Expression::make("c")), Eq(ExpressionManipulator::MODIFIED));
+    ASSERT_THAT(TFManipulator::factorIn(e, factor), Eq(ExpressionManipulator::MODIFIED));
     e->dump("factor_in_single_addition.dot", true);
     ASSERT_THAT(e->op2(), Eq(op::add));
     ASSERT_THAT(e->left()->op2(), Eq(op::mul));
@@ -386,9 +387,10 @@ TEST(NAME, factor_in_single_addition)
 
 TEST(NAME, factor_in_complex)
 {
+    Reference<Expression> factor = Expression::make("s");
     Reference<Expression> e = Expression::parse("a+b*g+c+d*e^(3+f)");
     e->dump("factor_in_complex.dot");
-    ASSERT_THAT(TFManipulator::factorIn(e, Expression::make("s")), Eq(ExpressionManipulator::MODIFIED));
+    ASSERT_THAT(TFManipulator::factorIn(e, factor), Eq(ExpressionManipulator::MODIFIED));
     e->dump("factor_in_complex.dot", true);
 
     ASSERT_THAT(e->checkParentConsistencies(), Eq(true));

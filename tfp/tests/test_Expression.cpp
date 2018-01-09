@@ -72,7 +72,7 @@ TEST(NAME, substitute_with_cycles_fails)
     vt->set("b", "c");
     vt->set("c", "d");
     vt->set("d", "b");
-    EXPECT_THROW(e1->insertSubstitutions(vt), std::runtime_error);
+    EXPECT_THAT(e1->insertSubstitutions(vt), Eq(false));
 }
 
 TEST(NAME, size_returns_correct_value)

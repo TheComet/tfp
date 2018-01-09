@@ -4,7 +4,7 @@
 #include "tfp/util/Reference.hpp"
 #include <random>
 
-#define NAME ExpressionOptimiser
+#define NAME ExpressionOptimiserSimplifications
 
 using namespace testing;
 using namespace tfp;
@@ -42,13 +42,13 @@ public:
         ASSERT_THAT(before, DoubleEq(after));
     }
 
-private:
+protected:
     Expression* e;
 };
 
 TEST_F(NAME, exponentiate_two_equal_product_operands)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
         Expression::make("a"),
         Expression::make("a"));
     e->dump("exponentiate_two_equal_product_operands.dot");
@@ -61,7 +61,7 @@ TEST_F(NAME, exponentiate_two_equal_product_operands)
 
 TEST_F(NAME, exponentiate_three_equal_product_operands)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
         Expression::make("a"),
         Expression::make(op::mul,
             Expression::make("a"),
@@ -76,7 +76,7 @@ TEST_F(NAME, exponentiate_three_equal_product_operands)
 
 TEST_F(NAME, exponentiate_chain_of_product_operands_with_constant_in_middle)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
         Expression::make("a"),
         Expression::make(op::mul,
             Expression::make(5.0),
@@ -93,7 +93,7 @@ TEST_F(NAME, exponentiate_chain_of_product_operands_with_constant_in_middle)
 
 TEST_F(NAME, combine_exponents_simple_test)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
         Expression::make(op::pow,
             Expression::make("a"),
             Expression::make("x")),
@@ -112,7 +112,7 @@ TEST_F(NAME, combine_exponents_simple_test)
 
 TEST_F(NAME, combine_exponents_recursive_multiplies)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
         Expression::make(op::mul,
             Expression::make(op::pow,
                 Expression::make("a"),
@@ -139,7 +139,7 @@ TEST_F(NAME, combine_exponents_recursive_multiplies)
 
 TEST_F(NAME, simplify_addition_of_two_trees_that_are_same)
 {
-    Reference<Expression> e = Expression::make(op::add,
+    e = Expression::make(op::add,
         Expression::make(op::pow,
             Expression::make("s"),
             Expression::make(4.0)),
@@ -158,7 +158,7 @@ TEST_F(NAME, simplify_addition_of_two_trees_that_are_same)
 
 TEST_F(NAME, simplify_identical_symbols_in_mul_and_div_chain_1)
 {
-    Reference<Expression> e = Expression::make(op::mul,
+    e = Expression::make(op::mul,
             Expression::make(op::div,
                 Expression::make(1.0),
                 Expression::make("a")),
@@ -172,7 +172,7 @@ TEST_F(NAME, simplify_identical_symbols_in_mul_and_div_chain_1)
 
 TEST_F(NAME, simplify_identical_symbols_in_mul_and_div_chain_2)
 {
-    Reference<Expression> e = Expression::make(op::div,
+    e = Expression::make(op::div,
             Expression::make(op::div,
                 Expression::make("b"),
                 Expression::make(op::mul,
@@ -192,7 +192,7 @@ TEST_F(NAME, simplify_identical_symbols_in_mul_and_div_chain_2)
 
 TEST_F(NAME, simplify_triple_division)
 {
-    Reference<Expression> e = Expression::make(op::div,
+    e = Expression::make(op::div,
             Expression::make(op::div,
                 Expression::make("c"),
                 Expression::make(op::mul,

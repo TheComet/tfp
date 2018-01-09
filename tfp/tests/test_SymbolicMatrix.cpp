@@ -174,8 +174,8 @@ TEST(NAME, add_2x3_with_2x3)
 
 TEST(NAME, add_2x2_with_scalar)
 {
-    SymbolicMatrix m = SymbolicMatrix(2, 2, 1, 1, 1, 1)
-        .add(Expression::make(3.0));
+    Reference<Expression> e = Expression::make(3.0);
+    SymbolicMatrix m = SymbolicMatrix(2, 2, 1, 1, 1, 1).add(e);
     ASSERT_THAT(m.rows(), Eq(2));
     ASSERT_THAT(m.columns(), Eq(2));
     for (int r = 0; r != 2; ++r)
@@ -213,8 +213,8 @@ TEST(NAME, subtract_2x3_with_2x3)
 
 TEST(NAME, subtract_2x2_with_scalar)
 {
-    SymbolicMatrix m = SymbolicMatrix(2, 2, 1, 1, 1, 1)
-        .sub(Expression::make(3.0));
+    Reference<Expression> e = Expression::make(3.0);
+    SymbolicMatrix m = SymbolicMatrix(2, 2, 1, 1, 1, 1).sub(e);
     ASSERT_THAT(m.rows(), Eq(2));
     ASSERT_THAT(m.columns(), Eq(2));
     for (int r = 0; r != 2; ++r)
@@ -285,8 +285,8 @@ TEST(NAME, multiply_2x3_with_3x2)
 
 TEST(NAME, multiply_2x2_with_scalar)
 {
-    SymbolicMatrix m = SymbolicMatrix(2, 2, 4, 4, 4, 4)
-        .mul(Expression::make(3.0));
+    Reference<Expression> e = Expression::make(3.0);
+    SymbolicMatrix m = SymbolicMatrix(2, 2, 4, 4, 4, 4).mul(e);
     ASSERT_THAT(m.rows(), Eq(2));
     ASSERT_THAT(m.columns(), Eq(2));
     for (int r = 0; r != 2; ++r)
