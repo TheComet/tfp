@@ -63,6 +63,7 @@ set (tfp_SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicStateSpace.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/math/new/Expression.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
@@ -116,7 +117,8 @@ if (TFP_BUILD_TESTS)
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp")
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp")
     add_executable (test_all
         "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_all.cpp")
     add_executable (test_tfp
@@ -127,13 +129,25 @@ endif ()
 
 find_package (Qt5
     COMPONENTS Core Widgets Gui OpenGL REQUIRED)
+find_package (FLEX REQUIRED)
+find_package (BISON REQUIRED)
 
 qt5_wrap_cpp (tfp_SOURCES_MOC ${tfp_HEADERS_MOC})
 qt5_wrap_ui  (tfp_FORMS_MOC ${tfp_FORMS})
 qt5_add_resources (tfp_RESOURCES_GEN ${tfp_RESOURCES})
 #qt5_add_translation (tfp_QM_FILES ${tfp_TRANSLATION_FILES})
 
-include_directories ("include")
+# Expression parser
+file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/math/new")
+file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/tfp/math/new")
+bison_target (ExpressionParser
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/ExpressionParser.y"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/math/new/ExpressionParser.cpp"
+    DEFINES_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/tfp/math/new/ExpressionParser.hpp")
+flex_target (ExpressionLexer
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/ExpressionLexer.l"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/math/new/ExpressionLexer.cpp")
+add_flex_bison_dependency (ExpressionLexer ExpressionParser)
 
 add_library (tfp ${BUILD_TYPE}
     ${tfp_SOURCES}
@@ -141,8 +155,13 @@ add_library (tfp ${BUILD_TYPE}
     ${tfp_SOURCES_MOC}
     ${tfp_FORMS_MOC}
     ${tfp_RESOURCES_GEN}
-    ${QM_FILES}
-)
+    ${BISON_ExpressionParser_OUTPUTS}
+    ${FLEX_ExpressionLexer_OUTPUTS}
+    ${QM_FILES})
+target_include_directories(tfp
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+    PUBLIC $<INSTALL_INTERFACE:include>
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
 # generates the correct project files for visual studio, setting thee correct
 # debug working directory and other stuff

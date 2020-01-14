@@ -13,7 +13,7 @@ class Dirtyable
 {
 public:
     Dirtyable() : dirty_(true) {}
-    void markDirty() { dirty_; }
+    void markDirty() { dirty_ = true; }
     bool dirty() const { return dirty_; }
 
 private:
