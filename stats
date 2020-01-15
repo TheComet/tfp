@@ -10,10 +10,7 @@ aliases = {
 }
 
 exclude_folders = [
-    'tests/googletest',
-    'tests/googlemock',
-    'pugixml-1.7',
-    'qwt-6.1.2'
+    'thirdparty'
 ]
 
 def get_real_name(alias):

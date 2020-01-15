@@ -1,124 +1,41 @@
-###############################################################################
-# compiler flags
-###############################################################################
-
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_definitions (-W -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-unused-local-typedefs -Wno-long-long -Wno-variadic-macros -Wno-missing-field-initializers -Wno-write-strings)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_definitions (-W -Wall -Wextra -pedantic -Wno-unused-parameter -Wno-unused-local-typedefs -Wno-long-long -Wno-variadic-macros -Wno-missing-field-initializers -Wno-write-strings)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-endif ()
-
-add_definitions (-D_USE_MATH_DEFINES)
-
-###############################################################################
-# config
-###############################################################################
-
-# Required by export.hpp.in
-set (LIBRARY_NAME "TFP")
-set (BUILD_TYPE "SHARED")
-
-add_definitions (-DTFP_BUILDING)
-
-configure_file (${TEMPLATE_EXPORT_H} "include/tfp/export.hpp")
 configure_file ("include/tfp/config.hpp.in" "include/tfp/config.hpp")
 
 ###############################################################################
 # source files and library definition
 ###############################################################################
 
-set (tfp_HEADERS_MOC
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/DeltaPlotPicker.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Panner.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/RectangleZoomer.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Zoomer.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/AdjustmentWidget.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SettingsView.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/ToolContainer.hpp")
+find_package (Qt5Widgets REQUIRED)
+find_package (Qt5Gui REQUIRED)
+find_package (Qt5Core REQUIRED)
+find_package (Qt5OpenGL REQUIRED)
+find_package (Qt5LinguistTools REQUIRED)
+find_package (FLEX REQUIRED)
+find_package (BISON REQUIRED)
 
-set (tfp_SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/CoefficientPolynomial.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator_RationalFunction.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Constants.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Simplifications.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Graph.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/RootPolynomial.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/StateSpace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicMatrix.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicStateSpace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/new/Expression.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/MousePlotPickerMachine.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/Panner.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Plugin.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/PluginManager.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Tool.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Logger.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Tears.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTreeView.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/views/ToolContainer.cpp")
-set (tfp_FORMS
-        "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui"
-        "${CMAKE_CURRENT_LIST_DIR}/forms/SettingsView.ui")
-set (tfp_RESOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/res/res.qrc")
+set (TFP_HEADERS_MOC
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/DeltaPlotPicker.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Panner.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/RectangleZoomer.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/Zoomer.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/AdjustmentWidget.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/FloatAdjustmentWidget.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/InfiniSliderWidget.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/MainWindow.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/RealtimePlot.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/SettingsView.hpp"
+    "${CMAKE_CURRENT_LIST_DIR}/include/tfp/views/ToolContainer.hpp")
+set (TFP_FORMS
+    "${CMAKE_CURRENT_LIST_DIR}/forms/MainWindow.ui"
+    "${CMAKE_CURRENT_LIST_DIR}/forms/SettingsView.ui")
+set (TFP_RESOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/res/res.qrc")
+set (TFP_TRANSLATION_FILES
+    "")
 
-set (tfp_TRANSLATION_FILES
-        "")
-
-set (tfp_test_SOURCES "")
+set (TFP_test_SOURCES "")
 if (TFP_BUILD_TESTS)
-    set (tfp_test_SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp")
+    set (TFP_test_SOURCES
+        )
     add_executable (test_all
         "${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_all.cpp")
     add_executable (test_tfp
@@ -127,15 +44,10 @@ if (TFP_BUILD_TESTS)
     target_link_libraries (test_tfp tfp)
 endif ()
 
-find_package (Qt5
-    COMPONENTS Core Widgets Gui OpenGL REQUIRED)
-find_package (FLEX REQUIRED)
-find_package (BISON REQUIRED)
-
-qt5_wrap_cpp (tfp_SOURCES_MOC ${tfp_HEADERS_MOC})
-qt5_wrap_ui  (tfp_FORMS_MOC ${tfp_FORMS})
-qt5_add_resources (tfp_RESOURCES_GEN ${tfp_RESOURCES})
-#qt5_add_translation (tfp_QM_FILES ${tfp_TRANSLATION_FILES})
+qt5_wrap_cpp (TFP_SOURCES_MOC ${TFP_HEADERS_MOC})
+qt5_wrap_ui  (TFP_FORMS_MOC ${TFP_FORMS})
+qt5_add_resources (TFP_RESOURCES_GEN ${TFP_RESOURCES})
+#qt5_add_translation (TFP_QM_FILES ${TFP_TRANSLATION_FILES})
 
 # Expression parser
 file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/math/new")
@@ -149,72 +61,114 @@ flex_target (ExpressionLexer
     "${CMAKE_CURRENT_BINARY_DIR}/src/math/new/ExpressionLexer.cpp")
 add_flex_bison_dependency (ExpressionLexer ExpressionParser)
 
-add_library (tfp ${BUILD_TYPE}
-    ${tfp_SOURCES}
-    ${tfp_test_SOURCES}
-    ${tfp_SOURCES_MOC}
-    ${tfp_FORMS_MOC}
-    ${tfp_RESOURCES_GEN}
+add_library (tfp ${TFP_LIB_TYPE}
+    ${TFP_SOURCES_MOC}
+    ${TFP_FORMS_MOC}
+    ${TFP_RESOURCES_GEN}
     ${BISON_ExpressionParser_OUTPUTS}
     ${FLEX_ExpressionLexer_OUTPUTS}
-    ${QM_FILES})
+    ${TFP_QM_FILES}
+    "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/CoefficientPolynomial.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator_RationalFunction.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Constants.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Simplifications.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/Graph.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/RootPolynomial.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/StateSpace.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicMatrix.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicStateSpace.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/Expression.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/ColourPalette.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/DeltaPlotPicker.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/MousePlotPickerMachine.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/Panner.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/RectangleZoomer.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/UnitTracker.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plot/Zoomer.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Plugin.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plugin/PluginManager.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Tool.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/Logger.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/Tears.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/AdjustmentWidget.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/DataTreeView.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/FloatAdjustmentWidget.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/InfiniSliderWidget.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/MainWindow.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/views/ToolContainer.cpp"
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp">
+    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp">)
 target_include_directories(tfp
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-    PUBLIC $<INSTALL_INTERFACE:include>
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
+target_compile_options (tfp
+    PRIVATE
+        $<$<COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic>
+        $<$<COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic>)
+target_compile_definitions (tfp
+    PRIVATE
+        TFP_BUILDING)
+target_link_libraries (tfp
+    PRIVATE
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Gui
+        qwtinternal
+        qwtplot3d
+        ads
+        kissfft
+        pugixml
+        $<$<BOOL:${TFP_TESTS}>:gtest>)
 
-# generates the correct project files for visual studio, setting thee correct
-# debug working directory and other stuff
-create_vcproj_userfile (tfp)
-
-###############################################################################
-# dependencies
-###############################################################################
-
-# must be in this order due to linking
-include_directories (${KISS_FFT_INCLUDE_DIRS})
-include_directories (${QWT_INCLUDE_DIRS})
-include_directories (${QWTPLOT3D_INCLUDE_DIRS})
-include_directories (${ADS_INCLUDE_DIRS})
-include_directories (${EIGEN_INCLUDE_DIRS})
-include_directories (${PUGIXML_INCLUDE_DIRS})
-
-target_link_libraries (tfp Qt5::Core)
-target_link_libraries (tfp Qt5::Widgets)
-target_link_libraries (tfp Qt5::Gui)
-
-target_link_libraries (tfp ${QWT_LIBRARIES})
-target_link_libraries (tfp ${QWTPLOT3D_LIBRARIES})
-target_link_libraries (tfp ${ADS_LIBRARIES})
-target_link_libraries (tfp ${KISS_FFT_LIBRARIES})
-target_link_libraries (tfp ${PUGIXML_LIBRARIES})
-
-if (TFP_BUILD_TESTS)
-    target_link_libraries (tfp gmock)
-endif ()
-
-###############################################################################
-# Compile translation files
-###############################################################################
-
-if (PLATFORM MATCHES "WINDOWS")
-    set (LRELEASE_COMMAND ${Qt5Core_DIR}/../../../bin/lrelease.exe)
-else ()
-    set (LRELEASE_COMMAND lrelease)
-endif ()
-
-#add_custom_target (tfp_translations_compile
-#    COMMAND ${LRELEASE_COMMAND} ${CMAKE_CURRENT_LIST_DIR}/translations/tfp_de.ts
+#add_custom_target (TFP_translations_compile
+#    COMMAND ${LRELEASE_COMMAND} ${CMAKE_CURRENT_LIST_DIR}/translations/TFP_de.ts
 #    COMMENT "Compiling translations"
 #    VERBATIM
 #)
-#add_custom_target (tfp_translations_move
+#add_custom_target (TFP_translations_move
 #    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations
-#    COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_LIST_DIR}/translations/tfp_de.qm ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations/tfp_de.qm
+#    COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_LIST_DIR}/translations/TFP_de.qm ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/translations/TFP_de.qm
 #    VERBATIM
 #)
-#add_dependencies (tfp_translations_move tfp_translations_compile)
-#add_dependencies (tfp tfp_translations_move)
+#add_dependencies (TFP_translations_move TFP_translations_compile)
+#add_dependencies (tfp TFP_translations_move)
 
 ###############################################################################
 # DLLs need to be copied on Windows

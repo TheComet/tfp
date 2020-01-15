@@ -5,13 +5,11 @@
 #ifndef TFP_CONFIG_HPP
 #   define TFP_CONFIG_HPP
 
-#   include "tfp/export.hpp"
-
 #   include <Eigen/Dense>
 #   include <complex>
 
 namespace tfp {
-   typedef @REAL_TYPE@ Real;
+   typedef ${TFP_REAL} Real;
    typedef std::complex<Real> Complex;
    typedef Eigen::Array<Real, Eigen::Dynamic, 1> RealArray;
    typedef Eigen::Array<Complex, Eigen::Dynamic, 1> ComplexArray;
@@ -20,20 +18,34 @@ namespace tfp {
    typedef Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> RealMatrix;
 }
 
-#cmakedefine TFP_BUILD_TESTS
+#cmakedefine TFP_TESTS
+#   define TFP_${TFP_LIB_TYPE}
 
-#   define HAVE_SINH @HAVE_SINH@
-#   define HAVE_COSH @HAVE_COSH@
-#   define HAVE_TANH @HAVE_TANH@
-#   define HAVE_ASINH @HAVE_ASINH@
-#   define HAVE_ACOSH @HAVE_ACOSH@
-#   define HAVE_ATANH @HAVE_ATANH@
+#   define TFP_HAVE_SINH ${TFP_HAVE_SINH}
+#   define TFP_HAVE_COSH ${TFP_HAVE_COSH}
+#   define TFP_HAVE_TANH ${TFP_HAVE_TANH}
+#   define TFP_HAVE_ASINH ${TFP_HAVE_ASINH}
+#   define TFP_HAVE_ACOSH ${TFP_HAVE_ACOSH}
+#   define TFP_HAVE_ATANH ${TFP_HAVE_ATANH}
 
-#   define SINH @SINH_SYMBOL@
-#   define COSH @COSH_SYMBOL@
-#   define TANH @TANH_SYMBOL@
-#   define ASINH @ASINH_SYMBOL@
-#   define ACOSH @ACOSH_SYMBOL@
-#   define ATANH @ATANH_SYMBOL@
+#   define SINH ${TFP_SINH_SYMBOL}
+#   define COSH ${TFP_COSH_SYMBOL}
+#   define TANH ${TFP_TANH_SYMBOL}
+#   define ASINH ${TFP_ASINH_SYMBOL}
+#   define ACOSH ${TFP_ACOSH_SYMBOL}
+#   define ATANH ${TFP_ATANH_SYMBOL}
+
+#   if defined(TFP_SHARED)
+#       if defined(TFP_BUILDING)
+#           define TFP_PUBLIC_API ${TFP_API_EXPORT}
+#       else
+#           define TFP_PUBLIC_API ${TFP_API_IMPORT}
+#       endif
+#       define TFP_PRIVATE_API ${TFP_API_LOCAL}
+#   else
+#       define TFP_PUBLIC_API
+#       define TFP_PRIVATE_API
+#   endif
+
 
 #endif /* TFP_CONFIG_HPP */
