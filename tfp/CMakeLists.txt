@@ -118,20 +118,20 @@ add_library (tfp ${TFP_LIB_TYPE}
     "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/views/ToolContainer.cpp"
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp">
-    $<$<BOOL:${TFP_TESTS}>:"${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp">)
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp>
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp>)
 target_include_directories(tfp
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
@@ -140,8 +140,8 @@ target_include_directories(tfp
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 target_compile_options (tfp
     PRIVATE
-        $<$<COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic>
-        $<$<COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic>)
+        $<$<CXX_COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic>
+        $<$<CXX_COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic>)
 target_compile_definitions (tfp
     PRIVATE
         TFP_BUILDING)

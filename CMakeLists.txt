@@ -18,7 +18,7 @@ message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 project ("Transfer-Function-Plotter"
     VERSION 0.0.1
-    LANGUAGES CXX)
+    LANGUAGES C CXX)
 
 list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules")
 
@@ -109,5 +109,5 @@ add_subdirectory ("thirdparty/ads-2.0.1")
 add_subdirectory ("tfp")
 add_subdirectory ("application")
 if (TFP_TESTS)
-    add_subdirectory ("thirdparty/googlemock")
+    add_subdirectory ("thirdparty/googletest")
 endif ()

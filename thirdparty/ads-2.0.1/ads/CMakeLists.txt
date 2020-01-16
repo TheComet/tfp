@@ -1,31 +1,10 @@
-###############################################################################
-# compiler flags
-###############################################################################
-
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_definitions (-Wno-error -fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_definitions (-Wno-error -fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-endif ()
-
-set (LIBRARY_NAME ADS)
 if (ADS_SHARED_LIB)
     set (BUILD_TYPE SHARED)
 else ()
     set (BUILD_TYPE STATIC)
 endif ()
-configure_file (${TEMPLATE_EXPORT_H} "include/ads/export.h")
 
-###############################################################################
-# Defines
-###############################################################################
-
-if (ADS_SHARED_LIB)
-    add_definitions (-DADS_EXPORT)
-    add_definitions (-DADS_BUILDING)
-endif ()
+configure_file ("include/ads/config.h.in" "include/ads/config.h")
 
 ###############################################################################
 # Library, source and header files
@@ -62,10 +41,6 @@ set (ADS_MOC_HEADERS
     "include/ads/DockSplitter.h")
 set (ADS_RESOURCES
     "res/ads.qrc")
-set (ADS_INCLUDE_DIRS
-    "${CMAKE_CURRENT_LIST_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}/include"
-    CACHE STRING "Advanced Docking System include directories" FORCE)
 
 find_package (Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 qt5_wrap_cpp (ADS_MOC_SOURCES ${ADS_MOC_HEADERS})
@@ -77,15 +52,25 @@ add_library (ads ${BUILD_TYPE}
     ${ADS_HEADERS}
     ${ADS_SOURCES}
     ${ADS_MOC_SOURCES}
-    ${ADS_RESOURCES_GEN}
-)
-set (ADS_LIBRARIES ads CACHE STRING "ADS libraries" FORCE)
-
-# generates the correct project files for visual studio, setting the correct
-# debug working directory and other stuff
-create_vcproj_userfile (ads)
-
-target_link_libraries (ads Qt5::Core Qt5::Gui Qt5::Widgets)
+    ${ADS_RESOURCES_GEN})
+target_compile_options (ads
+    PRIVATE
+        $<$<CXX_COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic -Wno-unused-parameter>
+        $<$<CXX_COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic -Wno-unused-parameter>)
+target_compile_definitions (ads
+    PRIVATE
+        ADS_EXPORT
+        ADS_BUILDING)
+target_include_directories(ads
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+target_link_libraries (ads
+    PRIVATE
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets)
 
 ###############################################################################
 # install targets

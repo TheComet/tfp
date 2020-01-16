@@ -30,7 +30,7 @@
 //============================================================================
 //                                   INCLUDES
 //============================================================================
-#include "ads/export.h"
+#include "ads/config.h"
 #include "ads/DockContainerWidget.h"
 
 namespace ads

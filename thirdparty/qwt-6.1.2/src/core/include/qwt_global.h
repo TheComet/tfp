@@ -11,7 +11,6 @@
 #define QWT_GLOBAL_H
 
 #include <qglobal.h>
-#include "qwt_export.h"
 
 // QWT_VERSION is (major << 16) + (minor << 8) + patch.
 

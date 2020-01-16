@@ -4,44 +4,34 @@ option (PUGIXML_WCHAR_MODE "Enable wchar_t mode" OFF)
 option (PUGIXML_COMPACT "Enable compact mode" OFF)
 option (PUGIXML_NO_XPATH "Disable XPath" OFF)
 option (PUGIXML_NO_EXCEPTIONS "Disable C++ exceptions" OFF)
+option (PUGIXML_PIC "Generate position independent code" OFF)
 set(PUGI_DEFINES "" CACHE STRING "Build defines")
 
 # Pre-defines standard install locations on *nix systems.
 include(GNUInstallDirs)
 mark_as_advanced(CLEAR CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_INCLUDEDIR)
 
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_definitions (-fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_definitions (-fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-endif ()
-
 set(HEADERS "include/pugixml.hpp" "include/pugiconfig.hpp.in")
 set(SOURCES ${HEADERS} "src/pugixml.cpp")
 
-set (LIBRARY_NAME PUGIXML)
 if (PUGI_SHARED_LIB)
     set (BUILD_TYPE SHARED)
 else ()
     set (BUILD_TYPE STATIC)
 endif ()
-configure_file (${TEMPLATE_EXPORT_H} "include/pugiexport.hpp")
 configure_file ("include/pugiconfig.hpp.in" "include/pugiconfig.hpp")
-add_definitions (-DPUGIXML_BUILDING)
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/include/pugiexport.hpp")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/include/pugiconfig.hpp")
 
-set (PUGIXML_INCLUDE_DIRS
-    "${CMAKE_CURRENT_LIST_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}/include"
-    CACHE STRING "pugiXML include directories" FORCE)
-include_directories (${PUGIXML_INCLUDE_DIRS})
-
-set (PUGIXML_LIBRARIES pugixml CACHE STRING "PugiXML library" FORCE)
-
-add_library(pugixml ${BUILD_TYPE} ${SOURCES})
+add_library (pugixml ${BUILD_TYPE} ${SOURCES})
+#set_property (TARGET pugixml PROPERTY POSITION_INDEPENDENT_CODE ${PUGIXML_PIC})
+target_compile_definitions (pugixml
+    PRIVATE
+        PUGIXML_BUILDING)
+target_include_directories (pugixml
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 
 # generates the correct project files for visual studio, setting the correct
 # debug working directory and other stuff

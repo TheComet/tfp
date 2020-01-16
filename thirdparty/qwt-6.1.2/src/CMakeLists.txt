@@ -1,34 +1,4 @@
 ###############################################################################
-# compiler flags
-###############################################################################
-
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_definitions (-Wno-error -fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_definitions (-Wno-error -fPIC)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-endif ()
-
-###############################################################################
-# Defines
-###############################################################################
-
-if (QWT_SHARED)
-    add_definitions (-DQT_DLL -DQWT_DLL -DQWT_MAKEDLL)
-endif ()
-
-if (QWT_SVG)
-    add_definitions (-DQWT_SVG)
-else ()
-    add_definitions (-DQWT_NO_SVG)
-endif ()
-
-if (NOT QWT_OPENGL)
-    add_definitions (-DQWT_NO_OPENGL)
-endif ()
-
-###############################################################################
 # Library, source and header files
 ###############################################################################
 
@@ -40,8 +10,6 @@ set (QWT_MOC_HEADERS
     "core/include/qwt_panner.h"
     "core/include/qwt_picker.h"
     "core/include/qwt_text_label.h")
-set (_QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/core/include")
-
 if (QWT_PLOT)
     file (GLOB QWT_PLOT_HEADERS "plot/include/*.h")
     file (GLOB QWT_PLOT_SOURCES "plot/src/*.cpp")
@@ -60,14 +28,12 @@ if (QWT_PLOT)
         "plot/include/qwt_plot_magnifier.h"
         "plot/include/qwt_sampling_thread.h"
         "plot/include/qwt_scale_widget.h")
-    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/plot/include")
 endif ()
 if (QWT_SVG)
     file (GLOB QWT_SVG_HEADERS "svg/include/*.h")
     file (GLOB QWT_SVG_SOURCES "svg/src/*.cpp")
     list (APPEND QWT_HEADERS ${QWT_SVG_HEADERS})
     list (APPEND QWT_SOURCES ${QWT_SVG_SOURCES})
-    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/svg/include")
 endif ()
 if (QWT_OPENGL)
     file (GLOB QWT_OPENGL_HEADERS "opengl/include/*.h")
@@ -75,7 +41,6 @@ if (QWT_OPENGL)
     list (APPEND QWT_HEADERS ${QWT_OPENGL_HEADERS})
     list (APPEND QWT_SOURCES ${QWT_OPENGL_SOURCES})
     list (APPEND QWT_MOC_HEADERS "opengl/include/qwt_plot_glcanvas.h")
-    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/opengl/include")
 endif ()
 if (QWT_WIDGETS)
     file (GLOB QWT_WIDGETS_HEADERS "widgets/include/*.h")
@@ -93,51 +58,59 @@ if (QWT_WIDGETS)
         "widgets/include/qwt_slider.h"
         "widgets/include/qwt_thermo.h"
         "widgets/include/qwt_wheel.h")
-    list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/widgets/include")
 endif ()
 
 find_package (Qt5 COMPONENTS Core Concurrent PrintSupport REQUIRED)
 qt5_wrap_cpp (QWT_MOC_SOURCES ${QWT_MOC_HEADERS})
 
-set (LIBRARY_NAME QWT)
 if (QWT_SHARED_LIB)
     set (BUILD_TYPE SHARED)
 else ()
     set (BUILD_TYPE STATIC)
 endif ()
-configure_file (${TEMPLATE_EXPORT_H} "include/qwt_export.h")
-list (APPEND _QWT_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/include")
-
-set (QWT_INCLUDE_DIRS ${_QWT_INCLUDE_DIRS} CACHE STRING "Qwt include directories" FORCE)
-include_directories (${QWT_INCLUDE_DIRS})
 
 add_library (qwtinternal ${BUILD_TYPE}
     ${QWT_SOURCES}
-    ${QWT_MOC_SOURCES}
-)
-set (QWT_LIBRARIES qwtinternal CACHE STRING "Qwt libraries" FORCE)
-
-# generates the correct project files for visual studio, setting the correct
-# debug working directory and other stuff
-create_vcproj_userfile (qwtinternal)
-
-add_definitions (-DQWT_BUILDING)
-
-target_link_libraries (qwtinternal Qt5::Core Qt5::Concurrent Qt5::PrintSupport)
+    ${QWT_MOC_SOURCES})
+target_include_directories (qwtinternal
+    PUBLIC
+        $<BUILD_INTERFACE:
+            ${CMAKE_CURRENT_LIST_DIR}/core/include
+            ${CMAKE_CURRENT_BINARY_DIR}/include
+            $<$<BOOL:${QWT_PLOT}>:${CMAKE_CURRENT_LIST_DIR}/plot/include>
+            $<$<BOOL:${QWT_SVG}>:${CMAKE_CURRENT_LIST_DIR}/svg/include>
+            $<$<BOOL:${QWT_OPENGL}>:${CMAKE_CURRENT_LIST_DIR}/opengl/include>
+            $<$<BOOL:${QWT_WIDGETS}>:${CMAKE_CURRENT_LIST_DIR}/widgets/include>>
+        $<INSTALL_INTERFACE:include>)
+target_compile_definitions (qwtinternal
+    PRIVATE
+        $<$<BOOL:${QWT_SHARED}>:QT_DLL QWT_DLL QWT_MAKEDLL>
+        $<$<BOOL:${QWT_SVG}>:QWT_SVG>
+        $<$<NOT:$<BOOL:${QWT_SVG}>>:QWT_NO_SVG>
+        $<$<NOT:$<BOOL:${QWT_OPENGL}>>:QWT_NO_OPENGL>)
+target_compile_options (qwtinternal
+    PRIVATE
+        $<$<CXX_COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic -Wno-unused-parameter>
+        $<$<CXX_COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic -Wno-unused-parameter>)
+target_link_libraries (qwtinternal
+    PRIVATE
+        Qt5::Core
+        Qt5::Concurrent
+        Qt5::PrintSupport)
 
 if (QWT_WIDGETS)
     find_package (Qt5 COMPONENTS Widgets REQUIRED)
-    target_link_libraries (qwtinternal Qt5::Widgets)
+    target_link_libraries (qwtinternal PRIVATE Qt5::Widgets)
 endif ()
 
 if (QWT_SVG)
     find_package (Qt5 COMPONENTS Svg REQUIRED)
-    target_link_libraries (qwtinternal Qt5::Svg)
+    target_link_libraries (qwtinternal PRIVATE Qt5::Svg)
 endif ()
 
 if (QWT_OPENGL)
     find_package (Qt5 COMPONENTS OpenGL REQUIRED)
-    target_link_libraries (qwtinternal Qt5::OpenGL)
+    target_link_libraries (qwtinternal PRIVATE Qt5::OpenGL)
 endif ()
 
 ###############################################################################
