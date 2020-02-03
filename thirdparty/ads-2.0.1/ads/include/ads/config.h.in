@@ -1,2 +1,15 @@
 #pragma once
 
+#define ADS_${ADS_LIB_TYPE}
+
+#if defined(ADS_SHARED)
+#   if defined(ADS_BUILDING)
+#       define ADS_PUBLIC_API ${ADS_API_EXPORT}
+#   else
+#       define ADS_PUBLIC_API ${ADS_API_IMPORT}
+#   endif
+#   define ADS_PRIVATE_API ${ADS_API_LOCAL}
+#else
+#   define ADS_PUBLIC_API
+#   define ADS_PRIVATE_API
+#endif

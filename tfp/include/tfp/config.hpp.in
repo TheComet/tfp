@@ -47,5 +47,4 @@ namespace tfp {
 #       define TFP_PRIVATE_API
 #   endif
 
-
 #endif /* TFP_CONFIG_HPP */

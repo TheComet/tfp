@@ -1,7 +1,6 @@
 #include "tfp/models/Config.hpp"
 #include "tfp/util/Util.hpp"
 #include "tfp/util/Logger.hpp"
-#include "pugixml.hpp"
 
 namespace tfp {
 Config g_config;

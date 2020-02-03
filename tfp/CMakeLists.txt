@@ -9,8 +9,6 @@ find_package (Qt5Gui REQUIRED)
 find_package (Qt5Core REQUIRED)
 find_package (Qt5OpenGL REQUIRED)
 find_package (Qt5LinguistTools REQUIRED)
-find_package (FLEX REQUIRED)
-find_package (BISON REQUIRED)
 
 set (TFP_HEADERS_MOC
     "${CMAKE_CURRENT_LIST_DIR}/include/tfp/plot/DeltaPlotPicker.hpp"
@@ -49,47 +47,12 @@ qt5_wrap_ui  (TFP_FORMS_MOC ${TFP_FORMS})
 qt5_add_resources (TFP_RESOURCES_GEN ${TFP_RESOURCES})
 #qt5_add_translation (TFP_QM_FILES ${TFP_TRANSLATION_FILES})
 
-# Expression parser
-file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/math/new")
-file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/tfp/math/new")
-bison_target (ExpressionParser
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/ExpressionParser.y"
-    "${CMAKE_CURRENT_BINARY_DIR}/src/math/new/ExpressionParser.cpp"
-    DEFINES_FILE "${CMAKE_CURRENT_BINARY_DIR}/include/tfp/math/new/ExpressionParser.hpp")
-flex_target (ExpressionLexer
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/ExpressionLexer.l"
-    "${CMAKE_CURRENT_BINARY_DIR}/src/math/new/ExpressionLexer.cpp")
-add_flex_bison_dependency (ExpressionLexer ExpressionParser)
-
 add_library (tfp ${TFP_LIB_TYPE}
     ${TFP_SOURCES_MOC}
     ${TFP_FORMS_MOC}
     ${TFP_RESOURCES_GEN}
-    ${BISON_ExpressionParser_OUTPUTS}
-    ${FLEX_ExpressionLexer_OUTPUTS}
     ${TFP_QM_FILES}
     "${CMAKE_CURRENT_LIST_DIR}/src/tfp.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/CoefficientPolynomial.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/Connection.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/Expression.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionParser.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionManipulator_RationalFunction.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Constants.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_Simplifications.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/ExpressionOptimiser_UselessOperations.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/Graph.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/Math.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/Node.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/RootPolynomial.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/StateSpace.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicMatrix.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/SymbolicStateSpace.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/System.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/TransferFunction.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/new/Expression.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/math/VariableTable.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/models/Config.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/models/Translation.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/plot/AutoScaler.cpp"
@@ -104,8 +67,6 @@ add_library (tfp ${TFP_LIB_TYPE}
     "${CMAKE_CURRENT_LIST_DIR}/src/plugin/PluginManager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/plugin/Tool.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/util/Logger.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/util/Metric.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/util/RefCounted.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/util/String.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/util/Tears.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/util/Util.cpp"
@@ -118,20 +79,7 @@ add_library (tfp ${TFP_LIB_TYPE}
     "${CMAKE_CURRENT_LIST_DIR}/src/views/RealtimePlot3D.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/views/SettingsView.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/views/ToolContainer.cpp"
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionManipulator_RationalFunction.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Constants.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_Simplifications.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_ExpressionOptimiser_UselessOperations.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Expression_parser.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Graph.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_Node.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_StateSpace.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicMatrix.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_SymbolicStateSpace.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/test_VariableTable.cpp>
-    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/new/test_Expression.cpp>)
+    $<$<BOOL:${TFP_TESTS}>:${CMAKE_CURRENT_LIST_DIR}/tests/run_tests_api.cpp>)
 target_include_directories(tfp
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
@@ -154,7 +102,6 @@ target_link_libraries (tfp
         qwtplot3d
         ads
         kissfft
-        pugixml
         $<$<BOOL:${TFP_TESTS}>:gtest>)
 
 #add_custom_target (TFP_translations_compile

@@ -5,7 +5,7 @@
 #ifndef KISS_FFT_CONFIG_H
 #   define KISS_FFT_CONFIG_H
 
-#cmakedefine KISS_FFT_FIXED_POINT
+#cmakedefine KISS_FFT_FIXED_POINT ${KISS_FFT_FIXED_POINT}
 #cmakedefine KISS_FFT_USE_SIMD
 #cmakedefine KISS_FFT_USE_ALLOCA
 #define kiss_fft_scalar @KISS_FFT_DATATYPE@

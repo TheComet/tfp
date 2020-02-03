@@ -12,26 +12,27 @@ set (ADS_DEMO_MOC_HEADERS
 set (ADS_DEMO_FORMS
     "mainwindow.ui")
 
-find_package (Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+find_package (Qt5Core REQUIRED)
+find_package (Qt5Gui REQUIRED)
+find_package (Qt5Widgets REQUIRED)
 
 qt5_wrap_cpp (ADS_DEMO_MOC_SOURCES ${ADS_DEMO_MOC_HEADERS})
 qt5_wrap_ui (ADS_DEMO_FORMS_MOC ${ADS_DEMO_FORMS})
-
-include_directories (${ADS_INCLUDE_DIRS})
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable (ads_demo
     ${ADS_DEMO_HEADERS}
     ${ADS_DEMO_SOURCES}
     ${ADS_DEMO_MOC_SOURCES}
-    ${ADS_DEMO_FORMS_MOC}
-)
-
-# generates the correct project files for visual studio, setting the correct
-# debug working directory and other stuff
-create_vcproj_userfile (ads_demo)
-
-target_link_libraries (ads_demo ${ADS_LIBRARIES})
+    ${ADS_DEMO_FORMS_MOC})
+target_link_libraries (ads_demo
+    PRIVATE
+        ads)
+target_include_directories (ads_demo
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    PRIVATE $<INSTALL_INTERFACE:install>)
+set_target_properties (ads_demo
+    PROPERTIES
+        INSTALL_RPATH "../lib")
 
 ###############################################################################
 # install targets
@@ -39,8 +40,4 @@ target_link_libraries (ads_demo ${ADS_LIBRARIES})
 
 install (
     TARGETS ads_demo
-    ARCHIVE DESTINATION "lib"
-    LIBRARY DESTINATION "lib"
-    RUNTIME DESTINATION "bin"
-)
-
+    RUNTIME DESTINATION "bin")
