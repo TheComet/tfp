@@ -28,12 +28,9 @@ struct sfgsym_expr
 
 SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_add(sfgsym_real a, sfgsym_real b);
 SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_sub(sfgsym_real a, sfgsym_real b);
-SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_neg(sfgsym_real a);
 SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_mul(sfgsym_real a, sfgsym_real b);
 SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_div(sfgsym_real a, sfgsym_real b);
 SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_pow(sfgsym_real a, sfgsym_real b);
-SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_exp(sfgsym_real a);
-SFGSYM_PUBLIC_API sfgsym_real sfgsym_op_sqrt(sfgsym_real a);
 
 SFGSYM_PUBLIC_API struct sfgsym_expr* sfgsym_expr_literal_create(sfgsym_real value);
 SFGSYM_PUBLIC_API struct sfgsym_expr* sfgsym_expr_variable_create(const char* name);
@@ -77,7 +74,7 @@ SFGSYM_PUBLIC_API void
 sfgsym_expr_destroy_recurse(struct sfgsym_expr* expr);
 
 SFGSYM_PUBLIC_API int
-sfgsym_expr_child_count(struct sfgsym_expr* expr);
+sfgsym_expr_child_count(const struct sfgsym_expr* expr);
 
 SFGSYM_PUBLIC_API void
 sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr);

@@ -122,6 +122,7 @@ add_library (sfgsym_obj OBJECT
     "src/parsers/expression_parser.y"
     "src/parsers/expression_parser.l"
     "src/parsers/expression_parser.c"
+    "src/exporters/expr2dot.c"
     "src/symbolic/expression.c"
     "src/util/log.c")
 set_target_properties (sfgsym_obj
@@ -146,6 +147,9 @@ endif ()
 target_compile_definitions (sfgsym_obj
     PRIVATE
         SFGSYM_BUILDING)
+target_link_libraries (sfgsym_obj
+    PUBLIC
+        cstructures)
 
 if (SFGSYM_TESTS)
     add_library (sfgsym_tests_obj OBJECT
@@ -166,6 +170,9 @@ add_library (sfgsym ${SFGSYM_LIB_TYPE}
 set_target_properties (sfgsym
     PROPERTIES
         SOVERSION ${PROJECT_VERSION})
+target_link_libraries (sfgsym
+    PUBLIC
+        cstructures)
 
 if (SFGSYM_TESTS)
     add_executable (sfgsym_tests

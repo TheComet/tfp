@@ -72,6 +72,7 @@ struct sfgsym_expr* sfgsym_expr_op_create(int argc, sfgsym_real (*op_func)(), ..
         return NULL;
 
     op->type = SFGSYM_OP + (enum sfgsym_expr_type)(argc - 1);
+    op->data.op = op_func;
     op->parent = NULL;
 
     va_start(ap, op_func);
@@ -196,7 +197,7 @@ sfgsym_expr_destroy_recurse(struct sfgsym_expr* expr)
 
 /* ------------------------------------------------------------------------- */
 int
-sfgsym_expr_child_count(struct sfgsym_expr* expr)
+sfgsym_expr_child_count(const struct sfgsym_expr* expr)
 {
     if (expr->type < SFGSYM_OP)
         return 0;

@@ -104,5 +104,5 @@ sfgsymerror(SFGSYMLTYPE* locp, sfgsymscan_t scanner, const char* fmt, ...)
     va_start(ap, fmt);
     sfgsym_vlog_error(fmt, ap);
     va_end(ap);
+    sfgsym_log("\n");
 }
-

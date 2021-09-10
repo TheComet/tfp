@@ -29,6 +29,7 @@ list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 # must be in this order due to linking
 add_subdirectory ("thirdparty/googletest-1.10.0")
 #add_subdirectory ("thirdparty/kiss_fft130")
+add_subdirectory ("thirdparty/cstructures")
 add_subdirectory ("sfgsym")
 #add_subdirectory ("thirdparty/qwt-6.1.2")
 #add_subdirectory ("thirdparty/qwtplot3d-0.3.1")
