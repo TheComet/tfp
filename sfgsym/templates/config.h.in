@@ -1,0 +1,35 @@
+#ifndef SFGSYM_CONFIG_H
+#define SFGSYM_CONFIG_H
+
+#cmakedefine SFGSYM_TESTS
+#cmakedefine SFGSYM_PIC
+
+#define SFGSYM_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
+#define SFGSYM_VERSION_MINOR ${PROJECT_VERSION_MINOR}
+#define SFGSYM_VERSION_PATCH ${PROJECT_VERSION_PATCH}
+#define SFGSYM_VERSION ((SFGSYM_VERSION_MAJOR << 16) | (SFGSYM_VERSION_MINOR << 8) | SFGSYM_VERSION_PATCH)
+#define SFGSYM_VERSION_STR "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+
+#define SFGSYM_${SFGSYM_LIB_TYPE}
+
+#if defined(SFGSYM_SHARED)
+#   if defined(SFGSYM_BUILDING)
+#       define SFGSYM_PUBLIC_API ${SFGSYM_API_EXPORT}
+#   else
+#       define SFGSYM_PUBLIC_API ${SFGSYM_API_IMPORT}
+#   endif
+#   define SFGSYM_PRIVATE_API ${SFGSYM_API_LOCAL}
+#endif
+
+#if defined(__cplusplus)
+#   define C_BEGIN extern "C" {
+#   define C_END }
+#else
+#   define C_BEGIN
+#   define C_END
+#endif
+
+typedef ${SFGSYM_REAL} sfgsym_real;
+
+#endif
+

@@ -35,7 +35,7 @@ SFGSYM_PUBLIC_API double comma(double a, double b);
  *     allocating and initialising an expression object instead of overloading
  *     the constructor. The reason was because both Expression::parse() and
  *     Expression::make() take strings, but do very different things. Having a
- *     constructor that takes a sting makes its purpose a little ambiguous.
+ *     constructor that takes a string would make its purpose a little ambiguous.
  */
 class SFGSYM_PUBLIC_API Expression : public RefCounted
 {
