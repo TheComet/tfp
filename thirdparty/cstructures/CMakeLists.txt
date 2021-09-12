@@ -44,6 +44,7 @@ add_library (cstructures ${CSTRUCTURES_LIB_TYPE}
     "src/init.c"
     "src/memory.c"
     "src/string.c"
+    "src/varhashmap.c"
     "src/vector.c"
     $<$<PLATFORM_ID:Linux>:src/platform/linux/backtrace_linux.c>)
 set_property (TARGET cstructures

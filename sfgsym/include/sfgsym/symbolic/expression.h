@@ -4,6 +4,8 @@
 
 C_BEGIN
 
+struct sfgsym_subs_table;
+
 enum sfgsym_expr_type
 {
     SFGSYM_LITERAL,
@@ -78,5 +80,9 @@ sfgsym_expr_child_count(const struct sfgsym_expr* expr);
 
 SFGSYM_PUBLIC_API void
 sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API sfgsym_real
+sfgsym_expr_eval(const struct sfgsym_expr* expr,
+                 const struct sfgsym_subs_table* st);
 
 C_END

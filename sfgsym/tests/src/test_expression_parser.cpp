@@ -16,10 +16,18 @@ static sfgsym_expr* parse_string(const char* str)
     return expr;
 }
 
-TEST(NAME, bla)
+TEST(NAME, foo)
 {
     sfgsym_expr* expr = parse_string("a+b*c^e(f+g, 2, 5)h");
     ASSERT_THAT(expr, NotNull());
-    sfgsym_export_expr_dot_file(expr, "test.dot");
+    sfgsym_export_expr_dot_file(expr, "foo.dot");
+    sfgsym_expr_destroy_recurse(expr);
+}
+
+TEST(NAME, bla)
+{
+    sfgsym_expr* expr = parse_string("2a b 5(((x)))");
+    ASSERT_THAT(expr, NotNull());
+    sfgsym_export_expr_dot_file(expr, "bla.dot");
     sfgsym_expr_destroy_recurse(expr);
 }

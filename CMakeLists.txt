@@ -26,6 +26,10 @@ list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 # Options
 ###############################################################################
 
+# Don't install thirdparty libs
+set (INSTALL_GTEST OFF CACHE INTERNAL "")
+set (gtest_force_shared_crt ON CACHE INTERNAL "")
+
 # must be in this order due to linking
 add_subdirectory ("thirdparty/googletest-1.10.0")
 #add_subdirectory ("thirdparty/kiss_fft130")

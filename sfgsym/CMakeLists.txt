@@ -116,25 +116,45 @@ add_flex_bison_dependency (sfgsym_expression_lexer sfgsym_expression_parser)
 # Library definition
 ###############################################################################
 
-add_library (sfgsym_obj OBJECT
+set (SFGSYM_SOURCES
+    "src/algo/mason.c"
+    "src/exporters/graph2dot.c"
+    "src/exporters/expr2dot.c"
+    "src/sfg/branch.c"
+    "src/sfg/graph.c"
+    "src/sfg/node.c"
+    "src/symbolic/expression.c"
+    "src/symbolic/expression_eval.c"
+    "src/symbolic/subs_table.c"
+    "src/util/log.c"
+    "src/init.c")
+set (SFGSYM_PARSER_SOURCES
     ${BISON_sfgsym_expression_parser_OUTPUTS}
     ${FLEX_sfgsym_expression_lexer_OUTPUTS}
     "src/parsers/expression_parser.y"
     "src/parsers/expression_parser.l"
-    "src/parsers/expression_parser.c"
-    "src/exporters/expr2dot.c"
-    "src/symbolic/expression.c"
-    "src/util/log.c")
-set_target_properties (sfgsym_obj
+    "src/parsers/expression_parser.c")
+set (SFGSYM_TEST_SOURCES
+    "tests/src/test_expression.cpp"
+    "tests/src/test_expression_parser.cpp"
+    "tests/src/test_mason_gain_rule.cpp"
+    "tests/src/run_tests.cpp")
+
+add_library (sfgsym ${SFGSYM_LIB_TYPE}
+    ${SFGSYM_SOURCES}
+    ${SFGSYM_PARSER_SOURCES}
+    $<$<BOOL:${SFGSYM_TESTS}>:${SFGSYM_TEST_SOURCES}>)
+set_target_properties (sfgsym
     PROPERTIES
         C_STANDARD 90
         POSITION_INDEPENDENT_CODE ${SFGSYM_PIC})
-target_include_directories (sfgsym_obj
+target_include_directories (sfgsym
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+        $<$<BOOL:${SFGSYM_TESTS}>:$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/tests/include>>
         $<INSTALL_INTERFACE:include>)
-target_compile_options (sfgsym_obj
+target_compile_options (sfgsym
     PRIVATE
     $<$<C_COMPILER_ID:GNU>:-W -Wall -Wextra -pedantic -Wshadow>
     $<$<C_COMPILER_ID:Clang>:-W -Wall -Wextra -pedantic -Wshadow>)
@@ -144,46 +164,31 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set_source_files_properties (${BISON_sfgsym_expression_parser_OUTPUTS}
         PROPERTIES COMPILE_OPTIONS "-Wno-pedantic")
 endif ()
-target_compile_definitions (sfgsym_obj
+target_compile_definitions (sfgsym
     PRIVATE
         SFGSYM_BUILDING)
-target_link_libraries (sfgsym_obj
-    PUBLIC
-        cstructures)
-
-if (SFGSYM_TESTS)
-    add_library (sfgsym_tests_obj OBJECT
-        "tests/test_expression.cpp"
-        "tests/test_expression_parser.cpp")
-    set_target_properties (sfgsym_tests_obj
-        PROPERTIES
-            POSITION_INDEPENDENT_CODE ${SFGSYM_PIC})
-    target_link_libraries (sfgsym_tests_obj
-        PRIVATE
-            sfgsym_obj
-            GTest::gmock)
-endif ()
-
-add_library (sfgsym ${SFGSYM_LIB_TYPE}
-    $<TARGET_OBJECTS:sfgsym_obj>
-    $<$<BOOL:${SFGSYM_TESTS}>:$<TARGET_OBJECTS:sfgsym_tests_obj>>)
+target_link_libraries (sfgsym
+    PRIVATE
+        cstructures
+        $<$<BOOL:${SFGSYM_TESTS}>:GTest::gmock>)
 set_target_properties (sfgsym
     PROPERTIES
         SOVERSION ${PROJECT_VERSION})
-target_link_libraries (sfgsym
-    PUBLIC
-        cstructures)
 
 if (SFGSYM_TESTS)
+    if (SFGSYM_PIC)
+        set_target_properties (gmock
+            PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        set_target_properties (gtest
+            PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    endif ()
+
     add_executable (sfgsym_tests
-        "tests/main.cpp")
+        "tests/src/main.c")
     target_link_libraries (sfgsym_tests
-        PUBLIC
-            sfgsym
-            GTest::gmock)
+        PRIVATE sfgsym)
     set_target_properties (sfgsym_tests
-        PROPERTIES 
-            INSTALL_RPATH "../lib")
+        PROPERTIES INSTALL_RPATH "../lib")
 endif ()
 
 ###############################################################################
