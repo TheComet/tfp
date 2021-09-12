@@ -11,6 +11,7 @@
 #include "qwt_scale_div.h"
 #include "qwt_plot.h"
 #include "qwt_painter.h"
+#include <qpainterpath.h>
 #include <qbitmap.h>
 #include <qstyle.h>
 #include <qstyleoption.h>

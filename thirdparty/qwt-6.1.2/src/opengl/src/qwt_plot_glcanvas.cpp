@@ -11,6 +11,7 @@
 #include "qwt_plot.h"
 #include <qevent.h>
 #include <qpainter.h>
+#include <qpainterpath.h>
 #include <qdrawutil.h>
 #include <qstyle.h>
 #include <qstyleoption.h>

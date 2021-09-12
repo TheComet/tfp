@@ -20,6 +20,7 @@
 #include <qpainter.h>
 #include <qpaintengine.h>
 #include <qtransform.h>
+#include <qpainterpath.h>
 #include <qprinter.h>
 #include <qprintdialog.h>
 #include <qfiledialog.h>
