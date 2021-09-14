@@ -67,7 +67,7 @@ sfgsym_algo_find_forward_paths(
     if (hashmap_init_with_options(&visited, sizeof(struct sfgsym_node*), 0, 64, hash32_aligned_ptr) != HM_OK)
         goto init_visited_failed;
     if (hashmap_init_with_options(&blocked, sizeof(struct sfgsym_node*), 0, 64, hash32_aligned_ptr) != HM_OK)
-        goto init_aligned_failed;
+        goto init_blocked_failed;
     vector_init(&stack, sizeof(struct sfgsym_branch*));
 
     NODE_FOR_EACH_OUTGOING(in, branch)
@@ -82,7 +82,7 @@ sfgsym_algo_find_forward_paths(
 
     find_paths_failed   : vector_deinit(&stack);
                           hashmap_deinit(&blocked);
-    init_aligned_failed : hashmap_deinit(&visited);
+    init_blocked_failed : hashmap_deinit(&visited);
     init_visited_failed : return -1;
 }
 
@@ -98,7 +98,7 @@ sfgsym_algo_find_loops(
     if (hashmap_init_with_options(&visited, sizeof(struct sfgsym_node*), 0, 64, hash32_aligned_ptr) != HM_OK)
         goto init_visited_failed;
     if (hashmap_init_with_options(&blocked, sizeof(struct sfgsym_node*), 0, 64, hash32_aligned_ptr) != HM_OK)
-        goto init_aligned_failed;
+        goto init_blocked_failed;
     vector_init(&stack, sizeof(struct sfgsym_branch*));
 
     GRAPH_FOR_EACH_NODE(graph, node)
@@ -119,7 +119,7 @@ sfgsym_algo_find_loops(
 
     find_paths_failed   : vector_deinit(&stack);
                           hashmap_deinit(&blocked);
-    init_aligned_failed : hashmap_deinit(&visited);
+    init_blocked_failed : hashmap_deinit(&visited);
     init_visited_failed : return -1;
 
 }
