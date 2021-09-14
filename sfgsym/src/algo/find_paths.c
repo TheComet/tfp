@@ -70,6 +70,14 @@ sfgsym_algo_find_forward_paths(
         goto init_blocked_failed;
     vector_init(&stack, sizeof(struct sfgsym_branch*));
 
+    /*
+     * Small quirk of the algorithm, we have to block the initial node or it's
+     * possible that a loop that starts at the first node is counted as part
+     * of the path.
+     */
+    if (hashmap_insert(&blocked, &in, NULL) != HM_OK)
+        goto find_paths_failed;
+
     NODE_FOR_EACH_OUTGOING(in, branch)
         if (find_paths_recurse(paths, branch, out, &visited, &blocked, &stack) != 0)
             goto find_paths_failed;
