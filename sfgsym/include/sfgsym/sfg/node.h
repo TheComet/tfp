@@ -12,8 +12,8 @@ struct sfgsym_node
 {
     struct sfgsym_graph* owning_graph;
 
-    struct cs_vector outgoing;  /* list of struct sfgsym_branch */
-    struct cs_vector incoming;  /* list of struct sfgsym_branch */
+    struct cs_vector outgoing;  /* list of struct sfgsym_branch* */
+    struct cs_vector incoming;  /* list of struct sfgsym_branch* */
     char* name;
 };
 
@@ -68,5 +68,12 @@ sfgsym_node_is_dependent_variable(const struct sfgsym_node* node);
  */
 SFGSYM_PUBLIC_API struct sfgsym_expr*
 sfgsym_node_equation(const struct sfgsym_node* node);
+
+#define NODE_FOR_EACH_OUTGOING(node, branch_var) \
+    VECTOR_FOR_EACH(&(node)->outgoing, struct sfgsym_branch*, node_##branch_var) \
+    struct sfgsym_branch* branch_var = *node_##branch_var; {
+
+#define NODE_END_EACH \
+    VECTOR_END_EACH }
 
 C_END

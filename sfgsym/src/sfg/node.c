@@ -25,7 +25,7 @@ sfgsym_node_create(struct sfgsym_graph* graph, const char* name)
 }
 
 /* ------------------------------------------------------------------------- */
-SFGSYM_PUBLIC_API void
+void
 sfgsym_node_destroy(struct sfgsym_node* node)
 {
     vector_deinit(&node->outgoing);

@@ -4,6 +4,9 @@
 #include "sfgsym/parsers/expression_parser.h"
 #include "sfgsym/symbolic/expression.h"
 #include "sfgsym/symbolic/subs_table.h"
+#include "sfgsym/sfg/path.h"
+#include "sfgsym/algo/find_loops.h"
+#include "sfgsym/algo/find_paths.h"
 #include "sfgsym/algo/mason.h"
 
 #define NAME mason_gain_rule
@@ -25,9 +28,9 @@ static sfgsym_expr* mason(sfgsym_graph* g, sfgsym_node* in, sfgsym_node* out)
     sfgsym_path_list_init(&paths);
     sfgsym_path_list_init(&loops);
 
-    sfgsym_graph_find_forward_paths(&paths, in, out);
-    sfgsym_graph_find_loops(&loops, g);
-    sfgsym_expr* tf = sfgsym_mason_gain_rule(&paths, &loops);
+    sfgsym_algo_find_forward_paths(&paths, in, out);
+    sfgsym_algo_find_loops(&loops, g);
+    sfgsym_expr* tf = sfgsym_algo_mason_gain_rule(&paths, &loops);
 
     sfgsym_path_list_deinit(&loops);
     sfgsym_path_list_deinit(&paths);

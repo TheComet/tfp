@@ -62,15 +62,16 @@ sfgsym_graph_destroy_node(struct sfgsym_graph* graph, struct sfgsym_node* node);
  * \param a The outgoing node. Branch will be pointing away from this node.
  * \param b The incoming node. Branch will be pointing into this node.
  * \param weight The weight to give the branch. The branch will take ownership
- * of this parameter.
+ * of this parameter. If you specify NULL, then the weight will default to 1.0.
  * \return Non-owning pointer to the new branch (graph takes ownership), or NULL
  * if allocation fails.
  */
 SFGSYM_PUBLIC_API struct sfgsym_branch*
-sfgsym_graph_connect_a_to_b(struct sfgsym_graph* graph,
-                            struct sfgsym_node* a,
-                            struct sfgsym_node* b,
-                            struct sfgsym_expr* weight);
+sfgsym_graph_connect_a_to_b(
+        struct sfgsym_graph* graph,
+        struct sfgsym_node* a,
+        struct sfgsym_node* b,
+        struct sfgsym_expr* weight);
 
 /*!
  * \brief Destroys a single branch connecting two nodes.
@@ -95,11 +96,11 @@ sfgsym_graph_destroy_branch(struct sfgsym_graph* graph, struct sfgsym_branch* br
 
 #define GRAPH_FOR_EACH_NODE(graph, node_var) \
     VECTOR_FOR_EACH(&(graph)->nodes, struct sfgsym_node*, graph_##node_var) \
-    struct sfgsym_node* node_var= *(graph_##node_var); {
+    struct sfgsym_node* node_var = *(graph_##node_var); {
 
 #define GRAPH_FOR_EACH_BRANCH(graph, branch_var) \
     VECTOR_FOR_EACH(&(graph)->branches, struct sfgsym_branch*, graph_##branch_var) \
-    struct sfgsym_branch* branch_var= *(graph_##branch_var); {
+    struct sfgsym_branch* branch_var = *(graph_##branch_var); {
 
 #define GRAPH_END_EACH \
     VECTOR_END_EACH }

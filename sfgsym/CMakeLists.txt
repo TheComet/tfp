@@ -117,12 +117,14 @@ add_flex_bison_dependency (sfgsym_expression_lexer sfgsym_expression_parser)
 ###############################################################################
 
 set (SFGSYM_SOURCES
+    "src/algo/find_paths.c"
     "src/algo/mason.c"
     "src/exporters/graph2dot.c"
     "src/exporters/expr2dot.c"
     "src/sfg/branch.c"
     "src/sfg/graph.c"
     "src/sfg/node.c"
+    "src/sfg/path.c"
     "src/symbolic/expression.c"
     "src/symbolic/expression_eval.c"
     "src/symbolic/subs_table.c"
@@ -137,7 +139,9 @@ set (SFGSYM_PARSER_SOURCES
 set (SFGSYM_TEST_SOURCES
     "tests/src/test_expression.cpp"
     "tests/src/test_expression_parser.cpp"
-    "tests/src/test_mason_gain_rule.cpp"
+    "tests/src/test_algo_find_loops.cpp"
+    "tests/src/test_algo_find_paths.cpp"
+    "tests/src/test_algo_mason.cpp"
     "tests/src/run_tests.cpp")
 
 add_library (sfgsym ${SFGSYM_LIB_TYPE}

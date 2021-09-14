@@ -1,6 +1,7 @@
 #include "sfgsym/sfg/graph.h"
 #include "sfgsym/sfg/node.h"
 #include "sfgsym/sfg/branch.h"
+#include "sfgsym/symbolic/expression.h"
 #include "cstructures/memory.h"
 #include <stddef.h>
 
@@ -83,22 +84,47 @@ sfgsym_graph_destroy_node(struct sfgsym_graph* graph, struct sfgsym_node* node)
 
 /* ------------------------------------------------------------------------- */
 struct sfgsym_branch*
-sfgsym_graph_connect_a_to_b(struct sfgsym_graph* graph,
-                            struct sfgsym_node* a,
-                            struct sfgsym_node* b,
-                            struct sfgsym_expr* weight)
+sfgsym_graph_connect_a_to_b(
+        struct sfgsym_graph* graph,
+        struct sfgsym_node* a,
+        struct sfgsym_node* b,
+        struct sfgsym_expr* weight)
 {
-    struct sfgsym_branch* branch = sfgsym_branch_create_with_weight(graph, a, b, weight);
-    if (branch == NULL)
-        return NULL;
+    struct sfgsym_branch** branch;
+    struct sfgsym_branch** outgoing;
+    struct sfgsym_branch** incoming;
+    struct sfgsym_expr* default_weight = NULL;
 
-    if (vector_push(&graph->branches, &branch) != 0)
+    branch = vector_emplace(&graph->branches);
+    if (branch == NULL)
+        goto emplace_branch_failed;
+
+    outgoing = vector_emplace(&a->outgoing);
+    if (outgoing == NULL)
+        goto emplace_outgoing_failed;
+    incoming = vector_emplace(&b->incoming);
+    if (incoming == NULL)
+        goto emplace_incoming_failed;
+
+    if (weight == NULL)
     {
-        sfgsym_branch_destroy(branch);
-        return NULL;
+        weight = default_weight = sfgsym_expr_literal_create(1.0);
+        if (default_weight == NULL)
+            goto alloc_default_weight_failed;
     }
 
-    return branch;
+    *branch = *outgoing = *incoming =
+            sfgsym_branch_create_with_weight(graph, a, b, weight);
+    if (*branch == NULL)
+        goto create_branch_failed;
+
+    return *branch;
+
+    create_branch_failed        : if (default_weight) sfgsym_expr_destroy_recurse(default_weight);
+    alloc_default_weight_failed : vector_pop(&b->incoming);
+    emplace_incoming_failed     : vector_pop(&a->outgoing);
+    emplace_outgoing_failed     : vector_pop(&graph->branches);
+    emplace_branch_failed       : return NULL;
 }
 
 /* ------------------------------------------------------------------------- */
