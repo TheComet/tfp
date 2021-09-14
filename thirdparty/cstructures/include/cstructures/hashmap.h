@@ -66,12 +66,12 @@ struct cs_hashmap
  * @return If successful, returns CSTRUCTURES_OK. If allocation fails,
  * CSTRUCTURES_ERR_OUT_OF_MEMORY is returned.
  */
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_create(struct cs_hashmap** hm,
                uint32_t key_size,
                uint32_t value_size);
 
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_create_with_options(struct cs_hashmap** hm,
                             uint32_t key_size,
                             uint32_t value_size,
@@ -82,12 +82,12 @@ hashmap_create_with_options(struct cs_hashmap** hm,
  * @brief Initializes a new hashmap. See hashmap_create() for details on
  * parameters and return values.
  */
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_init(struct cs_hashmap* hm,
              uint32_t key_size,
              uint32_t value_size);
 
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_init_with_options(struct cs_hashmap* hm,
                           uint32_t key_size,
                           uint32_t value_size,
@@ -97,16 +97,16 @@ hashmap_init_with_options(struct cs_hashmap* hm,
 /*!
  * @brief Cleans up internal resources without freeing the hashmap object itself.
  */
-CSTRUCTURES_PRIVATE_API void
+CSTRUCTURES_PUBLIC_API void
 hashmap_deinit(struct cs_hashmap* hm);
 
 /*!
  * @brief Cleans up all resources and frees the hashmap.
  */
-CSTRUCTURES_PRIVATE_API void
+CSTRUCTURES_PUBLIC_API void
 hashmap_free(struct cs_hashmap* hm);
 
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_reserve(struct cs_hashmap* hm,
                 uint32_t table_count);
 
@@ -125,30 +125,23 @@ hashmap_reserve(struct cs_hashmap* hm,
  * and CSTRUCTURES_HASH_EXISTS is returned. If the key is successfully inserted, CSTRUCTURES_OK
  * is returned. If insertion failed, CSTRUCTURES_ERR_OUT_OF_MEMORY is returned.
  */
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
+CSTRUCTURES_PUBLIC_API enum cs_hashmap_status
 hashmap_insert(struct cs_hashmap* hm,
                const void* key,
                const void* value);
 
-CSTRUCTURES_PRIVATE_API enum cs_hashmap_status
-hashmap_insert_str(struct cs_hashmap* hm,
-                   const char* key,
-                   const void* value);
-
-CSTRUCTURES_PRIVATE_API void*
+CSTRUCTURES_PUBLIC_API void*
 hashmap_erase(struct cs_hashmap* hm,
               const void* key);
 
-CSTRUCTURES_PRIVATE_API void*
-hashmap_erase_str(struct cs_hashmap* hm,
-                  const char* key,
-                  enum cs_hashmap_status* status);
-
-CSTRUCTURES_PRIVATE_API void*
+CSTRUCTURES_PUBLIC_API void*
 hashmap_find(const struct cs_hashmap* hm, const void* key);
 
-CSTRUCTURES_PRIVATE_API void*
-hashmap_find_str(struct cs_hashmap* hm, const char* key);
+CSTRUCTURES_PUBLIC_API int
+hashmap_exists(const struct cs_hashmap* hm, const void* key);
+
+CSTRUCTURES_PUBLIC_API void
+hashmap_clear(struct cs_hashmap* hm);
 
 #define hashmap_count(hm) ((hm)->slots_used)
 

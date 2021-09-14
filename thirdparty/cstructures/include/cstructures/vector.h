@@ -233,7 +233,7 @@ vector_erase_element(struct cs_vector* vector, void* element);
  * returned.
  */
 CSTRUCTURES_PUBLIC_API void*
-vector_get_element(const struct cs_vector*, cs_vec_idx index);
+vector_get_element(const struct cs_vector* vector, cs_vec_idx index);
 
 CSTRUCTURES_PUBLIC_API cs_vec_idx
 vector_find_element(const struct cs_vector* vector, const void* element);

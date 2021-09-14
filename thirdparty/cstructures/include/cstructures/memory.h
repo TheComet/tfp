@@ -67,7 +67,4 @@ memory_get_num_allocs(void);
 CSTRUCTURES_PUBLIC_API uintptr_t
 memory_get_memory_usage(void);
 
-CSTRUCTURES_PRIVATE_API void
-mutated_string_and_hex_dump(const void* data, uintptr_t size_in_bytes);
-
 C_END

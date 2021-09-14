@@ -355,3 +355,45 @@ hashmap_find(const struct cs_hashmap* hm, const void* key)
 
     return VALUE(hm, pos);
 }
+
+/* ------------------------------------------------------------------------- */
+int
+hashmap_exists(const struct cs_hashmap* hm, const void* key)
+{
+    cs_hash32 hash = hash_wrapper(hm, key, hm->key_size);
+    cs_hash32 pos = hash % hm->table_count;
+    cs_hash32 i = 0;
+    while (1)
+    {
+        if (SLOT(hm, pos) == hash)
+        {
+            if (memcmp(KEY(hm, pos), key, hm->key_size) == 0)
+                break;
+        }
+        else
+        {
+            if (SLOT(hm, pos) == HM_SLOT_UNUSED)
+                return 0;
+        }
+
+        /* Quadratic probing following p(K,i)=(i^2+i)/2. If the hash table
+         * size is a power of two, this will visit every slot */
+        i++;
+        pos += i;
+        pos = pos % hm->table_count;
+    }
+
+    return 1;
+}
+
+/* ------------------------------------------------------------------------- */
+void
+hashmap_clear(struct cs_hashmap* hm)
+{
+    /* Re-initialize hash table -- NOTE: Only works if HM_SLOT_UNUSED is 0 */
+    if (hm->slots_used)
+    {
+        memset(hm->storage, 0, (sizeof(cs_hash32) + hm->key_size) * hm->table_count);
+        hm->slots_used = 0;
+    }
+}

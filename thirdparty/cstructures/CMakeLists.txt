@@ -18,6 +18,7 @@ option (CSTRUCTURES_BTREE_64BIT_CAPACITY "Enable btrees to allow up to 2^64 entr
 option (CSTRUCTURES_BENCHMARKS "Compile benchmarks (requires C++)" OFF)
 option (CSTRUCTURES_MEMORY_BACKTRACE "Enable generating backtraces to every malloc/realloc call, making it easy to find where memory leaks occur" ${DEBUG_FEATURE})
 option (CSTRUCTURES_MEMORY_DEBUGGING "Enable tracking malloc/realloc/free calls to detect memory leaks" ${DEBUG_FEATURE})
+option (CSTRUCTURES_MEMORY_DUMP "Enable dumping non-deallocated memory when deinit() is called" ${DEBUG_FEATURE})
 option (CSTRUCTURES_PIC "Generate position independent code" ON)
 option (CSTRUCTURES_PROFILING "Enable -pg and -fno-omit-frame-pointer" OFF)
 option (CSTRUCTURES_TESTS "Compile unit tests (requires C++)" OFF)

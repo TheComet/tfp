@@ -27,6 +27,11 @@ typedef struct report_info_t
 #   endif
 } report_info_t;
 
+#   if defined(CSTRUCTURES_MEMORY_DUMP)
+static void
+mutated_string_and_hex_dump(const void* data, uintptr_t size_in_bytes);
+#   endif
+
 /* ------------------------------------------------------------------------- */
 int
 memory_init(void)
@@ -263,6 +268,7 @@ memory_deinit(void)
     fprintf(stderr, "=========================================\n");
 
     /* report details on any g_allocations that were not de-allocated */
+#   if defined(CSTRUCTURES_MEMORY_DUMP)
     if (hashmap_count(&g_report) != 0)
     {
         HASHMAP_FOR_EACH(&g_report, void*, report_info_t, key, info)
@@ -270,7 +276,7 @@ memory_deinit(void)
             fprintf(stderr, "  un-freed memory at %p, size %p\n", (void*)info->location, (void*)info->size);
             mutated_string_and_hex_dump((void*)info->location, info->size);
 
-#   if defined(CSTRUCTURES_MEMORY_BACKTRACE)
+#       if defined(CSTRUCTURES_MEMORY_BACKTRACE)
             fprintf(stderr, "  Backtrace to where malloc() was called:\n");
             {
                 intptr_t i;
@@ -279,12 +285,13 @@ memory_deinit(void)
             }
             free(info->backtrace); /* this was allocated when malloc() was called */
             fprintf(stderr, "  -----------------------------------------\n");
-#   endif
+#       endif
 
         HASHMAP_END_EACH
 
         fprintf(stderr, "=========================================\n");
     }
+#   endif
 
     /* overall report */
     leaks = (g_allocations > d_deallocations ? g_allocations - d_deallocations : d_deallocations - g_allocations);
@@ -316,17 +323,9 @@ memory_get_memory_usage(void)
     return g_bytes_in_use;
 }
 
-#else /* CSTRUCTURES_MEMORY_DEBUGGING */
-
-int memory_init(void)                   { return 0; }
-uintptr_t memory_deinit(void)           { return 0; }
-uintptr_t memory_get_num_allocs(void)   { return 0; }
-uintptr_t memory_get_memory_usage(void) { return 0; }
-
-#endif /* CSTRUCTURES_MEMORY_DEBUGGING */
-
 /* ------------------------------------------------------------------------- */
-void
+#   if defined(CSTRUCTURES_MEMORY_DUMP)
+static void
 mutated_string_and_hex_dump(const void* data, uintptr_t length_in_bytes)
 {
     char* dump;
@@ -355,3 +354,13 @@ mutated_string_and_hex_dump(const void* data, uintptr_t length_in_bytes)
 
     free(dump);
 }
+#   endif
+
+#else /* CSTRUCTURES_MEMORY_DEBUGGING */
+
+int memory_init(void)                   { return 0; }
+uintptr_t memory_deinit(void)           { return 0; }
+uintptr_t memory_get_num_allocs(void)   { return 0; }
+uintptr_t memory_get_memory_usage(void) { return 0; }
+
+#endif /* CSTRUCTURES_MEMORY_DEBUGGING */
