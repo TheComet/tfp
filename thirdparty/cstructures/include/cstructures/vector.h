@@ -239,6 +239,9 @@ CSTRUCTURES_PUBLIC_API cs_vec_idx
 vector_find_element(const struct cs_vector* vector, const void* element);
 
 CSTRUCTURES_PUBLIC_API void
+vector_swap(struct cs_vector* v1, struct cs_vector* v2);
+
+CSTRUCTURES_PUBLIC_API void
 vector_reverse(struct cs_vector* vector);
 
 /*!

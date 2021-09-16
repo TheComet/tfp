@@ -357,6 +357,15 @@ vector_find_element(const struct cs_vector* vector, const void* element)
 
 /* ------------------------------------------------------------------------- */
 void
+vector_swap(struct cs_vector* v1, struct cs_vector* v2)
+{
+    struct cs_vector tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
+}
+
+/* ------------------------------------------------------------------------- */
+void
 vector_reverse(struct cs_vector* vector)
 {
     assert(vector);
