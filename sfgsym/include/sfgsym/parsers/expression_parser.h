@@ -12,18 +12,19 @@ struct sfgsym_expr_parser
     sfgsymscan_t scanner;
     sfgsympstate* parser;
     struct sfgsym_expr* result;
+    int (*log)(const char* fmt, ...);
 };
 
-SFGSYM_PRIVATE_API int
+SFGSYM_PUBLIC_API int
 sfgsym_expr_parser_init(struct sfgsym_expr_parser* driver);
 
-SFGSYM_PRIVATE_API void
+SFGSYM_PUBLIC_API void
 sfgsym_expr_parser_deinit(struct sfgsym_expr_parser* driver);
 
-SFGSYM_PRIVATE_API struct sfgsym_expr*
+SFGSYM_PUBLIC_API struct sfgsym_expr*
 sfgsym_expr_from_string(struct sfgsym_expr_parser* driver, const char* str);
 
-SFGSYM_PRIVATE_API struct sfgsym_expr*
+SFGSYM_PUBLIC_API struct sfgsym_expr*
 sfgsym_expr_from_buffer(struct sfgsym_expr_parser* driver, const void* buffer, int len);
 
 SFGSYM_PRIVATE_API void

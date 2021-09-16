@@ -1,5 +1,7 @@
 #include "sfgsym/parsers/expression_parser.h"
 #include "sfgsym/parsers/expression_parser.l.h"
+#include "sfgsym/parsers/expression_parser_post.h"
+#include "sfgsym/symbolic/expression.h"
 #include "sfgsym/util/log.h"
 #include <string.h>
 #include <stdarg.h>
@@ -31,6 +33,27 @@ do_parse(struct sfgsym_expr_parser* driver)
 }
 
 /* ------------------------------------------------------------------------- */
+static struct sfgsym_expr*
+do_post_parse(struct sfgsym_expr_parser* driver, struct sfgsym_expr* expr)
+{
+    struct sfgsym_expr* result;
+    result = sfgsym_expr_parser_replace_exp_function(driver, expr);
+    if (result == NULL)
+        goto fail;
+    expr = result;
+
+    result = sfgsym_expr_parser_collapse_lists(driver, expr);
+    if (result == NULL)
+        goto fail;
+    expr = result;
+
+    return expr;
+
+    fail : sfgsym_expr_destroy_recurse(expr);
+    return NULL;
+}
+
+/* ------------------------------------------------------------------------- */
 int
 sfgsym_expr_parser_init(struct sfgsym_expr_parser* driver)
 {
@@ -48,6 +71,7 @@ sfgsym_expr_parser_init(struct sfgsym_expr_parser* driver)
     }
 
     driver->result = NULL;
+    driver->log = sfgsym_log;
 
     return 0;
 
@@ -85,6 +109,11 @@ sfgsym_expr_from_buffer(struct sfgsym_expr_parser* driver, const void* bytes, in
 
     result = do_parse(driver);
     sfgsym_delete_buffer(buf, driver->scanner);
+
+    if (result == NULL)
+        return NULL;
+
+    result = do_post_parse(driver, result);
     return result;
 }
 
