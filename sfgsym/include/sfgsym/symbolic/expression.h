@@ -88,4 +88,7 @@ SFGSYM_PUBLIC_API sfgsym_real
 sfgsym_expr_eval(const struct sfgsym_expr* expr,
                  const struct sfgsym_subs_table* st);
 
+SFGSYM_PUBLIC_API void
+sfgsym_expr_fold_constants(struct sfgsym_expr* expr);
+
 C_END

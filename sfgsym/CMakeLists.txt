@@ -127,6 +127,7 @@ set (SFGSYM_SOURCES
     "src/sfg/path.c"
     "src/symbolic/expression.c"
     "src/symbolic/expression_eval.c"
+    "src/symbolic/expression_fold_constants.c"
     "src/symbolic/subs_table.c"
     "src/util/log.c"
     "src/init.c")

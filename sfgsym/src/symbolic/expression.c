@@ -8,12 +8,9 @@
 
 sfgsym_real sfgsym_op_add(sfgsym_real a, sfgsym_real b) { return a+b; }
 sfgsym_real sfgsym_op_sub(sfgsym_real a, sfgsym_real b) { return a-b; }
-sfgsym_real sfgsym_op_neg(sfgsym_real a)                { return -a;  }
 sfgsym_real sfgsym_op_mul(sfgsym_real a, sfgsym_real b) { return a*b; }
 sfgsym_real sfgsym_op_div(sfgsym_real a, sfgsym_real b) { return a/b; }
 sfgsym_real sfgsym_op_pow(sfgsym_real a, sfgsym_real b) { return pow(a, b); }
-sfgsym_real sfgsym_op_exp(sfgsym_real a)                { return exp(a); }
-sfgsym_real sfgsym_op_sqrt(sfgsym_real a)               { return sqrt(a); }
 
 /* ------------------------------------------------------------------------- */
 struct sfgsym_expr* alloc_expr(int children)
