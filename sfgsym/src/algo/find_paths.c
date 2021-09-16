@@ -56,7 +56,7 @@ find_paths_recurse(
 
 /* ------------------------------------------------------------------------- */
 int
-sfgsym_algo_find_forward_paths(
+sfgsym_graph_find_forward_paths(
         struct sfgsym_path_list* paths,
         const struct sfgsym_node* in,
         const struct sfgsym_node* out)
@@ -96,7 +96,7 @@ sfgsym_algo_find_forward_paths(
 
 /* ------------------------------------------------------------------------- */
 int
-sfgsym_algo_find_loops(
+sfgsym_graph_find_loops(
         struct sfgsym_path_list* loops,
         const struct sfgsym_graph* graph)
 {

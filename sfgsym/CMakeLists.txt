@@ -135,7 +135,9 @@ set (SFGSYM_PARSER_SOURCES
     ${FLEX_sfgsym_expression_lexer_OUTPUTS}
     "src/parsers/expression_parser.y"
     "src/parsers/expression_parser.l"
-    "src/parsers/expression_parser.c")
+    "src/parsers/expression_parser.c"
+    "src/parsers/expression_parser_replace_exp_function.c"
+    "src/parsers/expression_parser_collapse_lists.c")
 set (SFGSYM_TEST_SOURCES
     "tests/src/test_expression.cpp"
     "tests/src/test_expression_parser.cpp"

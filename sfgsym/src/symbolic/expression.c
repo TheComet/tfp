@@ -1,4 +1,5 @@
 #include "sfgsym/symbolic/expression.h"
+#include "cstructures/memory.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -15,9 +16,17 @@ sfgsym_real sfgsym_op_exp(sfgsym_real a)                { return exp(a); }
 sfgsym_real sfgsym_op_sqrt(sfgsym_real a)               { return sqrt(a); }
 
 /* ------------------------------------------------------------------------- */
+struct sfgsym_expr* alloc_expr(int children)
+{
+    if (children < 1)
+        children = 1;
+    return MALLOC(sizeof(struct sfgsym_expr) + sizeof(struct sfgsym_expr*) * (children-1));
+}
+
+/* ------------------------------------------------------------------------- */
 struct sfgsym_expr* sfgsym_expr_literal_create(sfgsym_real value)
 {
-    struct sfgsym_expr* literal = malloc(sizeof *literal);
+    struct sfgsym_expr* literal = alloc_expr(0);
     if (literal == NULL)
         return NULL;
 
@@ -31,15 +40,15 @@ struct sfgsym_expr* sfgsym_expr_literal_create(sfgsym_real value)
 /* ------------------------------------------------------------------------- */
 struct sfgsym_expr* sfgsym_expr_variable_create(const char* name)
 {
-    struct sfgsym_expr* variable = malloc(sizeof *variable);
+    struct sfgsym_expr* variable = alloc_expr(0);
     if (variable == NULL)
         return NULL;
 
     variable->type = SFGSYM_VARIABLE;
-    variable->data.varname = malloc(strlen(name) + 1);
+    variable->data.varname = MALLOC(strlen(name) + 1);
     if (variable->data.varname == NULL)
     {
-        free(variable);
+        FREE(variable);
         return NULL;
     }
     strcpy(variable->data.varname, name);
@@ -51,7 +60,7 @@ struct sfgsym_expr* sfgsym_expr_variable_create(const char* name)
 /* ------------------------------------------------------------------------- */
 struct sfgsym_expr* sfgsym_expr_infinity_create(void)
 {
-    struct sfgsym_expr* infinity = malloc(sizeof *infinity);
+    struct sfgsym_expr* infinity = alloc_expr(0);
     if (infinity == NULL)
         return NULL;
 
@@ -67,11 +76,11 @@ struct sfgsym_expr* sfgsym_expr_op_create(int argc, sfgsym_real (*op_func)(), ..
     va_list ap;
     int i;
 
-    struct sfgsym_expr* op = malloc(sizeof(struct sfgsym_expr) + sizeof(struct sfgsym_expr) * (argc-1));
+    struct sfgsym_expr* op = alloc_expr(argc);
     if (op == NULL)
         return NULL;
 
-    op->type = SFGSYM_OP + (enum sfgsym_expr_type)(argc - 1);
+    op->type = (enum sfgsym_expr_type)(SFGSYM_OP + argc - 1);
     op->data.op = op_func;
     op->parent = NULL;
 
@@ -92,7 +101,7 @@ struct sfgsym_expr*
 sfgsym_expr_list_create(int argc)
 {
     int i;
-    struct sfgsym_expr* list = malloc(sizeof(struct sfgsym_expr) + sizeof(struct sfgsym_expr) * (argc-1));
+    struct sfgsym_expr* list = alloc_expr(argc);
     if (list == NULL)
         return NULL;
 
@@ -122,7 +131,7 @@ sfgsym_expr_list_realloc(struct sfgsym_expr* list, int argc)
     }
 
     if (argc > oldargc)
-        list = realloc(list, sizeof(struct sfgsym_expr) + sizeof(struct sfgsym_expr) * (argc-1));
+        list = REALLOC(list, sizeof(struct sfgsym_expr) + sizeof(struct sfgsym_expr*) * (argc-1));
     if (list == NULL)
         return NULL;
 
@@ -183,9 +192,9 @@ sfgsym_expr_destroy_recurse_no_unlink(struct sfgsym_expr* expr)
     }
 
     if (expr->type == SFGSYM_VARIABLE)
-        free(expr->data.varname);
+        FREE(expr->data.varname);
 
-    free(expr);
+    FREE(expr);
 }
 void
 sfgsym_expr_destroy_recurse(struct sfgsym_expr* expr)
@@ -220,5 +229,61 @@ sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr)
                 break;
             }
     }
+}
+
+/* ------------------------------------------------------------------------- */
+struct sfgsym_expr*
+sfgsym_expr_duplicate(const struct sfgsym_expr* expr)
+{
+    int i, child_count = sfgsym_expr_child_count(expr);
+    struct sfgsym_expr* new_expr = alloc_expr(child_count);
+    if (new_expr == NULL)
+        return NULL;
+    new_expr->type = expr->type;
+
+    /*
+     * Initial relationships to NULL, so in an error case we can safely call
+     * sfgsym_expr_destroy_recurse()
+     */
+    new_expr->parent = NULL;
+    for (i = 0; i != child_count; ++i)
+        new_expr->child[i] = NULL;
+
+    switch (expr->type)
+    {
+        case SFGSYM_LITERAL  : {
+            new_expr->data.literal = expr->data.literal;
+        } break;
+
+        case SFGSYM_VARIABLE : {
+            new_expr->data.varname = MALLOC(strlen(expr->data.varname) + 1);
+            if (new_expr->data.varname == NULL)
+            {
+                FREE(new_expr);
+                return NULL;
+            }
+            strcpy(new_expr->data.varname, expr->data.varname);
+        } break;
+
+        case SFGSYM_INFINITY : break;
+        case SFGSYM_OP : break;
+    }
+
+    if (child_count > 0)
+        new_expr->data.op = expr->data.op;
+
+    for (i = 0; i != child_count; ++i)
+    {
+        new_expr->child[i] = sfgsym_expr_duplicate(expr->child[i]);
+        if (new_expr->child[i] == NULL)
+        {
+            sfgsym_expr_destroy_recurse(new_expr);
+            return NULL;
+        }
+
+        new_expr->child[i]->parent = new_expr;
+    }
+
+    return new_expr;
 }
 

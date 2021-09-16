@@ -18,7 +18,7 @@ static sfgsym_expr* parse_string(const char* str)
 
 TEST(NAME, foo)
 {
-    sfgsym_expr* expr = parse_string("a+b*c^e(f+g, 2, 5)h");
+    sfgsym_expr* expr = parse_string("a*exp(b)exp(c)");
     ASSERT_THAT(expr, NotNull());
     sfgsym_export_expr_dot_file(expr, "foo.dot");
     sfgsym_expr_destroy_recurse(expr);

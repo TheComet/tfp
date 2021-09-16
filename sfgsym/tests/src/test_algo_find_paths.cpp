@@ -25,7 +25,7 @@ TEST(NAME, find_single_forward_path)
 
     sfgsym_path_list p;
     sfgsym_path_list_init(&p);
-    ASSERT_THAT(sfgsym_algo_find_forward_paths(&p, n1, n3), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_forward_paths(&p, n1, n3), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&p), Eq(1));
 
     sfgsym_path* p1 = sfgsym_path_list_at(&p, 0);
@@ -68,7 +68,7 @@ TEST(NAME, find_multiple_forward_paths)
 
     sfgsym_path_list p;
     sfgsym_path_list_init(&p);
-    ASSERT_THAT(sfgsym_algo_find_forward_paths(&p, n1, n5), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_forward_paths(&p, n1, n5), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&p), Eq(2));
 
     sfgsym_path* p1 = sfgsym_path_list_at(&p, 0);
@@ -111,7 +111,7 @@ TEST(NAME, find_single_forward_path_with_loops)
 
     sfgsym_path_list p;
     sfgsym_path_list_init(&p);
-    ASSERT_THAT(sfgsym_algo_find_forward_paths(&p, n1, n3), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_forward_paths(&p, n1, n3), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&p), Eq(1));
 
     sfgsym_path* p1 = sfgsym_path_list_at(&p, 0);
@@ -157,7 +157,7 @@ TEST(NAME, find_multiple_forward_paths_with_loops)
 
     sfgsym_path_list p;
     sfgsym_path_list_init(&p);
-    ASSERT_THAT(sfgsym_algo_find_forward_paths(&p, n1, n5), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_forward_paths(&p, n1, n5), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&p), Eq(2));
 
     sfgsym_path* p1 = sfgsym_path_list_at(&p, 0);

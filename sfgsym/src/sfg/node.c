@@ -1,6 +1,7 @@
 #include "sfgsym/sfg/node.h"
 #include "cstructures/memory.h"
 #include <stddef.h>
+#include <string.h>
 
 /* ------------------------------------------------------------------------- */
 struct sfgsym_node*
@@ -10,6 +11,7 @@ sfgsym_node_create(struct sfgsym_graph* graph, const char* name)
     if (node == NULL)
         return NULL;
 
+    node->owning_graph = graph;
     node->name = MALLOC(strlen(name) + 1);
     if (node->name == NULL)
     {

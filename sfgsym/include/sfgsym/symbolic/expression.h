@@ -81,6 +81,9 @@ sfgsym_expr_child_count(const struct sfgsym_expr* expr);
 SFGSYM_PUBLIC_API void
 sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr);
 
+SFGSYM_PUBLIC_API struct sfgsym_expr*
+sfgsym_expr_duplicate(const struct sfgsym_expr* expr);
+
 SFGSYM_PUBLIC_API sfgsym_real
 sfgsym_expr_eval(const struct sfgsym_expr* expr,
                  const struct sfgsym_subs_table* st);

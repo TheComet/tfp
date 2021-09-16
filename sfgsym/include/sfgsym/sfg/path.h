@@ -51,4 +51,17 @@ sfgsym_path_list_add_new_path(struct sfgsym_path_list* path_list);
 #define sfgsym_path_at(p, i) \
     (*(struct sfgsym_branch**)vector_get_element(&(p)->branches, i))
 
+#define PATH_LIST_FOR_EACH(path_list, path_var) \
+    VECTOR_FOR_EACH(&(path_list)->paths, struct sfgsym_path, path_var)
+
+#define PATH_LIST_END_EACH \
+    VECTOR_END_EACH
+
+#define PATH_FOR_EACH_BRANCH(path, branch_var) \
+    VECTOR_FOR_EACH(&(path)->branches, struct sfgsym_branch*, path_##branch_var) \
+    struct sfgsym_branch* branch_var = *path_##branch_var; {
+
+#define PATH_END_EACH \
+    VECTOR_END_EACH }
+
 C_END

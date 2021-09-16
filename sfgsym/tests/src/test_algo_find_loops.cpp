@@ -22,7 +22,7 @@ TEST(NAME, no_loops_no_islands)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(0));
 
     sfgsym_path_list_deinit(&l);
@@ -42,7 +42,7 @@ TEST(NAME, no_loops_islands)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(0));
 
     sfgsym_path_list_deinit(&l);
@@ -63,7 +63,7 @@ TEST(NAME, one_loop_three_nodes_no_islands)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(1));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -89,7 +89,7 @@ TEST(NAME, one_loop_two_nodes_islands)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(1));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -114,7 +114,7 @@ TEST(NAME, one_loop_one_node_islands)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(1));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -140,7 +140,7 @@ TEST(NAME, two_self_loops_different_nodes)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(2));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -170,7 +170,7 @@ TEST(NAME, two_self_loops_same_node)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(2));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -200,7 +200,7 @@ TEST(NAME, two_connected_loops)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(2));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -250,7 +250,7 @@ TEST(NAME, sample_graph_1)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(5));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);
@@ -331,7 +331,7 @@ TEST(NAME, sample_graph_2)
 
     sfgsym_path_list l;
     sfgsym_path_list_init(&l);
-    ASSERT_THAT(sfgsym_algo_find_loops(&l, &g), Eq(0));
+    ASSERT_THAT(sfgsym_graph_find_loops(&l, &g), Eq(0));
     ASSERT_THAT(sfgsym_path_list_count(&l), Eq(6));
 
     sfgsym_path* l1 = sfgsym_path_list_at(&l, 0);

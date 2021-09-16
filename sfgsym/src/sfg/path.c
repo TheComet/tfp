@@ -33,6 +33,9 @@ sfgsym_path_list_init(struct sfgsym_path_list* path_list)
 void
 sfgsym_path_list_deinit(struct sfgsym_path_list* path_list)
 {
+    VECTOR_FOR_EACH(&path_list->paths, struct sfgsym_path, path)
+        sfgsym_path_deinit(path);
+    VECTOR_END_EACH
     vector_deinit(&path_list->paths);
 }
 
