@@ -96,7 +96,7 @@ configure_file (
 ###############################################################################
 
 find_package (FLEX 2.6 REQUIRED)
-find_package (BISON 3.5 REQUIRED)
+find_package (BISON 3.8 REQUIRED)
 
 # These may not exist
 file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/src/parsers")

@@ -39,6 +39,9 @@ sfgsym_path_list_deinit(struct sfgsym_path_list* path_list);
 SFGSYM_PUBLIC_API struct sfgsym_path*
 sfgsym_path_list_add_new_path(struct sfgsym_path_list* path_list);
 
+SFGSYM_PUBLIC_API void
+sfgsym_path_list_clear(struct sfgsym_path_list* path_list);
+
 #define sfgsym_path_list_count(pl) \
     (vector_count(&(pl)->paths))
 

@@ -50,3 +50,13 @@ sfgsym_path_list_add_new_path(struct sfgsym_path_list* path_list)
     sfgsym_path_init(path);
     return path;
 }
+
+/* ------------------------------------------------------------------------- */
+void
+sfgsym_path_list_clear(struct sfgsym_path_list* path_list)
+{
+    VECTOR_FOR_EACH(&path_list->paths, struct sfgsym_path, path)
+        sfgsym_path_deinit(path);
+    VECTOR_END_EACH
+    vector_deinit(&path_list->paths);
+}

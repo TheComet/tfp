@@ -41,7 +41,7 @@ sfgsym_path_gain_expr(const struct sfgsym_path* path)
 struct sfgsym_expr*
 sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
 {
-    return NULL;
+    return sfgsym_expr_literal_create(1);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -122,5 +122,68 @@ sfgsym_path_mason_expr(
         const struct sfgsym_path_list* paths,
         const struct sfgsym_path_list* loops)
 {
+    struct sfgsym_path_list nontouching_loops;
+    struct sfgsym_expr* denominator;
+    struct sfgsym_expr* result;
+    struct sfgsym_expr* numerator = NULL;
+
+    sfgsym_path_list_init(&nontouching_loops);
+    PATH_LIST_FOR_EACH(paths, path)
+        struct sfgsym_expr* subdeterminant_expr;
+        struct sfgsym_expr* path_expr;
+        struct sfgsym_expr* gain_expr;
+
+        if (sfgsym_path_find_nontouching(&nontouching_loops, loops, path) != 0)
+            goto find_nontouching_failed;
+
+        subdeterminant_expr = sfgsym_path_determinant_expr(&nontouching_loops);
+        if (subdeterminant_expr == NULL)
+            goto calc_subdeterminant_failed;
+
+        path_expr = sfgsym_path_gain_expr(path);
+        if (path_expr == NULL)
+            goto calc_gain_failed;
+
+        gain_expr = sfgsym_expr_op_create(2, sfgsym_op_mul, path_expr, subdeterminant_expr);
+        if (gain_expr == NULL)
+            goto calc_gain_expr_failed;
+
+        if (numerator == NULL)
+        {
+            numerator = gain_expr;
+        }
+        else
+        {
+            struct sfgsym_expr* new_result = sfgsym_expr_op_create(2, sfgsym_op_add, numerator, gain_expr);
+            if (new_result == NULL)
+                goto add_to_result_failed;
+            numerator = new_result;
+        }
+
+        sfgsym_path_list_clear(&nontouching_loops);
+        continue;
+
+        add_to_result_failed       : sfgsym_expr_destroy_recurse(numerator);
+        calc_gain_expr_failed      : sfgsym_expr_destroy_recurse(path_expr);
+        calc_gain_failed           : sfgsym_expr_destroy_recurse(subdeterminant_expr);
+        calc_subdeterminant_failed :
+        find_nontouching_failed    : goto calc_numerator_failed;
+    PATH_LIST_END_EACH
+
+    denominator = sfgsym_path_determinant_expr(loops);
+    if (loops == NULL)
+        goto calc_determinant_failed;
+
+    result = sfgsym_expr_op_create(2, sfgsym_op_div, numerator, denominator);
+    if (result == NULL)
+        goto calc_fina_result_failed;
+
+    sfgsym_path_list_deinit(&nontouching_loops);
+
+    return result;
+
+    calc_fina_result_failed : sfgsym_expr_destroy_recurse(denominator);
+    calc_determinant_failed : sfgsym_expr_destroy_recurse(numerator);
+    calc_numerator_failed   : sfgsym_path_list_deinit(&nontouching_loops);
     return NULL;
 }
