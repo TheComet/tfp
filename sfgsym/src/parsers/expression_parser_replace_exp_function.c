@@ -31,6 +31,9 @@ find_arglist(struct sfgsym_expr* e)
     if (child_count == 1 && e->data.op == NULL)
         return e;
 
+    if (child_count != 2 || e->data.op != sfgsym_op_mul)
+        return NULL;
+
     for (i = 0; i != child_count; ++i)
     {
         struct sfgsym_expr* found = find_arglist(e->child[i]);
@@ -57,7 +60,7 @@ fixup_exp(struct sfgsym_expr_parser* driver, struct sfgsym_expr* exp)
         sfgsym_expr_child_count(exp->parent) != 2 ||
         exp->parent->data.op != sfgsym_op_mul)
     {
-        driver->log("eexp expects 1 argument, but none were found\n");
+        driver->log("eexp() expects 1 argument, but none were found\n");
         return -1;
     }
 
@@ -83,7 +86,7 @@ fixup_exp(struct sfgsym_expr_parser* driver, struct sfgsym_expr* exp)
     arglist = find_arglist(e);
     if (arglist == NULL)
     {
-        driver->log("eexp expects 1 argument\n");
+        driver->log("eexp() expects 1 argument\n");
         return -1;
     }
     assert(sfgsym_expr_child_count(arglist) == 1);

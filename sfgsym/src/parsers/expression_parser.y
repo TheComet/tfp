@@ -42,7 +42,6 @@
 %type <node> expr
 %type <node> factor
 %type <node> pow
-%type <node> impl_mul
 %type <node> term
 %type <node> val
 %type <node> lit
@@ -73,19 +72,15 @@ expr
   | expr '-' factor         { $$ = sfgsym_expr_op_create(2, sfgsym_op_sub, $1, $3); }
   ;
 factor
-  : impl_mul                { $$ = $1; }
-  | factor '*' impl_mul     { $$ = sfgsym_expr_op_create(2, sfgsym_op_mul, $1, $3); }
-  | factor '/' impl_mul     { $$ = sfgsym_expr_op_create(2, sfgsym_op_div, $1, $3); }
-  ;
-impl_mul
   : pow                     { $$ = $1; }
-  | impl_mul pow            { $$ = sfgsym_expr_op_create(2, sfgsym_op_mul, $1, $2); }
-  | '-' pow                 { $$ = sfgsym_expr_op_create(2, sfgsym_op_sub, sfgsym_expr_literal_create(0), $2); }
+  | factor '*' pow          { $$ = sfgsym_expr_op_create(2, sfgsym_op_mul, $1, $3); }
+  | factor '/' pow          { $$ = sfgsym_expr_op_create(2, sfgsym_op_div, $1, $3); }
   ;
 pow
   : term                    { $$ = $1; }
   | term '^' pow            { $$ = sfgsym_expr_op_create(2, sfgsym_op_pow, $1, $3); }
   | term '^' '-' pow        { $$ = sfgsym_expr_op_create(2, sfgsym_op_pow, $1, sfgsym_expr_op_create(2, sfgsym_op_sub, sfgsym_expr_literal_create(0), $4)); }
+  | term pow                { $$ = sfgsym_expr_op_create(2, sfgsym_op_mul, $1, $2); }
   ;
 term
   : '(' list ')'            { $$ = $2; }
