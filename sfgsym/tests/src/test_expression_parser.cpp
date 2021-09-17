@@ -409,10 +409,58 @@ TEST_F(NAME, pre_implicit_mul_after_pow)
 {
     e = parse_string("c^d(e+f)");
     ASSERT_THAT(e, NotNull());
+
+    EXPECT_THAT(e->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->data.op, Eq(sfgsym_op_pow));
+    ASSERT_THAT(e->child[0], NotNull());
+    EXPECT_THAT(e->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[0]->data.varname, StrEq("c"));
+    ASSERT_THAT(e->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->child[1]->data.op, Eq(sfgsym_op_mul));
+    ASSERT_THAT(e->child[1]->child[0], NotNull());
+    EXPECT_THAT(e->child[1]->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[0]->data.varname, StrEq("d"));
+    ASSERT_THAT(e->child[1]->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->child[1]->child[1]->data.op, Eq(sfgsym_op_add));
+    ASSERT_THAT(e->child[1]->child[1]->child[0], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[1]->child[0]->data.varname, StrEq("e"));
+    ASSERT_THAT(e->child[1]->child[1]->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->data.varname, StrEq("f"));
 }
 
 TEST_F(NAME, implicit_mul_and_pow_same_precedence)
 {
     e = parse_string("a^b(c)^d(e)");
     ASSERT_THAT(e, NotNull());
+
+    EXPECT_THAT(e->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->data.op, Eq(sfgsym_op_pow));
+    ASSERT_THAT(e->child[0], NotNull());
+    EXPECT_THAT(e->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[0]->data.varname, StrEq("a"));
+    ASSERT_THAT(e->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->child[1]->data.op, Eq(sfgsym_op_mul));
+    ASSERT_THAT(e->child[1]->child[0], NotNull());
+    EXPECT_THAT(e->child[1]->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[0]->data.varname, StrEq("b"));
+    ASSERT_THAT(e->child[1]->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->child[1]->child[1]->data.op, Eq(sfgsym_op_pow));
+    ASSERT_THAT(e->child[1]->child[1]->child[0], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[1]->child[0]->data.varname, StrEq("c"));
+    ASSERT_THAT(e->child[1]->child[1]->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->type, Eq(SFGSYM_OP + 1));
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->data.op, Eq(sfgsym_op_mul));
+    ASSERT_THAT(e->child[1]->child[1]->child[1]->child[0], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->child[0]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->child[0]->data.varname, StrEq("d"));
+    ASSERT_THAT(e->child[1]->child[1]->child[1]->child[1], NotNull());
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->child[1]->type, Eq(SFGSYM_VARIABLE));
+    EXPECT_THAT(e->child[1]->child[1]->child[1]->child[1]->data.varname, StrEq("e"));
 }
