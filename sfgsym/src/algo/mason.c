@@ -45,15 +45,15 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
     int i, j, k;
     struct sfgsym_expr* determinant;
     char* tt;
-    int* counters;
+    int* lcomb;
 
     const int loop_count = sfgsym_path_list_count(loops);
 
     determinant = sfgsym_expr_literal_create(1.0);
     if (determinant == NULL)
-        goto alloc_determinant_initial_value_failed;
+        goto alloc_determinant_failed;
 
-    /* Nothiing to do if there are no loops */
+    /* Nothing to do if there are no loops */
     if (loop_count == 0)
         return determinant;
 
@@ -89,6 +89,9 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
      * Check which combination of loops touch each other, and cache results
      * into a "touching table" or tt for short, because sfgsym_paths_are_touching()
      * can be fairly expensive to call over and over again.
+     *
+     * The table needs n(n-1)/2 bytes of memory instead of n^2 because we only
+     * need unique combinations.
      */
     tt = MALLOC(sizeof(char) * loop_count*(loop_count-1)/2);
     if (tt == NULL)
@@ -99,18 +102,30 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
                     sfgsym_path_list_at(loops, i),
                     sfgsym_path_list_at(loops, j));
 
-    counters = MALLOC(sizeof(int) * loop_count);
-    if (counters == NULL)
+    /*
+     * Create array for holding the current combination of loops. In the worst
+     * case all loops from 0 to N-1 will need to be referenced.
+     */
+    lcomb = MALLOC(sizeof(int) * loop_count);
+    if (lcomb == NULL)
         goto alloc_counters_failed;
 
+    /*
+     * Start with going through all 2-loop combinations, then 3-loop combinations,
+     * and so on until we reach k-loop combinations.
+     */
     for (k = 2; k != loop_count+1; ++k)
     {
         int found_nontouching_loops = 0;
+
+        /* We add or subtract the result of loop combinations depending on
+         * k being odd or even */
         sfgsym_real (*combine_op)(sfgsym_real, sfgsym_real) =
                 (k % 2 == 0 ? sfgsym_op_add : sfgsym_op_sub);
 
+        /* The initial combination of loops is 0, 1, ... k */
         for (i = 0; i != k; ++i)
-            counters[k-i-1] = i;
+            lcomb[k-i-1] = i;
 
         while (1)
         {
@@ -121,17 +136,17 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
             for (i = 0; i != k-1; ++i)
                 for (j = i+1; j != k; ++j)
                 {
-                    const int l1 = counters[j];
-                    const int l2 = counters[i];
+                    const int l1 = lcomb[j];
+                    const int l2 = lcomb[i];
                     if (tt[l1 + loop_count*(l2-l1-1)])
                         goto loops_touch;
                 }
 
             /*
              * The current combination of loops do not touch each other, so
-             * multiply their gains.
+             * multiply their gains together.
              */
-            combined_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, counters[0]));
+            combined_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, lcomb[0]));
             if (combined_gain == NULL)
                 goto duplicate_loop1_gain_failed;
             for (i = 1; i != k; ++i)
@@ -139,7 +154,7 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
                 struct sfgsym_expr* loop2_gain;
                 struct sfgsym_expr* new_combined_gain;
 
-                loop2_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, counters[i]));
+                loop2_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, lcomb[i]));
                 if (loop2_gain == NULL)
                     goto duplicate_loop2_gain_failed;
 
@@ -153,7 +168,7 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
                 combined_gain = new_combined_gain;
             }
 
-            /* Finally, add or subtract it to/from the final expression */
+            /* Now, add or subtract it to/from the final expression */
             new_determinant = sfgsym_expr_op_create(2, combine_op, determinant, combined_gain);
             if (new_determinant == NULL)
             {
@@ -165,17 +180,17 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
 
             /* Calculate next combination of loops */
             loops_touch:
-            counters[0]++;
+            lcomb[0]++;
             for (i = 0; i != k; ++i)
             {
-                if (counters[i] >= loop_count - i)
+                if (lcomb[i] >= loop_count - i)
                 {
                     if (i == k-1)
                         goto no_more_combinations;
 
-                    counters[i+1]++;
+                    lcomb[i+1]++;
                     for (j = i; j >= 0; --j)
-                        counters[j] = counters[j+1]+1;
+                        lcomb[j] = lcomb[j+1]+1;
                     continue;
                 }
 
@@ -197,19 +212,16 @@ sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
             break;
     }
 
-    FREE(counters);
+    FREE(lcomb);
     FREE(tt);
 
     return determinant;
 
-calc_combined_gain_failed :
-alloc_counters_failed :
-    FREE(tt);
-alloc_tt_failed :
-calc_k1_failed :
-    sfgsym_expr_destroy_recurse(determinant);
-alloc_determinant_initial_value_failed :
-    return NULL;
+    calc_combined_gain_failed :
+    alloc_counters_failed     : FREE(tt);
+    alloc_tt_failed           :
+    calc_k1_failed            : sfgsym_expr_destroy_recurse(determinant);
+    alloc_determinant_failed  : return NULL;
 }
 
 /* ------------------------------------------------------------------------- */
