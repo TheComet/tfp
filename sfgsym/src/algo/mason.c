@@ -2,6 +2,7 @@
 #include "sfgsym/sfg/path.h"
 #include "sfgsym/sfg/branch.h"
 #include "sfgsym/symbolic/expression.h"
+#include "cstructures/memory.h"
 #include <stddef.h>
 
 /* ------------------------------------------------------------------------- */
@@ -41,7 +42,174 @@ sfgsym_path_gain_expr(const struct sfgsym_path* path)
 struct sfgsym_expr*
 sfgsym_path_determinant_expr(const struct sfgsym_path_list* loops)
 {
-    return sfgsym_expr_literal_create(1);
+    int i, j, k;
+    struct sfgsym_expr* determinant;
+    char* tt;
+    int* counters;
+
+    const int loop_count = sfgsym_path_list_count(loops);
+
+    determinant = sfgsym_expr_literal_create(1.0);
+    if (determinant == NULL)
+        goto alloc_determinant_initial_value_failed;
+
+    /* Nothiing to do if there are no loops */
+    if (loop_count == 0)
+        return determinant;
+
+    /*
+     * For k=0 and k=1 the expressions are trivial and can be computed manually
+     * as follows: 1 - (L1 + L2 + ... + Li) where Li is the loop gain at index i.
+     */
+    for (i = 0; i != loop_count; ++i)
+    {
+        struct sfgsym_expr* gain;
+        struct sfgsym_expr* result;
+
+        gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, i));
+        if (gain == NULL)
+            goto dup_loop_gain_failed;
+
+        result = sfgsym_expr_op_create(2, sfgsym_op_sub, determinant, gain);
+        if (result == NULL)
+            goto create_op_failed;
+
+        determinant = result;
+        continue;
+
+        create_op_failed     : sfgsym_expr_destroy_recurse(gain);
+        dup_loop_gain_failed : goto calc_k1_failed;
+    }
+
+    /* If there are less than 2 loops, we are done */
+    if (loop_count < 2)
+        return determinant;
+
+    /*
+     * Check which combination of loops touch each other, and cache results
+     * into a "touching table" or tt for short, because sfgsym_paths_are_touching()
+     * can be fairly expensive to call over and over again.
+     */
+    tt = MALLOC(sizeof(char) * loop_count*(loop_count-1)/2);
+    if (tt == NULL)
+        goto alloc_tt_failed;
+    for (i = 0; i != loop_count-1; ++i)
+        for (j = i+1; j != loop_count; ++j)
+            tt[i+loop_count*(j-i-1)] = sfgsym_paths_are_touching(
+                    sfgsym_path_list_at(loops, i),
+                    sfgsym_path_list_at(loops, j));
+
+    counters = MALLOC(sizeof(int) * loop_count);
+    if (counters == NULL)
+        goto alloc_counters_failed;
+
+    for (k = 2; k != loop_count+1; ++k)
+    {
+        int found_nontouching_loops = 0;
+        sfgsym_real (*combine_op)(sfgsym_real, sfgsym_real) =
+                (k % 2 == 0 ? sfgsym_op_add : sfgsym_op_sub);
+
+        for (i = 0; i != k; ++i)
+            counters[k-i-1] = i;
+
+        while (1)
+        {
+            struct sfgsym_expr* combined_gain;
+            struct sfgsym_expr* new_determinant;
+
+            /* Check if any loops in the current combination touch each other */
+            for (i = 0; i != k-1; ++i)
+                for (j = i+1; j != k; ++j)
+                {
+                    const int l1 = counters[j];
+                    const int l2 = counters[i];
+                    if (tt[l1 + loop_count*(l2-l1-1)])
+                        goto loops_touch;
+                }
+
+            /*
+             * The current combination of loops do not touch each other, so
+             * multiply their gains.
+             */
+            combined_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, counters[0]));
+            if (combined_gain == NULL)
+                goto duplicate_loop1_gain_failed;
+            for (i = 1; i != k; ++i)
+            {
+                struct sfgsym_expr* loop2_gain;
+                struct sfgsym_expr* new_combined_gain;
+
+                loop2_gain = sfgsym_path_gain_expr(sfgsym_path_list_at(loops, counters[i]));
+                if (loop2_gain == NULL)
+                    goto duplicate_loop2_gain_failed;
+
+                new_combined_gain = sfgsym_expr_op_create(2, sfgsym_op_mul, combined_gain, loop2_gain);
+                if (new_combined_gain == NULL)
+                {
+                    sfgsym_expr_destroy_recurse(loop2_gain);
+                    goto duplicate_loop2_gain_failed;
+                }
+
+                combined_gain = new_combined_gain;
+            }
+
+            /* Finally, add or subtract it to/from the final expression */
+            new_determinant = sfgsym_expr_op_create(2, combine_op, determinant, combined_gain);
+            if (new_determinant == NULL)
+            {
+                sfgsym_expr_destroy_recurse(combined_gain);
+                goto calc_combined_gain_failed;
+            }
+            determinant = new_determinant;
+            found_nontouching_loops = 1;
+
+            /* Calculate next combination of loops */
+            loops_touch:
+            counters[0]++;
+            for (i = 0; i != k; ++i)
+            {
+                if (counters[i] >= loop_count - i)
+                {
+                    if (i == k-1)
+                        goto no_more_combinations;
+
+                    counters[i+1]++;
+                    for (j = i; j >= 0; --j)
+                        counters[j] = counters[j+1]+1;
+                    continue;
+                }
+
+                break;
+            }
+
+            continue;
+
+            duplicate_loop2_gain_failed : sfgsym_expr_destroy_recurse(combined_gain);
+            duplicate_loop1_gain_failed : goto calc_combined_gain_failed;
+        } no_more_combinations:;
+
+        /*
+         * Can exit early if for the current k no non-touching loops were found,
+         * because that necessarily means that for larger k, there won't be
+         * any non-touching loops either.
+         */
+        if (!found_nontouching_loops)
+            break;
+    }
+
+    FREE(counters);
+    FREE(tt);
+
+    return determinant;
+
+calc_combined_gain_failed :
+alloc_counters_failed :
+    FREE(tt);
+alloc_tt_failed :
+calc_k1_failed :
+    sfgsym_expr_destroy_recurse(determinant);
+alloc_determinant_initial_value_failed :
+    return NULL;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -176,14 +344,14 @@ sfgsym_path_mason_expr(
 
     result = sfgsym_expr_op_create(2, sfgsym_op_div, numerator, denominator);
     if (result == NULL)
-        goto calc_fina_result_failed;
+        goto calc_final_result_failed;
 
     sfgsym_path_list_deinit(&nontouching_loops);
 
     return result;
 
-    calc_fina_result_failed : sfgsym_expr_destroy_recurse(denominator);
-    calc_determinant_failed : sfgsym_expr_destroy_recurse(numerator);
-    calc_numerator_failed   : sfgsym_path_list_deinit(&nontouching_loops);
+    calc_final_result_failed : sfgsym_expr_destroy_recurse(denominator);
+    calc_determinant_failed  : sfgsym_expr_destroy_recurse(numerator);
+    calc_numerator_failed    : sfgsym_path_list_deinit(&nontouching_loops);
     return NULL;
 }

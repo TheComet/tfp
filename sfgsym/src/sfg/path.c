@@ -58,5 +58,5 @@ sfgsym_path_list_clear(struct sfgsym_path_list* path_list)
     VECTOR_FOR_EACH(&path_list->paths, struct sfgsym_path, path)
         sfgsym_path_deinit(path);
     VECTOR_END_EACH
-    vector_deinit(&path_list->paths);
+    vector_clear(&path_list->paths);
 }
