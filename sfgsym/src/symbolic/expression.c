@@ -179,7 +179,15 @@ sfgsym_expr_list_set(struct sfgsym_expr* list, int idx, struct sfgsym_expr* chil
 
 /* ------------------------------------------------------------------------- */
 static void
-sfgsym_expr_destroy_recurse_no_unlink(struct sfgsym_expr* expr)
+sfgsym_expr_deinit_single(struct sfgsym_expr* expr)
+{
+    if (expr->type == SFGSYM_VARIABLE)
+        FREE(expr->data.varname);
+}
+static void
+sfgsym_expr_destroy_recurse_no_unlink(struct sfgsym_expr* expr);
+static void
+sfgsym_expr_deinit_recurse_no_unlink(struct sfgsym_expr* expr)
 {
     int i = sfgsym_expr_child_count(expr) - 1;
     for (; i >= 0; i--)
@@ -188,8 +196,12 @@ sfgsym_expr_destroy_recurse_no_unlink(struct sfgsym_expr* expr)
             sfgsym_expr_destroy_recurse_no_unlink(expr->child[i]);
     }
 
-    if (expr->type == SFGSYM_VARIABLE)
-        FREE(expr->data.varname);
+    sfgsym_expr_deinit_single(expr);
+}
+static void
+sfgsym_expr_destroy_recurse_no_unlink(struct sfgsym_expr* expr)
+{
+    sfgsym_expr_deinit_recurse_no_unlink(expr);
 
     FREE(expr);
 }
@@ -199,6 +211,22 @@ sfgsym_expr_destroy_recurse(struct sfgsym_expr* expr)
 
     sfgsym_expr_unlink_from_parent(expr);
     sfgsym_expr_destroy_recurse_no_unlink(expr);
+}
+
+/* ------------------------------------------------------------------------- */
+void
+sfgsym_expr_destroy_single(struct sfgsym_expr* expr)
+{
+    sfgsym_expr_deinit_single(expr);
+    FREE(expr);
+}
+
+/* ------------------------------------------------------------------------- */
+void sfgsym_expr_morph_to_literal(struct sfgsym_expr* expr, sfgsym_real value)
+{
+    sfgsym_expr_deinit_recurse_no_unlink(expr);
+    expr->type = SFGSYM_LITERAL;
+    expr->data.literal = value;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -226,6 +254,148 @@ sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr)
                 break;
             }
     }
+}
+
+/* ------------------------------------------------------------------------- */
+/*
+ *     a                       a
+ *    / \     collapse(c)     / \
+ *   b   e        -->        c   e
+ *  / \
+ * d   c
+ */
+void
+sfgsym_expr_collapse_into_parent(struct sfgsym_expr* c)
+{
+    int i;
+    struct sfgsym_expr* a;
+    struct sfgsym_expr* b;
+
+    b = c->parent;
+    assert(b);
+
+    i = sfgsym_expr_child_count(b);
+    for (; i >= 0; --i)
+        if (b->child[i] == c)
+        {
+            b->child[i] = NULL;
+            break;
+        }
+
+    a = b->parent;
+    if (a)
+    {
+        i = sfgsym_expr_child_count(a) - 1;
+        for (; i >= 0; --i)
+            if (a->child[i] == b)
+            {
+                a->child[i] = c;
+                break;
+            }
+    }
+    c->parent = a;
+    sfgsym_expr_destroy_recurse_no_unlink(b);
+}
+
+/* ------------------------------------------------------------------------- */
+/*
+ *     a                          a
+ *    / \     collapse(c)        / \
+ *   b   e        -->           c   e
+ *  / \
+ * d   c                  d  <--  (detatched node)
+ */
+void
+sfgsym_expr_collapse_into_parent_keep_siblings(struct sfgsym_expr* c)
+{
+    int i;
+    struct sfgsym_expr* a;
+    struct sfgsym_expr* b;
+
+    b = c->parent;
+    assert(b);
+
+    i = sfgsym_expr_child_count(b) - 1;
+    for (; i >= 0; --i)
+        b->child[i]->parent = NULL;
+
+    a = b->parent;
+    if (a)
+    {
+        i = sfgsym_expr_child_count(a) - 1;
+        for (; i >= 0; --i)
+            if (a->child[i] == b)
+            {
+                a->child[i] = c;
+                break;
+            }
+    }
+    c->parent = a;
+    sfgsym_expr_destroy_single(b);
+}
+
+/* ------------------------------------------------------------------------- */
+/*
+ *     a                          a
+ *    / \     collapse(c)        / \
+ *   b   e        -->       b   c   e
+ *  / \                    /
+ * d   c                  d  <--  (detatched nodes)
+ */
+void
+sfgsym_expr_collapse_into_parent_keep_parent(struct sfgsym_expr* c)
+{
+    int i;
+    struct sfgsym_expr* a;
+    struct sfgsym_expr* b;
+
+    b = c->parent;
+    assert(b);
+
+    i = sfgsym_expr_child_count(b) - 1;
+    for (; i >= 0; --i)
+        if (b->child[i] == c)
+        {
+            b->child[i] = NULL;
+            break;
+        }
+
+    a = b->parent;
+    if (a)
+    {
+        i = sfgsym_expr_child_count(a) - 1;
+        for (; i >= 0; --i)
+            if (a->child[i] == b)
+            {
+                a->child[i] = c;
+                break;
+            }
+    }
+    c->parent = a;
+}
+
+/* ------------------------------------------------------------------------- */
+void
+sfgsym_expr_swap(struct sfgsym_expr* a, struct sfgsym_expr* b)
+{
+    int ia, ib;
+    struct sfgsym_expr* tmp;
+    struct sfgsym_expr* pa = a->parent;
+    struct sfgsym_expr* pb = b->parent;
+
+    for (ia = sfgsym_expr_child_count(pa) - 1; ia >= 0; --ia)
+        if (pa->child[ia] == a)
+            break;
+    for (ib = sfgsym_expr_child_count(pb) - 1; ia >= 0; --ib)
+        if (pb->child[ib] == b)
+            break;
+
+    tmp = pa->child[ia];
+    pa->child[ia] = pb->child[ib];
+    pb->child[ib] = tmp;
+
+    pa->child[ia]->parent = pa;
+    pb->child[ib]->parent = pb;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -284,3 +454,32 @@ sfgsym_expr_duplicate(const struct sfgsym_expr* expr)
     return new_expr;
 }
 
+/* ------------------------------------------------------------------------- */
+int
+sfgsym_expr_compare_trees(const struct sfgsym_expr* a, const struct sfgsym_expr* b)
+{
+    int i, cca, ccb;
+
+    if (a->type != b->type)
+        return 0;
+
+    switch (a->type)
+    {
+        case SFGSYM_LITERAL: return a->data.literal == b->data.literal;
+        case SFGSYM_VARIABLE: return strcmp(a->data.varname, b->data.varname) == 0;
+        case SFGSYM_INFINITY:
+        case SFGSYM_OP:
+            break;
+    }
+
+    cca = sfgsym_expr_child_count(a) - 1;
+    ccb = sfgsym_expr_child_count(b) - 1;
+    if (cca != ccb)
+        return 0;
+
+    for (i = 0; i != cca; ++i)
+        if (sfgsym_expr_compare_trees(a->child[0], b->child[0]))
+            return 1;
+
+    return 0;
+}

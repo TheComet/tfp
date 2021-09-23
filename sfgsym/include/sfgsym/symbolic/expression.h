@@ -39,6 +39,8 @@ SFGSYM_PUBLIC_API struct sfgsym_expr* sfgsym_expr_variable_create(const char* na
 SFGSYM_PUBLIC_API struct sfgsym_expr* sfgsym_expr_infinity_create(void);
 SFGSYM_PUBLIC_API struct sfgsym_expr* sfgsym_expr_op_create(int argc, sfgsym_real (*op_func)(), ...);
 
+SFGSYM_PUBLIC_API void sfgsym_expr_morph_to_literal(struct sfgsym_expr* expr, sfgsym_real value);
+
 /*!
  * \brief Creates a new list with children initialized to NULL.
  * \param argc Number of children to allocate.
@@ -73,6 +75,9 @@ SFGSYM_PUBLIC_API void
 sfgsym_expr_list_set(struct sfgsym_expr* list, int idx, struct sfgsym_expr* child);
 
 SFGSYM_PUBLIC_API void
+sfgsym_expr_destroy_single(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API void
 sfgsym_expr_destroy_recurse(struct sfgsym_expr* expr);
 
 SFGSYM_PUBLIC_API int
@@ -81,14 +86,54 @@ sfgsym_expr_child_count(const struct sfgsym_expr* expr);
 SFGSYM_PUBLIC_API void
 sfgsym_expr_unlink_from_parent(struct sfgsym_expr* expr);
 
+SFGSYM_PUBLIC_API void
+sfgsym_expr_collapse_into_parent(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API void
+sfgsym_expr_collapse_into_parent_keep_siblings(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API void
+sfgsym_expr_collapse_into_parent_keep_parent(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API void
+sfgsym_expr_swap(struct sfgsym_expr* a, struct sfgsym_expr* b);
+
+SFGSYM_PUBLIC_API struct sfgsym_expr*
+sfgsym_expr_steal_collapse(struct sfgsym_expr* expr);
+
 SFGSYM_PUBLIC_API struct sfgsym_expr*
 sfgsym_expr_duplicate(const struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API int
+sfgsym_expr_compare_trees(const struct sfgsym_expr* a, const struct sfgsym_expr* b);
 
 SFGSYM_PUBLIC_API sfgsym_real
 sfgsym_expr_eval(const struct sfgsym_expr* expr,
                  const struct sfgsym_subs_table* st);
 
 SFGSYM_PUBLIC_API void
-sfgsym_expr_fold_constants(struct sfgsym_expr* expr);
+sfgsym_expr_constants_fold(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API int
+sfgsym_expr_normalize_add_sub(struct sfgsym_expr* expr);
+
+SFGSYM_PUBLIC_API int
+sfgsym_expr_normalize_mul_div(struct sfgsym_expr* expr);
+
+/*!
+ * @brief Tries to collect terms sharing common variables.
+ *
+ * Examples:
+ *   a + a  -> 2a
+ *   2ab + a - b - 3ab + 2a  ->  -ab + 3a - b
+ *
+ * Assumptions:
+ *  - Chains of additions/subtractions are normalized. @see sfgsym_expr_normalize_add_sub
+ *  - Chains of multiplications/divisions are normalized. @see sfgsym_expr_normalize_mul_div
+ *    + Constant factors are expected to exist in child[0], and all other
+ *      factors in child[1]
+ */
+SFGSYM_PUBLIC_API struct sfgsym_expr*
+sfgsym_expr_collect_common_terms(struct sfgsym_expr* expr);
 
 C_END

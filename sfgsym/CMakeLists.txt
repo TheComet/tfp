@@ -127,7 +127,9 @@ set (SFGSYM_SOURCES
     "src/sfg/path.c"
     "src/symbolic/expression.c"
     "src/symbolic/expression_eval.c"
-    "src/symbolic/expression_fold_constants.c"
+    "src/symbolic/expression_constant_fold.c"
+    "src/symbolic/expression_normalize.c"
+    "src/symbolic/expression_factor.c"
     "src/symbolic/subs_table.c"
     "src/util/log.c"
     "src/init.c")
@@ -142,6 +144,8 @@ set (SFGSYM_PARSER_SOURCES
 set (SFGSYM_TEST_SOURCES
     "tests/src/test_expression.cpp"
     "tests/src/test_expression_parser.cpp"
+    "tests/src/test_expression_factor_add_sub.cpp"
+    "tests/src/test_expression_simplify_redundant_ops.cpp"
     "tests/src/test_algo_find_loops.cpp"
     "tests/src/test_algo_find_paths.cpp"
     "tests/src/test_algo_mason.cpp"

@@ -4,11 +4,11 @@
 
 /* ------------------------------------------------------------------------- */
 void
-sfgsym_expr_fold_constants(struct sfgsym_expr* expr)
+sfgsym_expr_constants_fold(struct sfgsym_expr* expr)
 {
     int i, child_count = sfgsym_expr_child_count(expr);
     for (i = 0; i != child_count; ++i)
-        sfgsym_expr_fold_constants(expr->child[i]);
+        sfgsym_expr_constants_fold(expr->child[i]);
 
     /* child count might have changed */
     child_count = sfgsym_expr_child_count(expr);
